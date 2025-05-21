@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/src/deps/Clipper2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/admesh" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/libigl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/libnest2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/libnoise" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/nlopt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/deps/qhull" vcs="Git" />
+  </component>
+</project>
