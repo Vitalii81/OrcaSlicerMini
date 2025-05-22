@@ -493,13 +493,8 @@ std::tuple<std::string, std::string, std::string> split_file_path(const std::str
     return std::make_tuple(directory, filename, extension);
 }
 
-/**
- * Main entry point for the slicing application
- * @param argc Argument count
- * @param argv Argument values
- * @return Exit status code
- */
-int main(int argc, char** argv) {
+int orca_slicer(int argc, char** argv)
+{
     if (argc < 2) {
         cerr << "Usage: " << argv[0] << " <path_to_stl> [layer_height]\n";
         return EXIT_FAILURE;
@@ -518,6 +513,7 @@ int main(int argc, char** argv) {
 
     // Perform the slicing operation
     auto print = slicing_stl(stl_path.c_str(), layer_height );
+
     if (!print) return EXIT_FAILURE;
 
     // Prepare output directory
@@ -533,4 +529,32 @@ int main(int argc, char** argv) {
     cout << "Read Bin:\n";
     auto rx = read_layers(path_n, true);
     return EXIT_SUCCESS;
+
+}
+
+/**
+ * Main entry point for the slicing application
+ * @param argc Argument count
+ * @param argv Argument values
+ * @return Exit status code
+ */
+int main(int argc, char** argv) {
+    cout << "--- Stated Orca Slicer App ---" << endl;
+    if (argc  == 1) // When no argument
+    {
+        cout << "--- Usage: " << argv[0] << " <path_to_stl> [layer_height] ---\n";
+        cout << "Test slicing model cube.stl\n";
+        char* _argv[] = {
+            "program_name",              // argv[0] — умовна назва програми
+            "/home/vitalii/Desktop/Slice3rCore/3dModel/cube.stl",
+            "0.4"
+        };
+        int _argc = sizeof(_argv) / sizeof(_argv[0]);
+
+        return orca_slicer( _argc, _argv);
+    }else
+    {
+        return orca_slicer( argc, argv);
+    }
+
 }
