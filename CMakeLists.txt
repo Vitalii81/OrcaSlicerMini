@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
 
-if (APPLE)
-    # if CMAKE_OSX_DEPLOYMENT_TARGET is not set, set it to 11.3
-    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "11.3" CACHE STRING "Minimum OS X deployment version" FORCE)
-    endif ()
-    message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
-endif ()
-
 project(OrcaSlicer)
 
 #include("version.inc")
@@ -62,21 +54,6 @@ set(OPENVDB_FIND_MODULE_PATH "" CACHE PATH "Path to OpenVDB installation's find 
 # set(SLIC3R_GTK "2" CACHE STRING "GTK version to use with wxWidgets on Linux")
 
 set(IS_CROSS_COMPILE FALSE)
-
-if (APPLE)
-    set(CMAKE_FIND_FRAMEWORK LAST)
-    set(CMAKE_FIND_APPBUNDLE LAST)
-    list(FIND CMAKE_OSX_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR} _arch_idx)
-    if (CMAKE_OSX_ARCHITECTURES AND _arch_idx LESS 0)
-        set(IS_CROSS_COMPILE TRUE)
-    endif ()
-    if (CMAKE_MACOSX_BUNDLE)
-        set(CMAKE_INSTALL_RPATH @executable_path/../Frameworks)
-    endif()
-    SET(CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "com.softfever3d.orca-slicer")
-
-    message(STATUS "Orca: IS_CROSS_COMPILE: ${IS_CROSS_COMPILE}")
-endif ()
 
 # Proposal for C++ unit tests and sandboxes
 # option(SLIC3R_BUILD_SANDBOXES   "Build development sandboxes" OFF)
@@ -225,15 +202,6 @@ if(WIN32)
     endif()
 endif()
 
-if (APPLE)
-    message("OS X SDK Path: ${CMAKE_OSX_SYSROOT}")
-    if (CMAKE_OSX_DEPLOYMENT_TARGET)
-        message("OS X Deployment Target: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
-    else ()
-        message("OS X Deployment Target: (default)")
-    endif ()
-endif ()
-
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(PkgConfig REQUIRED)
 
@@ -339,11 +307,6 @@ if (SLIC3R_ASAN)
     endif ()
 endif ()
 
-if (APPLE)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=partial-availability -Werror=unguarded-availability -Werror=unguarded-availability-new")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=partial-availability -Werror=unguarded-availability -Werror=unguarded-availability-new")
-endif ()
-
 if(MSVC)
 # 添加编译选项，忽略警告 C4305 （格式转换截断）
 add_compile_options(/wd4305)
@@ -434,11 +397,6 @@ find_package(Boost 1.83.0 REQUIRED COMPONENTS system filesystem thread log log_s
 
 add_library(boost_libs INTERFACE)
 add_library(boost_headeronly INTERFACE)
-
-if (APPLE)
-    # BOOST_ASIO_DISABLE_KQUEUE : prevents a Boost ASIO bug on OS X: https://svn.boost.org/trac/boost/ticket/5339
-    target_compile_definitions(boost_headeronly INTERFACE BOOST_ASIO_DISABLE_KQUEUE)
-endif()
 
 if(NOT SLIC3R_STATIC)
     target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
@@ -541,7 +499,7 @@ if (NOT EXPAT_FOUND)
     set(EXPAT_LIBRARIES expat)
 endif ()
 
-find_package(PNG REQUIRED)
+#find_package(PNG REQUIRED)
 
 set(OpenGL_GL_PREFERENCE "LEGACY")
 find_package(OpenGL REQUIRED)

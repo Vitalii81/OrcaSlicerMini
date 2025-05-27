@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/Clipper2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/admesh" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/libigl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/libnest2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/libnoise" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/nlopt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__src/deps/qhull" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/deps/Clipper2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/deps/admesh" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/deps/cereal" vcs="Git" />
