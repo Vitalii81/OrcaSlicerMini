@@ -301,8 +301,10 @@ Model Model::read_from_file(const std::string&                                  
     //BBS: remove the old .amf.xml files
     //else if (boost::algorithm::iends_with(input_file, ".amf") || boost::algorithm::iends_with(input_file, ".amf.xml"))
     else if (boost::algorithm::iends_with(input_file, ".amf"))
+    {
         //BBS: is_xxx is used for is_inches when load amf
-        result = load_amf(input_file.c_str(), config, config_substitutions, &model, is_xxx);
+        //        result = load_amf(input_file.c_str(), config, config_substitutions, &model, is_xxx);
+    }
     else if (boost::algorithm::iends_with(input_file, ".3mf"))
         //BBS: add part plate related logic
         // BBS: backup & restore
@@ -381,7 +383,9 @@ Model Model::read_from_archive(const std::string& input_file, DynamicPrintConfig
         }
     }
     else if (boost::algorithm::iends_with(input_file, ".zip.amf"))
-        result = load_amf(input_file.c_str(), config, config_substitutions, &model, &is_bbl_3mf);
+    {
+     //   result = load_amf(input_file.c_str(), config, config_substitutions, &model, &is_bbl_3mf);
+    }
     else
         throw Slic3r::RuntimeError(_L("Unknown file format. Input file must have .3mf or .zip.amf extension."));
 

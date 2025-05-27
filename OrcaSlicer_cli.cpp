@@ -5,6 +5,7 @@
 #include <libslic3r/PrintConfig.hpp>
 #include <libslic3r/Point.hpp>
 #include <libslic3r/Layer.hpp>
+#include "OrcaSlicer_cli.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -21,7 +22,6 @@
 #include <sys/types.h>
 #include <signal.h>
 
-
 using namespace Slic3r;
 using namespace std;
 
@@ -29,7 +29,7 @@ using namespace std;
  * Logs a processing step message to stdout
  * @param msg The message to log
  */
-void log_step(const char* msg) { std::cout << "=== " << msg << " ===" << std::endl; }
+void log(const char* msg) { std::cout << "=== " << msg << " ===" << std::endl; }
 
 /**
  * Signal handler for critical errors
@@ -398,22 +398,52 @@ SlicingData collect_layers_data(const Slic3r::Print& print)
  * Performs STL file slicing with given parameters
  * @param path Path to the STL file
  * @param layer_height Layer height in mm
- * @return Unique pointer to the Print object or nullptr on failure
+ * @return Unique pointer to the Print object or nullptr on failure`
  */
-std::unique_ptr<Slic3r::Print> slicing_stl(const char* path, float layer_height = 0.1)
+std::unique_ptr<Slic3r::Print> slicing_file(const char* path, float layer_height, TypeFile type)
 {
     auto print = std::make_unique<Slic3r::Print>();
+    Slic3r::Model           model;
+    Slic3r::TriangleMesh    mesh;
+    Slic3r::ModelObject*    obj = model.add_object("Object1", path, std::move(mesh));
+    Slic3r::ModelInstance*  instance = obj->add_instance();
 
-    log_step("Loading model");
-    Slic3r::TriangleMesh mesh;
+    log("Loading model");
+if (type == TypeSTL)
+{
     if (!mesh.ReadSTLFile(path, true, nullptr)) {
         std::cerr << "ERROR: Failed to read STL file!" << std::endl;
         return nullptr;
     }
+} else if (type == TypeStep)
+{
+    log("Loading STEP model");
 
-    Slic3r::Model model;
-    Slic3r::ModelObject* obj = model.add_object("Object1", path, std::move(mesh));
-    Slic3r::ModelInstance* instance = obj->add_instance();
+    model = Slic3r::Model::read_from_step(
+       path,
+       Slic3r::LoadStrategy::Default,
+       nullptr, // step progress callback (optional)
+       nullptr, // isUtf8 callback (optional)
+       nullptr, // step_mesh_fn
+       0.01,    // linear_defletion
+       20.0,    // angle_defletion
+       false    // is_split_compound
+   );
+
+    if (model.objects.empty()) {
+        std::cerr << "ERROR: Failed to read STEP file or model is empty!" << std::endl;
+        return nullptr;
+    }
+
+    for (const auto &object : model.objects) {
+        mesh.merge(object->raw_mesh());
+    }
+
+    if (mesh.empty()) {
+        std::cerr << "ERROR: Resulting mesh is empty after conversion!" << std::endl;
+        return nullptr;
+    }
+}
 
     const auto bbox = obj->raw_bounding_box();
     const auto center = bbox.center();
@@ -433,7 +463,7 @@ std::unique_ptr<Slic3r::Print> slicing_stl(const char* path, float layer_height 
         return nullptr;
     }
 
-    log_step("Setting up config");
+    log("Setting up config");
     Slic3r::DynamicPrintConfig config = Slic3r::DynamicPrintConfig::full_print_config();
     config.set_key_value("layer_height", new Slic3r::ConfigOptionFloat(layer_height));
     config.set_key_value("first_layer_height", new Slic3r::ConfigOptionFloatOrPercent(layer_height, false));
@@ -462,7 +492,7 @@ std::unique_ptr<Slic3r::Print> slicing_stl(const char* path, float layer_height 
         return nullptr;
     }
 
-    log_step("Slicing (slice, perimeter, infill)");
+    log("Slicing (slice, perimeter, infill)");
     try {
         print->process();
     } catch (const std::exception& e) {
@@ -496,14 +526,22 @@ std::tuple<std::string, std::string, std::string> split_file_path(const std::str
 int orca_slicer(int argc, char** argv)
 {
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <path_to_stl> [layer_height]\n";
+        cerr << "Usage: " << argv[0] << " <path_to_stl> [layer_height] [type:stl,step]\n";
         return EXIT_FAILURE;
     }
-    string stl_path = argv[1];
-    auto [dir, name, ext] = split_file_path(stl_path);
 
-    string    out_path = (argc >= 4) ? dir:"./";
+    string path = argv[1];
+
+    auto [dir, name, ext] = split_file_path(path);
+
     float layer_height = (argc >= 3) ? stof(argv[2]) : 0.2f;
+
+    TypeFile    type_s = TypeSTL;
+    if (argc >= 4)
+    {
+        if (strstr(argv[3], "step") != nullptr)
+             type_s = TypeStep;
+    }
 
     cout << "layer_height: " << layer_height << endl;
 
@@ -512,7 +550,7 @@ int orca_slicer(int argc, char** argv)
     signal(SIGABRT, signal_handler);
 
     // Perform the slicing operation
-    auto print = slicing_stl(stl_path.c_str(), layer_height );
+    auto print = slicing_file(path.c_str(), layer_height, type_s );
 
     if (!print) return EXIT_FAILURE;
 
@@ -542,12 +580,13 @@ int main(int argc, char** argv) {
     cout << "--- Stated Orca Slicer App ---" << endl;
     if (argc  == 1) // When no argument
     {
-        cout << "--- Usage: " << argv[0] << " <path_to_stl> [layer_height] ---\n";
+        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] [type] ---\n";
         cout << "Test slicing model cube.stl\n";
         char* _argv[] = {
             "program_name",              // argv[0] — умовна назва програми
             "/home/vitalii/Desktop/Slice3rCore/3dModel/cube.stl",
-            "0.4"
+            "0.4",
+            "stl"
         };
         int _argc = sizeof(_argv) / sizeof(_argv[0]);
 
