@@ -37,37 +37,109 @@ void log(const char* msg) { std::cout << "=== " << msg << " ===" << std::endl; }
  */
 void signal_handler(int signum) { std::cerr << "Signal " << signum << " caught!" << std::endl; std::exit(signum); }
 
-/**
- * Structure representing a 2D point with float coordinates
- */
-struct Point_ {
-    float x, y;  // X and Y coordinates
-};
 
-/**
- * Structure representing a contour/polygon composed of points
- */
-struct Contour {
-    std::vector<Point_> points;  // Collection of points forming the contour
-    bool is_outer = true;  // true — outer perimeter, false — hole (inner)
-};
+///////////////////////////////////////////////////////////////////////////
 
-/**
- * Structure representing data for a single layer
- */
-struct LayerData {
-    uint32_t __size;             // Size of layer data in bytes (for serialization)
-    uint32_t layer_id;           // Identifier of the layer
-    double z_height;             // Z-coordinate/height of the layer
-    std::vector<Contour> perimeters;  // Collection of contours (outer perimeter and holes)
-};
+TypeFile get_file_type(const std::string& path) {
+    std::string ext = path.substr(path.find_last_of(".") + 1);
+    if (ext == "stl") return TypeSTL;
+    if (ext == "step" || ext == "stp") return TypeSTEP;
+    if (ext == "3mf") return Type3MF;
+    if (ext == "obj") return TypeOBJ;
+    return TypeUnknown;
+}
 
-/**
- * Structure containing all slicing data for a model
- */
-struct SlicingData {
-    std::vector<LayerData> layers;  // Collection of all layers
-};
+TriangleMesh load_model(const std::string& path) {
+    TypeFile type = get_file_type(path);
+    TriangleMesh mesh;
+    Model model;
+
+    DynamicPrintConfig config;
+    ConfigSubstitutionContext config_substitutions(ForwardCompatibilitySubstitutionRule::Disable);
+    Semver file_version;
+
+    bool repair = true;
+    bool is_bbs_3mf = false; // має бути оголошено на рівні функції, бо використовується в кількох місцях
+
+    try {
+        switch (type) {
+
+            case TypeSTL:
+                if (!mesh.ReadSTLFile(path.c_str(), repair)) {
+                    std::cerr << "Failed to read STL file";
+                    throw std::runtime_error("STL read error");
+                }
+                break;
+
+            case TypeSTEP:
+                model = Model::read_from_step(
+                    path,
+                    LoadStrategy::Default,
+                    nullptr, nullptr, nullptr,
+                    0.01, 20.0, false
+                );
+                if (model.objects.empty())
+                    throw std::runtime_error("Empty STEP model");
+
+                mesh = model.objects.front()->raw_mesh();
+                break;
+
+            case Type3MF:
+                model = Model::read_from_file(
+                    path,
+                    &config,
+                    &config_substitutions,
+                    LoadStrategy::AddDefaultInstances,
+                    nullptr, // plate_data
+                    nullptr, // project_presets
+                    &is_bbs_3mf,
+                    &file_version,
+                    nullptr, // Import3mfProgressFn
+                    nullptr, // ImportstlProgressFn
+                    nullptr, // BBLProject*
+                    0,       // plate_id
+                    nullptr  // ObjImportColorFn
+                );
+
+                if (model.objects.empty())
+                    throw std::runtime_error("Empty 3MF model");
+
+                mesh = model.objects.front()->raw_mesh();
+                break;
+
+            case TypeOBJ:
+                model = Model::read_from_file(
+                    path,
+                    &config,
+                    &config_substitutions,
+                    LoadStrategy::AddDefaultInstances,
+                    nullptr, // plate_data
+                    nullptr, // project_presets
+                    &is_bbs_3mf,
+                    &file_version,
+                    nullptr, // Import3mfProgressFn
+                    nullptr, // ImportstlProgressFn
+                    nullptr, // BBLProject*
+                    0,       // plate_id
+                    nullptr  // ObjImportColorFn
+                );
+
+                if (model.objects.empty())
+                    throw std::runtime_error("Empty OBJ model");
+
+                mesh = model.objects.front()->raw_mesh();
+                break;
+
+            default:
+                throw std::runtime_error("Unsupported file format");
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << " (" << path << ")" << std::endl;
+        return TriangleMesh(); // Повертаємо порожній меш у разі помилки
+    }
+
+    return mesh;
+}
 
 /**
  * Prints detailed information about a single layer
@@ -400,50 +472,16 @@ SlicingData collect_layers_data(const Slic3r::Print& print)
  * @param layer_height Layer height in mm
  * @return Unique pointer to the Print object or nullptr on failure`
  */
-std::unique_ptr<Slic3r::Print> slicing_file(const char* path, float layer_height, TypeFile type)
+std::unique_ptr<Slic3r::Print> slicing_file(const char* path, float layer_height)
 {
+    log("Loading model");
+    Slic3r::TriangleMesh    mesh = load_model( path );
+
     auto print = std::make_unique<Slic3r::Print>();
     Slic3r::Model           model;
-    Slic3r::TriangleMesh    mesh;
+
     Slic3r::ModelObject*    obj = model.add_object("Object1", path, std::move(mesh));
     Slic3r::ModelInstance*  instance = obj->add_instance();
-
-    log("Loading model");
-if (type == TypeSTL)
-{
-    if (!mesh.ReadSTLFile(path, true, nullptr)) {
-        std::cerr << "ERROR: Failed to read STL file!" << std::endl;
-        return nullptr;
-    }
-} else if (type == TypeStep)
-{
-    log("Loading STEP model");
-
-    model = Slic3r::Model::read_from_step(
-       path,
-       Slic3r::LoadStrategy::Default,
-       nullptr, // step progress callback (optional)
-       nullptr, // isUtf8 callback (optional)
-       nullptr, // step_mesh_fn
-       0.01,    // linear_defletion
-       20.0,    // angle_defletion
-       false    // is_split_compound
-   );
-
-    if (model.objects.empty()) {
-        std::cerr << "ERROR: Failed to read STEP file or model is empty!" << std::endl;
-        return nullptr;
-    }
-
-    for (const auto &object : model.objects) {
-        mesh.merge(object->raw_mesh());
-    }
-
-    if (mesh.empty()) {
-        std::cerr << "ERROR: Resulting mesh is empty after conversion!" << std::endl;
-        return nullptr;
-    }
-}
 
     const auto bbox = obj->raw_bounding_box();
     const auto center = bbox.center();
@@ -526,7 +564,7 @@ std::tuple<std::string, std::string, std::string> split_file_path(const std::str
 int orca_slicer(int argc, char** argv)
 {
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <path_to_stl> [layer_height] [type:stl,step]\n";
+        cerr << "Usage: " << argv[0] << " <path_to_stl> [layer_height]\n";
         return EXIT_FAILURE;
     }
 
@@ -536,13 +574,6 @@ int orca_slicer(int argc, char** argv)
 
     float layer_height = (argc >= 3) ? stof(argv[2]) : 0.2f;
 
-    TypeFile    type_s = TypeSTL;
-    if (argc >= 4)
-    {
-        if (strstr(argv[3], "step") != nullptr)
-             type_s = TypeStep;
-    }
-
     cout << "layer_height: " << layer_height << endl;
 
     // Set up signal handlers for critical errors
@@ -550,7 +581,7 @@ int orca_slicer(int argc, char** argv)
     signal(SIGABRT, signal_handler);
 
     // Perform the slicing operation
-    auto print = slicing_file(path.c_str(), layer_height, type_s );
+    auto print = slicing_file(path.c_str(), layer_height );
 
     if (!print) return EXIT_FAILURE;
 
@@ -580,10 +611,10 @@ int main(int argc, char** argv) {
     cout << "--- Stated Orca Slicer App ---" << endl;
     if (argc  == 1) // When no argument
     {
-        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] [type] ---\n";
+        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] ---\n";
         cout << "Test slicing model cube.stl\n";
         char* _argv[] = {
-            "program_name",              // argv[0] — умовна назва програми
+            "program_name",              // argv[0] — name of app
             "/home/vitalii/Desktop/Slice3rCore/3dModel/cube.stl",
             "0.4",
             "stl"
