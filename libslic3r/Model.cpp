@@ -3,8 +3,8 @@
 #include "BuildVolume.hpp"
 #include "Exception.hpp"
 #include "Model.hpp"
-#include "ModelArrange.hpp"
-#include "Arrange.hpp"
+// #include "ModelArrange.hpp"
+// #include "Arrange.hpp"
 #include "Geometry.hpp"
 #include "MTUtils.hpp"
 #include "TriangleMeshSlicer.hpp"
@@ -13,7 +13,7 @@
 #include "Format/AMF.hpp"
 #include "Format/svg.hpp"
 // BBS
-#include "FaceDetector.hpp"
+//#include "FaceDetector.hpp"
 
 #include "libslic3r/Geometry/ConvexHull.hpp"
 
@@ -25,10 +25,10 @@
 #include <boost/log/trivial.hpp>
 #include <boost/nowide/iostream.hpp>
 
-#include "SVG.hpp"
+//#include "SVG.hpp"
 #include <Eigen/Dense>
 #include <functional>
-#include "GCodeWriter.hpp"
+//#include "GCodeWriter.hpp"
 
 // BBS: for segment
 #include "MeshBoolean.hpp"
@@ -76,17 +76,17 @@ Model& Model::assign_copy(const Model &rhs)
     // BBS
     this->plates_custom_gcodes = rhs.plates_custom_gcodes;
     this->curr_plate_index = rhs.curr_plate_index;
-    this->calib_pa_pattern.reset();
-
-    if (rhs.calib_pa_pattern) {
-        this->calib_pa_pattern = std::make_unique<CalibPressureAdvancePattern>(
-            CalibPressureAdvancePattern(*rhs.calib_pa_pattern)
-        );
-    }
-
-    if (rhs.calib_pa_pattern) {
-        this->calib_pa_pattern = std::make_unique<CalibPressureAdvancePattern>(CalibPressureAdvancePattern(*rhs.calib_pa_pattern));
-    }
+    // this->calib_pa_pattern.reset();
+    //
+    // if (rhs.calib_pa_pattern) {
+    //     this->calib_pa_pattern = std::make_unique<CalibPressureAdvancePattern>(
+    //         CalibPressureAdvancePattern(*rhs.calib_pa_pattern)
+    //     );
+    // }
+    //
+    // if (rhs.calib_pa_pattern) {
+    //     this->calib_pa_pattern = std::make_unique<CalibPressureAdvancePattern>(CalibPressureAdvancePattern(*rhs.calib_pa_pattern));
+    // }
 
     // BBS: for design info
     this->design_info = rhs.design_info;
@@ -123,8 +123,8 @@ Model& Model::assign_copy(Model &&rhs)
     // BBS
     this->plates_custom_gcodes = std::move(rhs.plates_custom_gcodes);
     this->curr_plate_index = rhs.curr_plate_index;
-    this->calib_pa_pattern.reset();
-    this->calib_pa_pattern.swap(rhs.calib_pa_pattern);
+    // this->calib_pa_pattern.reset();
+    // this->calib_pa_pattern.swap(rhs.calib_pa_pattern);
 
     //BBS: add auxiliary path logic
     // BBS: backup, all in one temp dir
@@ -350,8 +350,8 @@ Model Model::read_from_file(const std::string&                                  
     //BBS
     //CustomGCode::update_custom_gcode_per_print_z_from_config(model.custom_gcode_per_print_z, config);
     //BBS
-    for (auto& plate_gcodes : model.plates_custom_gcodes)
-        CustomGCode::check_mode_for_custom_gcode_per_print_z(plate_gcodes.second);
+    // for (auto& plate_gcodes : model.plates_custom_gcodes)
+    //     CustomGCode::check_mode_for_custom_gcode_per_print_z(plate_gcodes.second);
 
     sort_remove_duplicates(config_substitutions->substitutions);
     return model;
@@ -428,8 +428,8 @@ Model Model::read_from_archive(const std::string& input_file, DynamicPrintConfig
     }
 
     //BBS
-    for (auto& plate_gcodes : model.plates_custom_gcodes)
-        CustomGCode::check_mode_for_custom_gcode_per_print_z(plate_gcodes.second);
+    // for (auto& plate_gcodes : model.plates_custom_gcodes)
+    //     CustomGCode::check_mode_for_custom_gcode_per_print_z(plate_gcodes.second);
 
     BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ":" << __LINE__ << boost::format("import 3mf IMPORT_STAGE_CHECK_MODE_GCODE\n");
     if (proFn) {
@@ -1045,7 +1045,7 @@ void Model::load_from(Model& model)
     model.design_info.reset();
     model.model_info.reset();
     model.profile_info.reset();
-    model.calib_pa_pattern.reset();
+    //model.calib_pa_pattern.reset();
 }
 
 // BBS: backup
@@ -1116,7 +1116,7 @@ ModelObject& ModelObject::assign_copy(const ModelObject &rhs)
     this->sla_support_points          = rhs.sla_support_points;
     this->sla_points_status           = rhs.sla_points_status;
     this->sla_drain_holes             = rhs.sla_drain_holes;
-    this->brim_points                 = rhs.brim_points;
+    //this->brim_points                 = rhs.brim_points;
     this->layer_config_ranges         = rhs.layer_config_ranges;
     this->layer_height_profile        = rhs.layer_height_profile;
     this->printable                   = rhs.printable;
@@ -1156,7 +1156,7 @@ ModelObject& ModelObject::assign_copy(ModelObject &&rhs)
     this->sla_support_points          = std::move(rhs.sla_support_points);
     this->sla_points_status           = std::move(rhs.sla_points_status);
     this->sla_drain_holes             = std::move(rhs.sla_drain_holes);
-    this->brim_points                 = std::move(brim_points);
+    //this->brim_points                 = std::move(brim_points);
     this->layer_config_ranges         = std::move(rhs.layer_config_ranges);
     this->layer_height_profile        = std::move(rhs.layer_height_profile);
     this->printable                   = std::move(rhs.printable);
@@ -1795,7 +1795,7 @@ void ModelObject::convert_units(ModelObjectPtrs& new_objects, ConversionType con
     new_object->sla_support_points.clear();
     new_object->sla_drain_holes.clear();
     new_object->sla_points_status = sla::PointsStatus::NoPoints;
-    new_object->brim_points.clear();
+    //new_object->brim_points.clear();
     new_object->clear_volumes();
     new_object->input_file.clear();
 
@@ -1947,7 +1947,7 @@ static void invalidate_translations(ModelObject* object, const ModelInstance* sr
         object->center_around_origin();
     }
 }
-
+#if 0
 void ModelObject::split(ModelObjectPtrs* new_objects)
 {
     std::vector<TriangleMesh> all_meshes;
@@ -2065,7 +2065,7 @@ void ModelObject::split(ModelObjectPtrs* new_objects)
         }
     }
 }
-
+#endif
 
 void ModelObject::merge()
 {
@@ -2100,7 +2100,7 @@ ModelObjectPtrs ModelObject::merge_volumes(std::vector<int>& vol_indeces)
     upper->sla_support_points.clear();
     upper->sla_drain_holes.clear();
     upper->sla_points_status = sla::PointsStatus::NoPoints;
-    upper->brim_points.clear();
+    //upper->brim_points.clear();
     upper->clear_volumes();
     upper->input_file.clear();
 
@@ -2896,7 +2896,7 @@ void Model::setPrintSpeedTable(const DynamicPrintConfig& config, const PrintConf
             exclude_poly.points.clear();
         }
     }
-    printSpeedMap.bed_poly = diff({ printSpeedMap.bed_poly }, exclude_polys)[0];
+   // printSpeedMap.bed_poly = diff({ printSpeedMap.bed_poly }, exclude_polys)[0];
 }
 
 // find temperature of heatend and bed and matierial of an given extruder
@@ -3251,57 +3251,57 @@ double ModelInstance::get_auto_brim_width() const
     return get_auto_brim_width(DeltaT, adhcoeff);
 }
 
-void ModelInstance::get_arrange_polygon(void *ap, const Slic3r::DynamicPrintConfig &config_global) const
-{
-//    static const double SIMPLIFY_TOLERANCE_MM = 0.1;
-
-    Vec3d rotation = get_rotation();
-    rotation.z()   = 0.;
-    Geometry::Transformation t(m_transformation);
-    t.set_offset(get_offset().z() * Vec3d::UnitZ());
-    t.set_rotation(rotation);
-    Polygon p = get_object()->convex_hull_2d(t.get_matrix());
-
-//    if (!p.points.empty()) {
-//        Polygons pp{p};
-//        pp = p.simplify(scaled<double>(SIMPLIFY_TOLERANCE_MM));
-//        if (!pp.empty()) p = pp.front();
-//    }
-
-    arrangement::ArrangePolygon& ret = *(arrangement::ArrangePolygon*)ap;
-    ret.poly.contour = std::move(p);
-    ret.translation  = Vec2crd{scaled(get_offset(X)), scaled(get_offset(Y))};
-    ret.rotation     = get_rotation(Z);
-
-    //BBS: add materials related information
-    ModelVolume *volume = NULL;
-    for (size_t i = 0; i < object->volumes.size(); ++i) {
-        if (object->volumes[i]->is_model_part()) {
-            volume = object->volumes[i];
-            if (!volume) {
-                BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << "invalid object, should not happen";
-                return;
-            }
-            auto ve = object->volumes[i]->get_extruders();
-            ret.extrude_ids.insert(ret.extrude_ids.end(), ve.begin(), ve.end());
-        }
-    }
-
-    // get per-object support extruders
-    auto op = object->get_config_value<ConfigOptionBool>(config_global, "enable_support");
-    bool is_support_enabled = op && op->getBool();
-    if (is_support_enabled) {
-        auto op1 = object->get_config_value<ConfigOptionInt>(config_global, "support_filament");
-        auto op2 = object->get_config_value<ConfigOptionInt>(config_global, "support_interface_filament");
-        int extruder_id;
-        // id==0 means follow previous material, so need not be recorded
-        if (op1 && (extruder_id = op1->getInt()) > 0) ret.extrude_ids.push_back(extruder_id);
-        if (op2 && (extruder_id = op2->getInt()) > 0) ret.extrude_ids.push_back(extruder_id);
-    }
-
-    if (ret.extrude_ids.empty()) //the default extruder
-        ret.extrude_ids.push_back(1);
-}
+// void ModelInstance::get_arrange_polygon(void *ap, const Slic3r::DynamicPrintConfig &config_global) const
+// {
+// //    static const double SIMPLIFY_TOLERANCE_MM = 0.1;
+//
+//     Vec3d rotation = get_rotation();
+//     rotation.z()   = 0.;
+//     Geometry::Transformation t(m_transformation);
+//     t.set_offset(get_offset().z() * Vec3d::UnitZ());
+//     t.set_rotation(rotation);
+//     Polygon p = get_object()->convex_hull_2d(t.get_matrix());
+//
+// //    if (!p.points.empty()) {
+// //        Polygons pp{p};
+// //        pp = p.simplify(scaled<double>(SIMPLIFY_TOLERANCE_MM));
+// //        if (!pp.empty()) p = pp.front();
+// //    }
+//
+//     arrangement::ArrangePolygon& ret = *(arrangement::ArrangePolygon*)ap;
+//     ret.poly.contour = std::move(p);
+//     ret.translation  = Vec2crd{scaled(get_offset(X)), scaled(get_offset(Y))};
+//     ret.rotation     = get_rotation(Z);
+//
+//     //BBS: add materials related information
+//     ModelVolume *volume = NULL;
+//     for (size_t i = 0; i < object->volumes.size(); ++i) {
+//         if (object->volumes[i]->is_model_part()) {
+//             volume = object->volumes[i];
+//             if (!volume) {
+//                 BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << "invalid object, should not happen";
+//                 return;
+//             }
+//             auto ve = object->volumes[i]->get_extruders();
+//             ret.extrude_ids.insert(ret.extrude_ids.end(), ve.begin(), ve.end());
+//         }
+//     }
+//
+//     // get per-object support extruders
+//     auto op = object->get_config_value<ConfigOptionBool>(config_global, "enable_support");
+//     bool is_support_enabled = op && op->getBool();
+//     if (is_support_enabled) {
+//         auto op1 = object->get_config_value<ConfigOptionInt>(config_global, "support_filament");
+//         auto op2 = object->get_config_value<ConfigOptionInt>(config_global, "support_interface_filament");
+//         int extruder_id;
+//         // id==0 means follow previous material, so need not be recorded
+//         if (op1 && (extruder_id = op1->getInt()) > 0) ret.extrude_ids.push_back(extruder_id);
+//         if (op2 && (extruder_id = op2->getInt()) > 0) ret.extrude_ids.push_back(extruder_id);
+//     }
+//
+//     if (ret.extrude_ids.empty()) //the default extruder
+//         ret.extrude_ids.push_back(1);
+// }
 
 ModelInstanceEPrintVolumeState ModelInstance::calc_print_volume_state(const BuildVolume& build_volume) const
 {
@@ -3586,12 +3586,7 @@ bool model_mmu_segmentation_data_changed(const ModelObject& mo, const ModelObjec
 
 bool model_brim_points_data_changed(const ModelObject& mo, const ModelObject& mo_new)
 {
-    if (mo.brim_points.size() != mo_new.brim_points.size())
-        return true;
-    for (size_t i = 0; i < mo.brim_points.size(); ++i) {
-        if (mo.brim_points[i] != mo_new.brim_points[i])
-            return true;
-    }
+
     return false;
 }
 

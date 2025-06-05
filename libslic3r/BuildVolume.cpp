@@ -2,7 +2,7 @@
 #include "ClipperUtils.hpp"
 #include "TriangleMesh.hpp"
 #include "Geometry/ConvexHull.hpp"
-#include "GCode/GCodeProcessor.hpp"
+//#include "GCode/GCodeProcessor.hpp"
 #include "Point.hpp"
 
 #include <boost/log/trivial.hpp>
@@ -327,6 +327,7 @@ BuildVolume::ObjectState BuildVolume::volume_state_bbox(const BoundingBoxf3& vol
 
 bool BuildVolume::all_paths_inside(const GCodeProcessorResult& paths, const BoundingBoxf3& paths_bbox, bool ignore_bottom) const
 {
+#if 0
     auto move_valid = [](const GCodeProcessorResult::MoveVertex &move) {
         return move.type == EMoveType::Extrude && move.extrusion_role != erCustom && move.width != 0.f && move.height != 0.f;
     };
@@ -364,6 +365,8 @@ bool BuildVolume::all_paths_inside(const GCodeProcessorResult& paths, const Boun
     default:
         return true;
     }
+#endif
+    return false;
 }
 
 template<typename Fn>

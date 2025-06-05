@@ -9,7 +9,7 @@
 #include "ClipperUtils.hpp"
 #include "EdgeGrid.hpp"
 #include "Geometry.hpp"
-#include "SVG.hpp"
+//#include "SVG.hpp"
 #include "PNGReadWrite.hpp"
 
 // #define EDGE_GRID_DEBUG_OUTPUT
@@ -1596,6 +1596,7 @@ std::vector<std::pair<EdgeGrid::Grid::ContourEdge, EdgeGrid::Grid::ContourEdge>>
 // Find all pairs of intersectiong edges from the set of polygons, highlight them in an SVG.
 void export_intersections_to_svg(const std::string &filename, const Polygons &polygons)
 {
+#if 0
 	std::vector<std::pair<EdgeGrid::Grid::ContourEdge, EdgeGrid::Grid::ContourEdge>> intersections = intersecting_edges(polygons);
     BoundingBox bbox = get_extents(polygons);
     SVG svg(filename.c_str(), bbox);
@@ -1627,6 +1628,7 @@ void export_intersections_to_svg(const std::string &filename, const Polygons &po
         svg.draw(edge(intersecting_edges.second), "red", line_width);
     }
     svg.Close();
+#endif
 }
 
 } // namespace Slic3r

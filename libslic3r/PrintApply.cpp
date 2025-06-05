@@ -1032,18 +1032,18 @@ Print::ApplyStatus Print::apply(const Model &model, DynamicPrintConfig new_full_
 	new_full_config.option("filament_settings_id",         true);
 	new_full_config.option("printer_settings_id",          true);
     // BBS
-    int used_filaments = this->extruders(true).size();
-
-    //new_full_config.normalize_fdm(used_filaments);
-    new_full_config.normalize_fdm_1();
-    t_config_option_keys changed_keys = new_full_config.normalize_fdm_2(objects().size(), used_filaments);
-    if (changed_keys.size() > 0) {
-        BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", got changed_keys, size=%1%")%changed_keys.size();
-        for (int i = 0; i < changed_keys.size(); i++)
-        {
-            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", i=%1%, key=%2%")%i %changed_keys[i];
-        }
-    }
+    // int used_filaments = this->extruders(true).size();
+    //
+    //
+    // new_full_config.normalize_fdm_1();
+    // t_config_option_keys changed_keys = new_full_config.normalize_fdm_2(objects().size(), used_filaments);
+    // if (changed_keys.size() > 0) {
+    //     BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", got changed_keys, size=%1%")%changed_keys.size();
+    //     for (int i = 0; i < changed_keys.size(); i++)
+    //     {
+    //         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", i=%1%, key=%2%")%i %changed_keys[i];
+    //     }
+    // }
     const ConfigOption* enable_support_option = new_full_config.option("enable_support");
     if (enable_support_option && enable_support_option->getBool())
         m_support_used = true;
@@ -1102,14 +1102,7 @@ Print::ApplyStatus Print::apply(const Model &model, DynamicPrintConfig new_full_
         //BBS: add more logs
         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(" %1%: found full_config_diff changed.")%__LINE__;
         update_apply_status(this->invalidate_step(psGCodeExport));
-        m_placeholder_parser.clear_config();
-        // Set the profile aliases for the PrintBase::output_filename()
-		m_placeholder_parser.set("print_preset",              new_full_config.option("print_settings_id")->clone());
-		m_placeholder_parser.set("filament_preset",           new_full_config.option("filament_settings_id")->clone());
-		m_placeholder_parser.set("printer_preset",            new_full_config.option("printer_settings_id")->clone());
-		// We want the filament overrides to be applied over their respective extruder parameters by the PlaceholderParser.
-		// see "Placeholders do not respect filament overrides." GH issue #3649
-		m_placeholder_parser.apply_config(filament_overrides);
+
 	    // It is also safe to change m_config now after this->invalidate_state_by_config_options() call.
 	    m_config.apply_only(new_full_config, print_diff, true);
 	    //FIXME use move semantics once ConfigBase supports it.
@@ -1304,7 +1297,7 @@ Print::ApplyStatus Print::apply(const Model &model, DynamicPrintConfig new_full_
                 update_apply_status(this->invalidate_step(psGCodeExport));
             }
             if (brim_points_differ) {
-                model_object.brim_points = model_object_new.brim_points;
+                //model_object.brim_points = model_object_new.brim_points;
                 update_apply_status(this->invalidate_all_steps());
             }
         }
@@ -1471,12 +1464,6 @@ Print::ApplyStatus Print::apply(const Model &model, DynamicPrintConfig new_full_
         if (full_config_diff.empty()) {
             //BBS: previous empty
             BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(" %1%: full_config_diff previous empty, need to apply now.")%__LINE__;
-
-            m_placeholder_parser.clear_config();
-            // Set the profile aliases for the PrintBase::output_filename()
-            m_placeholder_parser.set("print_preset",              new_full_config.option("print_settings_id")->clone());
-            m_placeholder_parser.set("filament_preset",           new_full_config.option("filament_settings_id")->clone());
-            m_placeholder_parser.set("printer_preset",            new_full_config.option("printer_settings_id")->clone());
 
             //m_placeholder_parser.apply_config(filament_overrides);
         }

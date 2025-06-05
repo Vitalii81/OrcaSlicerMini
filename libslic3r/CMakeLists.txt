@@ -16,410 +16,278 @@ if (TARGET OpenVDB::openvdb)
 endif()
 
 set(lisbslic3r_sources
-        ArcFitter.cpp
-        ArcFitter.hpp
-        pchheader.cpp
-        pchheader.hpp
-        AABBTreeIndirect.hpp
-        AABBTreeLines.hpp
-        AABBMesh.hpp
+        ArcFitter.cpp     # Аппроксимация дуг окружностей
+        ArcFitter.hpp     # Заголовок для ArcFitter
+        pchheader.cpp     # Прекомпіляція заголовків
+        pchheader.hpp     # Заголовок для пре-компіляції
+        AABBTreeIndirect.hpp    # Просторова структура AABB (індексована)
+        AABBTreeLines.hpp       # AABB для ліній
+        AABBMesh.hpp            # AABB для трикутної сітки
         AABBMesh.cpp
-        Algorithm/LineSplit.hpp
+        Algorithm/LineSplit.hpp         # Алгоритм поділу ліній
         Algorithm/LineSplit.cpp
-        Algorithm/RegionExpansion.hpp
+        Algorithm/RegionExpansion.hpp   # Розширення регіону (області друку)
         Algorithm/RegionExpansion.cpp
-        AnyPtr.hpp
-        BoundingBox.cpp
+        AnyPtr.hpp              # Універсальний вказівник (type-erased)
+        BoundingBox.cpp         # Визначення прямокутної області об'єкта
         BoundingBox.hpp
-        BridgeDetector.cpp
-        BridgeDetector.hpp
-        FaceDetector.cpp
-        FaceDetector.hpp
-        Brim.cpp
-        Brim.hpp
-        BrimEarsPoint.hpp
-        BuildVolume.cpp
+       # BridgeDetector.cpp      # Визначення мостів (перемичок між точками без опори)
+       # BridgeDetector.hpp
+#        Brim.cpp                # Генерація бріма (обідка)
+#        Brim.hpp
+#        BrimEarsPoint.hpp       # Точки "вух" бріма (для складних фігур)
+        BuildVolume.cpp         # Обробка об'єму будови
         BuildVolume.hpp
-        Circle.cpp
+        Circle.cpp              # Геометрія кола
         Circle.hpp
-        clipper.cpp
+        clipper.cpp             # Boolean-операції над полігонами
         clipper.hpp
-        ClipperUtils.cpp
+        ClipperUtils.cpp        # Утиліти для Clipper
         ClipperUtils.hpp
-        Clipper2Utils.cpp
+        Clipper2Utils.cpp       # Утиліти для Clipper2
         Clipper2Utils.hpp
-        ClipperZUtils.hpp
-        Color.cpp
+        ClipperZUtils.hpp       # 3D Clipper утиліти
+        Color.cpp               # Кольори об'єктів
         Color.hpp
-        Config.cpp
+        Config.cpp              # Конфігураційні параметри
         Config.hpp
-        CurveAnalyzer.cpp
-        CurveAnalyzer.hpp
-        EdgeGrid.cpp
+#        CurveAnalyzer.cpp       # Аналіз кривих для дугової апроксимації
+#        CurveAnalyzer.hpp
+        EdgeGrid.cpp            # Грані у вигляді сітки
         EdgeGrid.hpp
-        ElephantFootCompensation.cpp
-        ElephantFootCompensation.hpp
-        Emboss.cpp
+#        ElephantFootCompensation.cpp   # Компенсація ефекту розтікання
+#        ElephantFootCompensation.hpp
+        Emboss.cpp              # Вирізання/тиснення (embossing)
         Emboss.hpp
-        EmbossShape.hpp
-        enum_bitmask.hpp
-        ExPolygon.cpp
+        EmbossShape.hpp         # Геометрія для emboss
+        enum_bitmask.hpp        # Робота з enum'ами як бітовими масками
+        ExPolygon.cpp           # Розширений полігон (з отворами)
         ExPolygon.hpp
-        ExPolygonSerialize.hpp
-        ExPolygonsIndex.cpp
+        ExPolygonSerialize.hpp  # Серіалізація ExPolygon
+        ExPolygonsIndex.cpp     # Індексування полігонів
         ExPolygonsIndex.hpp
-        Extruder.cpp
+        Extruder.cpp            # Налаштування екструдера
         Extruder.hpp
-        ExtrusionEntity.cpp
-        ExtrusionEntity.hpp
-        ExtrusionEntityCollection.cpp
-        ExtrusionEntityCollection.hpp
-        ExtrusionSimulator.cpp
-        ExtrusionSimulator.hpp
-        FileParserError.hpp
-        Fill/Fill.cpp
-        Fill/Fill.hpp
-        Fill/Fill3DHoneycomb.cpp
-        Fill/Fill3DHoneycomb.hpp
-        Fill/FillAdaptive.cpp
-        Fill/FillAdaptive.hpp
-        Fill/FillBase.cpp
-        Fill/FillBase.hpp
-        Fill/FillConcentric.cpp
-        Fill/FillConcentric.hpp
-        Fill/FillConcentricInternal.cpp
-        Fill/FillConcentricInternal.hpp
-        Fill/FillCrossHatch.cpp
-        Fill/FillCrossHatch.hpp
-        Fill/FillHoneycomb.cpp
-        Fill/FillHoneycomb.hpp
-        Fill/FillGyroid.cpp
-        Fill/FillGyroid.hpp
-        Fill/FillPlanePath.cpp
-        Fill/FillPlanePath.hpp
-        Fill/FillLine.cpp
-        Fill/FillLine.hpp
-        Fill/FillLightning.cpp
-        Fill/FillLightning.hpp
-        Fill/Lightning/DistanceField.cpp
-        Fill/Lightning/DistanceField.hpp
-        Fill/Lightning/Generator.cpp
-        Fill/Lightning/Generator.hpp
-        Fill/Lightning/Layer.cpp
-        Fill/Lightning/Layer.hpp
-        Fill/Lightning/TreeNode.cpp
-        Fill/Lightning/TreeNode.hpp
-        Fill/FillRectilinear.cpp
-        Fill/FillRectilinear.hpp
-        Flow.cpp
-        Flow.hpp
-        FlushVolCalc.cpp
+#        ExtrusionEntity.cpp     # Представлення екструдованих елементів
+#        ExtrusionEntity.hpp
+#        ExtrusionEntityCollection.cpp  # Колекція екструдованих елементів
+#        ExtrusionEntityCollection.hpp
+#        ExtrusionSimulator.cpp  # Симуляція екструзії
+#        ExtrusionSimulator.hpp
+        FileParserError.hpp     # Обробка помилок парсингу файлів
+#        Flow.cpp                # Розрахунок потоку матеріалу
+#        Flow.hpp
+        FlushVolCalc.cpp        # Об'єм виштовхування матеріалу
         FlushVolCalc.hpp
-        format.hpp
-        Format/3mf.cpp
+        format.hpp              # Форматування рядків
+        Format/3mf.cpp          # Парсер 3MF
         Format/3mf.hpp
-        Format/bbs_3mf.cpp
+        Format/bbs_3mf.cpp      # Парсер кастомного Bambu 3MF
         Format/bbs_3mf.hpp
-        # Format/AMF.cpp
-#        Format/AMF.hpp
-        Format/OBJ.cpp
+        Format/OBJ.cpp          # Парсер OBJ-файлів
         Format/OBJ.hpp
         Format/objparser.cpp
         Format/objparser.hpp
-        Format/STEP.cpp
+        Format/STEP.cpp         # Парсер STEP
         Format/STEP.hpp
-        Format/STL.cpp
+        Format/STL.cpp          # Парсер STL
         Format/STL.hpp
-        #Format/SL1.hpp
-        #Format/SL1.cpp
-        Format/svg.hpp
-        #Format/svg.cpp
-        Format/ZipperArchiveImport.hpp
+        Format/ZipperArchiveImport.hpp # Імпорт ZIP-архівів
         Format/ZipperArchiveImport.cpp
-        GCode/ThumbnailData.cpp
+        GCode/ThumbnailData.cpp # Генерація прев’ю (thumbnail)
         GCode/ThumbnailData.hpp
-        GCode/CoolingBuffer.cpp
-        GCode/CoolingBuffer.hpp
-        GCode/FanMover.cpp
-        GCode/FanMover.hpp
-        GCode/PostProcessor.cpp
-        GCode/PostProcessor.hpp
-        GCode/PressureEqualizer.cpp
-        GCode/PressureEqualizer.hpp
-        GCode/PrintExtents.cpp
-        GCode/PrintExtents.hpp
-        GCode/RetractWhenCrossingPerimeters.cpp
-        GCode/RetractWhenCrossingPerimeters.hpp
-        GCode/SmallAreaInfillFlowCompensator.cpp
-        GCode/SmallAreaInfillFlowCompensator.hpp
-        GCode/PchipInterpolatorHelper.cpp
-        GCode/PchipInterpolatorHelper.hpp
-        GCode/AdaptivePAInterpolator.cpp
-        GCode/AdaptivePAInterpolator.hpp
-        GCode/AdaptivePAProcessor.cpp
-        GCode/AdaptivePAProcessor.hpp
-        GCode/SpiralVase.cpp
-        GCode/SpiralVase.hpp
-        GCode/SeamPlacer.cpp
-        GCode/SeamPlacer.hpp
-        GCode/ToolOrdering.cpp
-        GCode/ToolOrdering.hpp
-        GCode/WipeTower.cpp
-        GCode/WipeTower.hpp
-        GCode/WipeTower2.cpp
-        GCode/WipeTower2.hpp
-        GCode/GCodeProcessor.cpp
-        GCode/GCodeProcessor.hpp
-        GCode/AvoidCrossingPerimeters.cpp
-        GCode/AvoidCrossingPerimeters.hpp
-        GCode/ExtrusionProcessor.hpp
-        GCode/ConflictChecker.cpp
-        GCode/ConflictChecker.hpp
-        GCode.cpp
-        GCode.hpp
-        GCodeReader.cpp
-        GCodeReader.hpp
-        # GCodeSender.cpp
-        # GCodeSender.hpp
-        GCodeWriter.cpp
-        GCodeWriter.hpp
-        Geometry.cpp
+        Geometry.cpp            # Геометричні операції
         Geometry.hpp
-        Geometry/Bicubic.hpp
+        Geometry/Bicubic.hpp    # Бікубічна інтерполяція
         Geometry/Circle.cpp
         Geometry/Circle.hpp
-        Geometry/ConvexHull.cpp
+        Geometry/ConvexHull.cpp # Опукла оболонка
         Geometry/ConvexHull.hpp
         Geometry/Curves.hpp
-        Geometry/MedialAxis.cpp
-        Geometry/MedialAxis.hpp
-        Geometry/Voronoi.cpp
-        Geometry/Voronoi.hpp
-        Geometry/VoronoiOffset.cpp
-        Geometry/VoronoiOffset.hpp
-        Geometry/VoronoiUtils.hpp
-        Geometry/VoronoiUtils.cpp
-        Geometry/VoronoiUtilsCgal.cpp
-        Geometry/VoronoiUtilsCgal.hpp
-        Geometry/VoronoiVisualUtils.hpp
-        Int128.hpp
-        KDTreeIndirect.hpp
-        Layer.cpp
+#        Geometry/MedialAxis.cpp # Вісь середини області (тонкі проходи)
+#        Geometry/MedialAxis.hpp
+#        Geometry/Voronoi.cpp    # Діаграма Вороного
+#        Geometry/Voronoi.hpp
+#        Geometry/VoronoiOffset.cpp # Зсув Вороного
+#        Geometry/VoronoiOffset.hpp
+#        Geometry/VoronoiUtils.hpp
+#        Geometry/VoronoiUtils.cpp
+#        Geometry/VoronoiUtilsCgal.cpp # Версія з CGAL
+#        Geometry/VoronoiUtilsCgal.hpp
+#        Geometry/VoronoiVisualUtils.hpp # Візуальні утиліти для дебагу Вороного
+        Int128.hpp              # Робота з 128-бітними цілими
+        KDTreeIndirect.hpp      # KD-дерево для швидкого пошуку
+        Layer.cpp               # Реалізація шару друку
         Layer.hpp
-        LayerRegion.cpp
-        libslic3r.h
-        libslic3r.cpp
+        LayerRegion.cpp         # Область в шарі
+        libslic3r.h             # Основний заголовок
+        libslic3r.cpp           # Основна точка входу
         Line.cpp
         Line.hpp
-        BlacklistedLibraryCheck.cpp
+        BlacklistedLibraryCheck.cpp # Перевірка проблемних бібліотек
         BlacklistedLibraryCheck.hpp
-        LocalesUtils.cpp
+        LocalesUtils.cpp        # Мовна локалізація
         LocalesUtils.hpp
-        CutUtils.cpp
+        CutUtils.cpp            # Нарізка моделей
         CutUtils.hpp
-        Model.cpp
+        Model.cpp               # Представлення моделі
         Model.hpp
-        ModelArrange.hpp
-        ModelArrange.cpp
-        MultiMaterialSegmentation.cpp
-        MultiMaterialSegmentation.hpp
-        Measure.hpp
-        Measure.cpp
-        MeasureUtils.hpp
-        CustomGCode.cpp
-        CustomGCode.hpp
-        Arrange.hpp
-        Arrange.cpp
-        NormalUtils.cpp
+       # ModelArrange.hpp        # Автоматичне розміщення моделей
+       # ModelArrange.cpp
+#        MultiMaterialSegmentation.cpp # Сегментація для мультиматеріалу
+#        MultiMaterialSegmentation.hpp
+       # Measure.hpp             # Вимірювання
+       # Measure.cpp
+       # MeasureUtils.hpp        # Утиліти вимірювань
+       # Arrange.hpp             # Автоматичне компонування моделей
+       # Arrange.cpp
+        NormalUtils.cpp         # Робота з нормалями
         NormalUtils.hpp
-        ObjColorUtils.hpp
-        Orient.hpp
+        ObjColorUtils.hpp       # Обробка кольорів в OBJ
+        Orient.hpp              # Орієнтація моделей
         Orient.cpp
         MultiPoint.cpp
         MultiPoint.hpp
-        MutablePriorityQueue.hpp
-        #    NSVGUtils.cpp
-        #    NSVGUtils.hpp
-        ObjectID.cpp
+        MutablePriorityQueue.hpp # Черга з пріоритетами
+        ObjectID.cpp            # Унікальні ID об'єктів
         ObjectID.hpp
-        ParameterUtils.cpp
+        ParameterUtils.cpp      # Утиліти для параметрів
         ParameterUtils.hpp
-        PerimeterGenerator.cpp
+        PerimeterGenerator.cpp  # Генерація периметрів
         PerimeterGenerator.hpp
-        PlaceholderParser.cpp
-        PlaceholderParser.hpp
-        Platform.cpp
+#        PlaceholderParser.cpp   # Парсинг шаблонів для GCode
+#        PlaceholderParser.hpp
+        Platform.cpp            # Інфо про платформу
         Platform.hpp
-        Point.cpp
+        Point.cpp               # Точка
         Point.hpp
-        Polygon.cpp
+        Polygon.cpp             # Полігони
         Polygon.hpp
-        MutablePolygon.cpp
+        MutablePolygon.cpp      # Змінні полігони
         MutablePolygon.hpp
-        PolygonTrimmer.cpp
+        PolygonTrimmer.cpp      # Обрізка полігонів
         PolygonTrimmer.hpp
-        Polyline.cpp
+        Polyline.cpp            # Ламані лінії
         Polyline.hpp
-        Preset.cpp
+        Preset.cpp              # Пресети (налаштування)
         Preset.hpp
         PresetBundle.cpp
         PresetBundle.hpp
-        ProjectTask.cpp
+        ProjectTask.cpp         # Задачі проєкту
         ProjectTask.hpp
-        PrincipalComponents2D.hpp
+        PrincipalComponents2D.hpp # Головні компоненти для 2D
         PrincipalComponents2D.cpp
-        AppConfig.cpp
+        AppConfig.cpp           # Глобальна конфігурація
         AppConfig.hpp
-        Print.cpp
+        Print.cpp               # Головний клас друку
         Print.hpp
-        PrintApply.cpp
+        PrintApply.cpp          # Застосування параметрів
         PrintBase.cpp
         PrintBase.hpp
-        PrintConfig.cpp
+        PrintConfig.cpp         # Конфігурація принта
         PrintConfig.hpp
-        PrintObject.cpp
-        PrintObjectSlice.cpp
-        PrintRegion.cpp
-        PNGReadWrite.hpp
+        PrintObject.cpp         # Об'єкт для друку
+        PrintObjectSlice.cpp    # Нарізка об'єкта
+        PrintRegion.cpp         # Регіони в об'єкті
+        PNGReadWrite.hpp        # Читання/запис PNG
         PNGReadWrite.cpp
-        QuadricEdgeCollapse.cpp
+        QuadricEdgeCollapse.cpp # Спрощення сітки
         QuadricEdgeCollapse.hpp
-        Semver.cpp
-        ShortEdgeCollapse.cpp
+        ShortEdgeCollapse.cpp   # Колапс коротких ребер
         ShortEdgeCollapse.hpp
-        ShortestPath.cpp
-        ShortestPath.hpp
-        SLAPrint.cpp
-        SLAPrintSteps.cpp
-        SLAPrintSteps.hpp
-        SLAPrint.hpp
-        Slicing.cpp
+#        ShortestPath.cpp        # Найкоротший шлях (graph algo)
+#        ShortestPath.hpp
+#        SLAPrint.cpp            # SLA-друк
+#        SLAPrintSteps.cpp
+#        SLAPrintSteps.hpp
+#        SLAPrint.hpp
+        Slicing.cpp             # Основний slicing
         Slicing.hpp
         SlicesToTriangleMesh.hpp
         SlicesToTriangleMesh.cpp
-        SlicingAdaptive.cpp
+        SlicingAdaptive.cpp     # Адаптивне slicing
         SlicingAdaptive.hpp
-        Support/SupportCommon.cpp
-        Support/SupportCommon.hpp
-        Support/SupportLayer.hpp
-        Support/SupportMaterial.cpp
-        Support/SupportMaterial.hpp
-        Support/SupportSpotsGenerator.cpp
-        Support/SupportSpotsGenerator.hpp
-        Support/TreeSupport.hpp
-        Support/TreeSupport.cpp
-        Support/TreeSupport3D.hpp
-        Support/TreeSupport3D.cpp
-        Support/TreeModelVolumes.hpp
-        Support/TreeModelVolumes.cpp
-        Support/TreeSupportCommon.hpp
-        Support/SupportParameters.hpp
-        PrincipalComponents2D.cpp
-        PrincipalComponents2D.hpp
-        MinimumSpanningTree.hpp
+        MinimumSpanningTree.hpp # Алгоритм MST
         MinimumSpanningTree.cpp
-        Surface.cpp
+        Surface.cpp             # Поверхні друку
         Surface.hpp
         SurfaceCollection.cpp
         SurfaceCollection.hpp
-        SurfaceMesh.hpp
-        SVG.cpp
-        SVG.hpp
-        Technologies.hpp
-        Tesselate.cpp
+        SurfaceMesh.hpp         # Поверхнева сітка
+        Technologies.hpp        # Технології (типи друку)
+        Tesselate.cpp           # Теселяція геометрії
         Tesselate.hpp
-        TextConfiguration.hpp
-        TriangleMesh.cpp
+        TextConfiguration.hpp   # Конфігурація тексту
+        TriangleMesh.cpp        # Меш (сітка)
         TriangleMesh.hpp
-        TriangleMeshSlicer.cpp
+        TriangleMeshSlicer.cpp  # Нарізка сітки
         TriangleMeshSlicer.hpp
-        MeshSplitImpl.hpp
-        TriangulateWall.hpp
+        MeshSplitImpl.hpp       # Поділ мешу
+        TriangulateWall.hpp     # Триангуляція стінок
         TriangulateWall.cpp
-        utils.cpp
+        utils.cpp               # Загальні утиліти
         Utils.hpp
         Time.cpp
         Time.hpp
-        Timer.cpp
-        Timer.hpp
-        Thread.cpp
-        Thread.hpp
-        TriangleSelector.cpp
+        TriangleSelector.cpp    # Вибір трикутників
         TriangleSelector.hpp
-        TriangleSetSampling.cpp
+        TriangleSetSampling.cpp # Семплювання трикутників
         TriangleSetSampling.hpp
         MTUtils.hpp
-        VariableWidth.cpp
-        VariableWidth.hpp
-        Zipper.hpp
+       # VariableWidth.cpp       # Варіативна ширина ліній
+       # VariableWidth.hpp
+        Zipper.hpp              # Робота з ZIP-архівами
         Zipper.cpp
-        MinAreaBoundingBox.hpp
+        MinAreaBoundingBox.hpp  # Мінімальна обгортка (BBox)
         MinAreaBoundingBox.cpp
-        miniz_extension.hpp
+        miniz_extension.hpp     # Підтримка архівації
         miniz_extension.cpp
-        MarchingSquares.hpp
-        Execution/Execution.hpp
-        Execution/ExecutionSeq.hpp
-        Execution/ExecutionTBB.hpp
-        Optimize/Optimizer.hpp
-        Optimize/NLoptOptimizer.hpp
-        Optimize/BruteforceOptimizer.hpp
+        MarchingSquares.hpp     # Алгоритм Marching Squares
+        Execution/Execution.hpp         # Інтерфейс виконання
+        Execution/ExecutionSeq.hpp      # Послідовне виконання
+        Execution/ExecutionTBB.hpp      # Паралельне виконання
+        Optimize/Optimizer.hpp          # Загальна оптимізація
+        Optimize/NLoptOptimizer.hpp     # Оптимізатор NLopt
+        Optimize/BruteforceOptimizer.hpp # Оптимізація перебором
 
-        SLA/IndexedMesh.hpp
-        SLA/IndexedMesh.cpp
+         # Arachne: новий генератор екструзії
+#        Arachne/BeadingStrategy/BeadingStrategy.hpp
+#        Arachne/BeadingStrategy/BeadingStrategy.cpp
+#        Arachne/BeadingStrategy/BeadingStrategyFactory.hpp
+#        Arachne/BeadingStrategy/BeadingStrategyFactory.cpp
+#        Arachne/BeadingStrategy/DistributedBeadingStrategy.hpp
+#        Arachne/BeadingStrategy/DistributedBeadingStrategy.cpp
+#        Arachne/BeadingStrategy/LimitedBeadingStrategy.hpp
+#        Arachne/BeadingStrategy/LimitedBeadingStrategy.cpp
+#        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.hpp
+#        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.cpp
+#        Arachne/BeadingStrategy/RedistributeBeadingStrategy.hpp
+#        Arachne/BeadingStrategy/RedistributeBeadingStrategy.cpp
+#        Arachne/BeadingStrategy/WideningBeadingStrategy.hpp
+#        Arachne/BeadingStrategy/WideningBeadingStrategy.cpp
+#        Arachne/utils/ExtrusionLine.hpp
+#        Arachne/utils/ExtrusionLine.cpp
+#        Arachne/utils/SparseGrid.hpp
+#        Arachne/utils/SquareGrid.hpp
+#        Arachne/utils/SquareGrid.cpp
+#        Arachne/utils/PolylineStitcher.hpp
+#        Arachne/utils/PolylineStitcher.cpp
+#        Arachne/SkeletalTrapezoidation.hpp
+#        Arachne/SkeletalTrapezoidation.cpp
+#        Arachne/SkeletalTrapezoidationGraph.hpp
+#        Arachne/SkeletalTrapezoidationGraph.cpp
+#        Arachne/WallToolPaths.hpp
+#        Arachne/WallToolPaths.cpp
 
-        Arachne/BeadingStrategy/BeadingStrategy.hpp
-        Arachne/BeadingStrategy/BeadingStrategy.cpp
-        Arachne/BeadingStrategy/BeadingStrategyFactory.hpp
-        Arachne/BeadingStrategy/BeadingStrategyFactory.cpp
-        Arachne/BeadingStrategy/DistributedBeadingStrategy.hpp
-        Arachne/BeadingStrategy/DistributedBeadingStrategy.cpp
-        Arachne/BeadingStrategy/LimitedBeadingStrategy.hpp
-        Arachne/BeadingStrategy/LimitedBeadingStrategy.cpp
-        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.hpp
-        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.cpp
-        Arachne/BeadingStrategy/RedistributeBeadingStrategy.hpp
-        Arachne/BeadingStrategy/RedistributeBeadingStrategy.cpp
-        Arachne/BeadingStrategy/WideningBeadingStrategy.hpp
-        Arachne/BeadingStrategy/WideningBeadingStrategy.cpp
-        # Arachne/utils/ExtrusionJunction.hpp
-        Arachne/utils/ExtrusionLine.hpp
-        Arachne/utils/ExtrusionLine.cpp
-        # Arachne/utils/HalfEdge.hpp
-        # Arachne/utils/HalfEdgeGraph.hpp
-        # Arachne/utils/HalfEdgeNode.hpp
-        Arachne/utils/SparseGrid.hpp
-        # Arachne/utils/SparsePointGrid.hpp
-        # Arachne/utils/SparseLineGrid.hpp
-        Arachne/utils/SquareGrid.hpp
-        Arachne/utils/SquareGrid.cpp
-        # Arachne/utils/PolygonsPointIndex.hpp
-        # Arachne/utils/PolygonsSegmentIndex.hpp
-        Arachne/utils/PolylineStitcher.hpp
-        Arachne/utils/PolylineStitcher.cpp
-        Arachne/SkeletalTrapezoidation.hpp
-        Arachne/SkeletalTrapezoidation.cpp
-        # Arachne/SkeletalTrapezoidationEdge.hpp
-        Arachne/SkeletalTrapezoidationGraph.hpp
-        Arachne/SkeletalTrapezoidationGraph.cpp
-        # Arachne/SkeletalTrapezoidationJoint.hpp
-        Arachne/WallToolPaths.hpp
-        Arachne/WallToolPaths.cpp
-        Shape/TextShape.hpp
-        Shape/TextShape.cpp
-        calib.hpp
-        calib.cpp
-        GCode/Thumbnails.cpp
-        GCode/Thumbnails.hpp
-        Interlocking/InterlockingGenerator.hpp
-        Interlocking/InterlockingGenerator.cpp
-        Interlocking/VoxelUtils.hpp
-        Interlocking/VoxelUtils.cpp
+        Shape/TextShape.cpp             # Текстові мітки
+        GCode/Thumbnails.cpp            # Зображення в GCode
 )
+
 
 add_library(libslic3r STATIC ${lisbslic3r_sources}
         "${CMAKE_CURRENT_BINARY_DIR}/libslic3r_version.h"
-        ${OpenVDBUtils_SOURCES})
+#        ${OpenVDBUtils_SOURCES}
+)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${lisbslic3r_sources})
 
 if (SLIC3R_STATIC)
@@ -430,7 +298,7 @@ set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
 cmake_policy(PUSH)
 cmake_policy(SET CMP0011 NEW)
 find_package(CGAL REQUIRED)
-find_package(OpenCV REQUIRED core)
+#find_package(OpenCV REQUIRED core)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 cmake_policy(POP)
@@ -521,16 +389,16 @@ target_link_libraries(libslic3r
         Clipper2
         mcut
         JPEG::JPEG
-        qoi
+        #qoi
         #OpenCV::OpenCV
         noise
         freetype
         fontconfig
 )
 
-if (TARGET OpenVDB::openvdb)
-    target_link_libraries(libslic3r OpenVDB::openvdb)
-endif()
+#if (TARGET OpenVDB::openvdb)
+#    target_link_libraries(libslic3r OpenVDB::openvdb)
+#endif()
 
 if(SLIC3R_PROFILE)
     target_link_libraries(libslic3r Shiny)

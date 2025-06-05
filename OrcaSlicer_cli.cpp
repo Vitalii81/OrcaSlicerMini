@@ -581,7 +581,7 @@ int orca_slicer(int argc, char** argv)
     signal(SIGABRT, signal_handler);
 
     // Perform the slicing operation
-    auto print = slicing_file(path.c_str(), layer_height );
+    auto print =  slicing_file(path.c_str(), layer_height );
 
     if (!print) return EXIT_FAILURE;
 
@@ -616,8 +616,7 @@ int main(int argc, char** argv) {
         char* _argv[] = {
             "program_name",              // argv[0] — name of app
             "/home/vitalii/Desktop/Slice3rCore/3dModel/cube.stl",
-            "0.4",
-            "stl"
+            "0.4"
         };
         int _argc = sizeof(_argv) / sizeof(_argv[0]);
 

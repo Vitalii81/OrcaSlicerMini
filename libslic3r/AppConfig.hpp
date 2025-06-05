@@ -9,7 +9,7 @@
 
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Semver.hpp"
-#include "calib.hpp"
+//#include "calib.hpp"
 
 using namespace nlohmann;
 
@@ -257,8 +257,8 @@ public:
         m_dirty                = true;
     }
 
-	const std::vector<PrinterCaliInfo> &get_printer_cali_infos() const { return m_printer_cali_infos; }
-    void save_printer_cali_infos(const PrinterCaliInfo& cali_info, bool need_change_status = true);
+//	const std::vector<PrinterCaliInfo> &get_printer_cali_infos() const { return m_printer_cali_infos; }
+ //   void save_printer_cali_infos(const PrinterCaliInfo& cali_info, bool need_change_status = true);
 
 	// return recent/last_opened_folder or recent/settings_folder or empty string.
 	std::string 		get_last_dir() const;
@@ -380,7 +380,7 @@ private:
 	std::vector<std::string>									m_filament_presets;
     std::vector<std::string>									m_filament_colors;
 
-	std::vector<PrinterCaliInfo>								m_printer_cali_infos;
+	//std::vector<PrinterCaliInfo>								m_printer_cali_infos;
 
 	std::map<std::string, BBLocalMachine>						m_local_machines;
 };

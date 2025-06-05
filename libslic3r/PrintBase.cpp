@@ -68,19 +68,18 @@ std::string PrintBase::output_filename(const std::string &format, const std::str
     if (config_override != nullptr)
     	cfg = *config_override;
     cfg.set_key_value("version", new ConfigOptionString(std::string(SoftFever_VERSION)));
-    PlaceholderParser::update_timestamp(cfg);
+    //PlaceholderParser::update_timestamp(cfg);
     this->update_object_placeholders(cfg, default_ext);
     if (! filename_base.empty()) {
 		cfg.set_key_value("input_filename", new ConfigOptionString(filename_base + default_ext));
 		cfg.set_key_value("input_filename_base", new ConfigOptionString(filename_base));
     }
     try {
-		boost::filesystem::path filename = format.empty() ?
-			cfg.opt_string("input_filename_base") + default_ext :
-			this->placeholder_parser().process(format, 0, &cfg);
-        if (filename.extension().empty())
-            filename.replace_extension(default_ext);
-        return filename.string();
+		//boost::filesystem::path filename = format.empty() ? cfg.opt_string("input_filename_base") + default_ext : this->placeholder_parser().process(format, 0, &cfg);
+        // if (filename.extension().empty())
+        //     filename.replace_extension(default_ext);
+        // return filename.string();
+        return {};
     } catch (std::runtime_error &err) {
         throw Slic3r::PlaceholderParserError(L("Failed processing of the filename_format template.") + "\n" + err.what());
     }

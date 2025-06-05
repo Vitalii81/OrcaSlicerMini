@@ -1,7 +1,7 @@
 #include "LineSplit.hpp"
 
 #include "AABBTreeLines.hpp"
-#include "SVG.hpp"
+//#include "SVG.hpp"
 #include "Utils.hpp"
 
 //#define DEBUG_SPLIT_LINE

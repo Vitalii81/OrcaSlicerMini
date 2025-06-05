@@ -1,22 +1,22 @@
 #ifndef slic3r_Print_hpp_
 #define slic3r_Print_hpp_
 
-#include "Fill/FillAdaptive.hpp"
-#include "Fill/FillLightning.hpp"
+//#include "Fill/FillAdaptive.hpp"
+//#include "Fill/FillLightning.hpp"
 #include "PrintBase.hpp"
 
 #include "BoundingBox.hpp"
-#include "ExtrusionEntityCollection.hpp"
-#include "Flow.hpp"
+// #include "ExtrusionEntityCollection.hpp"
+//#include "Flow.hpp"
 #include "Point.hpp"
 #include "Slicing.hpp"
 #include "TriangleMeshSlicer.hpp"
-#include "GCode/ToolOrdering.hpp"
-#include "GCode/WipeTower.hpp"
-#include "GCode/WipeTower2.hpp"
-#include "GCode/ThumbnailData.hpp"
-#include "GCode/GCodeProcessor.hpp"
-#include "MultiMaterialSegmentation.hpp"
+// #include "GCode/ToolOrdering.hpp"
+// #include "GCode/WipeTower.hpp"
+// #include "GCode/WipeTower2.hpp"
+// #include "GCode/ThumbnailData.hpp"
+// #include "GCode/GCodeProcessor.hpp"
+//#include "MultiMaterialSegmentation.hpp"
 #include "libslic3r.h"
 
 #include <Eigen/Geometry>
@@ -24,7 +24,7 @@
 #include <functional>
 #include <set>
 
-#include "calib.hpp"
+//#include "calib.hpp"
 
 namespace Slic3r {
 
@@ -59,7 +59,7 @@ enum SupportNecessaryType {
     Cantilever,
     LargeOverhang,
 };
-
+#if 0
 namespace FillAdaptive {
     struct Octree;
     struct OctreeDeleter;
@@ -71,7 +71,7 @@ namespace FillLightning {
     struct GeneratorDeleter;
     using GeneratorPtr = std::unique_ptr<Generator, GeneratorDeleter>;
 }; // namespace FillLightning
-
+#endif
 // Print step IDs for keeping track of the print state.
 // The Print steps are applied in this order.
 enum PrintStep {
@@ -118,8 +118,8 @@ public:
     int                         print_region_id() const throw() { return m_print_region_id; }
     int                         print_object_region_id() const throw() { return m_print_object_region_id; }
 	// 1-based extruder identifier for this region and role.
-	unsigned int 				extruder(FlowRole role) const;
-    Flow                        flow(const PrintObject &object, FlowRole role, double layer_height, bool first_layer = false) const;
+	//unsigned int 				extruder(FlowRole role) const;
+  //  Flow                        flow(const PrintObject &object, FlowRole role, double layer_height, bool first_layer = false) const;
     // Average diameter of nozzles participating on extruding this region.
     coordf_t                    nozzle_dmr_avg(const PrintConfig &print_config) const;
     // Average diameter of nozzles participating on extruding this region.
@@ -345,15 +345,13 @@ public:
     std::vector<groupedVolumeSlices>& firstLayerObjGroupsMod() { return firstLayerObjSliceByGroups; }
 
     bool                         has_brim() const       {
-        return ((this->config().brim_type != btNoBrim && this->config().brim_width.value > 0.) || this->config().brim_type == btAutoBrim
-            || (this->config().brim_type == btPainted && !this->model_object()->brim_points.empty()))
-            && ! this->has_raft();
+        return false;
     }
 
     // BBS
-    const ExtrusionEntityCollection& object_skirt() const {
-        return m_skirt;
-    }
+    // const ExtrusionEntityCollection& object_skirt() const {
+    //     return m_skirt;
+    // }
 
     // This is the *total* layer count (including support layers)
     // this value is not supposed to be compared with Layer::id
@@ -493,20 +491,19 @@ private:
    void _transform_hole_to_polyholes();
 
     // Has any support (not counting the raft).
-    void detect_surfaces_type();
+  //  void detect_surfaces_type();
     void process_external_surfaces();
-    void discover_vertical_shells();
-    void bridge_over_infill();
-    void clip_fill_surfaces();
-    void discover_horizontal_shells();
-    void combine_infill();
+  //  void discover_vertical_shells();
+   // void bridge_over_infill();
+   // void clip_fill_surfaces();
+  //  void discover_horizontal_shells();
+    //void combine_infill();
     void _generate_support_material();
-    std::pair<FillAdaptive::OctreePtr, FillAdaptive::OctreePtr> prepare_adaptive_infill_data(
-        const std::vector<std::pair<const Surface*, float>>& surfaces_w_bottom_z) const;
-    FillLightning::GeneratorPtr prepare_lightning_infill_data();
+    //std::pair<FillAdaptive::OctreePtr, FillAdaptive::OctreePtr> prepare_adaptive_infill_data(  const std::vector<std::pair<const Surface*, float>>& surfaces_w_bottom_z) const;
+    // FillLightning::GeneratorPtr prepare_lightning_infill_data();
 
     // BBS
-    SupportNecessaryType is_support_necessary();
+  //  SupportNecessaryType is_support_necessary();
 
     // XYZ in scaled coordinates
     Vec3crd									m_size;
@@ -534,14 +531,14 @@ private:
     // so that next call to make_perimeters() performs a union() before computing loops
     bool                    				m_typed_slices = false;
 
-    std::pair<FillAdaptive::OctreePtr, FillAdaptive::OctreePtr> m_adaptive_fill_octrees;
-    FillLightning::GeneratorPtr m_lightning_generator;
+//    std::pair<FillAdaptive::OctreePtr, FillAdaptive::OctreePtr> m_adaptive_fill_octrees;
+   // FillLightning::GeneratorPtr m_lightning_generator;
 
     std::vector < VolumeSlices >            firstLayerObjSliceByVolume;
     std::vector<groupedVolumeSlices>        firstLayerObjSliceByGroups;
 
     // BBS: per object skirt
-    ExtrusionEntityCollection               m_skirt;
+    // ExtrusionEntityCollection               m_skirt;
 
     PrintObject*                            m_shared_object{ nullptr };
 
@@ -600,145 +597,145 @@ struct FakeWipeTower
     void set_pos(Vec2f p) { pos = p; }
     void set_pos_and_rotation(const Vec2f& p, float rotation) { pos = p; rotation_angle = rotation; }
 
-    std::vector<ExtrusionPaths> getFakeExtrusionPathsFromWipeTower() const
-    {
-        int   d         = scale_(depth);
-        int   w         = scale_(width);
-        int   bd        = scale_(brim_width);
-        Point minCorner = {scale_(pos.x()), scale_(pos.y())};
-        Point maxCorner = {minCorner.x() + w, minCorner.y() + d};
-
-        std::vector<ExtrusionPaths> paths;
-        for (float h = 0.f; h < height; h += layer_height) {
-            ExtrusionPath path(ExtrusionRole::erWipeTower, 0.0, 0.0, layer_height);
-            path.polyline = {minCorner, {maxCorner.x(), minCorner.y()}, maxCorner, {minCorner.x(), maxCorner.y()}, minCorner};
-            paths.push_back({path});
-
-            if (h == 0.f) { // add brim
-                ExtrusionPath fakeBrim(ExtrusionRole::erBrim, 0.0, 0.0, layer_height);
-                Point         wtbminCorner = {minCorner - Point{bd, bd}};
-                Point         wtbmaxCorner = {maxCorner + Point{bd, bd}};
-                fakeBrim.polyline          = {wtbminCorner, {wtbmaxCorner.x(), wtbminCorner.y()}, wtbmaxCorner, {wtbminCorner.x(), wtbmaxCorner.y()}, wtbminCorner};
-                paths.back().push_back(fakeBrim);
-            }
-        }
-        return paths;
-    }
-
-    std::vector<ExtrusionPaths> getFakeExtrusionPathsFromWipeTower2() const
-    {
-        float h = height;
-        float lh = layer_height;
-        int   d = scale_(depth);
-        int   w = scale_(width);
-        int   bd = scale_(brim_width);
-        Point minCorner = { -bd, -bd };
-        Point maxCorner = { minCorner.x() + w + bd, minCorner.y() + d + bd };
-
-        const auto [cone_base_R, cone_scale_x] = WipeTower2::get_wipe_tower_cone_base(width, height, depth, cone_angle);
-
-        std::vector<ExtrusionPaths> paths;
-        for (float hh = 0.f; hh < h; hh += lh) {
-            
-            if (hh != 0.f) {
-                // The wipe tower may be getting smaller. Find the depth for this layer.
-                size_t i = 0;
-                for (i=0; i<z_and_depth_pairs.size()-1; ++i)
-                    if (hh >= z_and_depth_pairs[i].first && hh < z_and_depth_pairs[i+1].first)
-                        break;
-                d = scale_(z_and_depth_pairs[i].second);
-                minCorner = {0.f, -d/2 + scale_(z_and_depth_pairs.front().second/2.f)};
-                maxCorner = { minCorner.x() + w, minCorner.y() + d };
-            }
-
-
-            ExtrusionPath path(ExtrusionRole::erWipeTower, 0.0, 0.0, lh);
-            path.polyline = { minCorner, {maxCorner.x(), minCorner.y()}, maxCorner, {minCorner.x(), maxCorner.y()}, minCorner };
-            paths.push_back({ path });
-
-            // We added the border, now add several parallel lines so we can detect an object that is fully inside the tower.
-            // For now, simply use fixed spacing of 3mm.
-            for (coord_t y=minCorner.y()+scale_(3.); y<maxCorner.y(); y+=scale_(3.)) {
-                path.polyline = { {minCorner.x(), y}, {maxCorner.x(), y} };
-                paths.back().emplace_back(path);
-            }
-
-            // And of course the stabilization cone and its base...
-            if (cone_base_R > 0.) {
-                path.polyline.clear();
-                double r = cone_base_R * (1 - hh/height);
-                for (double alpha=0; alpha<2.01*M_PI; alpha+=2*M_PI/20.)
-                    path.polyline.points.emplace_back(Point::new_scale(width/2. + r * std::cos(alpha)/cone_scale_x, depth/2. + r * std::sin(alpha)));
-                paths.back().emplace_back(path);
-                if (hh == 0.f) { // Cone brim.
-                    for (float bw=brim_width; bw>0.f; bw-=3.f) {
-                        path.polyline.clear();
-                        for (double alpha=0; alpha<2.01*M_PI; alpha+=2*M_PI/20.) // see load_wipe_tower_preview, where the same is a bit clearer
-                            path.polyline.points.emplace_back(Point::new_scale(
-                                width/2. + cone_base_R * std::cos(alpha)/cone_scale_x * (1. + cone_scale_x*bw/cone_base_R),
-                                depth/2. + cone_base_R * std::sin(alpha) * (1. + bw/cone_base_R))
-                            );
-                        paths.back().emplace_back(path);
-                    }
-                }
-            }
-
-            // Only the first layer has brim.
-            if (hh == 0.f) {
-                minCorner = minCorner + Point(bd, bd);
-                maxCorner = maxCorner - Point(bd, bd);
-            }
-        }
-
-        // Rotate and translate the tower into the final position.
-        for (ExtrusionPaths& ps : paths) {
-            for (ExtrusionPath& p : ps) {
-                p.polyline.rotate(Geometry::deg2rad(rotation_angle));
-                p.polyline.translate(scale_(pos.x()), scale_(pos.y()));
-            }
-        }
-
-        return paths;
-    }
+    // std::vector<ExtrusionPaths> getFakeExtrusionPathsFromWipeTower() const
+    // {
+    //     int   d         = scale_(depth);
+    //     int   w         = scale_(width);
+    //     int   bd        = scale_(brim_width);
+    //     Point minCorner = {scale_(pos.x()), scale_(pos.y())};
+    //     Point maxCorner = {minCorner.x() + w, minCorner.y() + d};
+    //
+    //     std::vector<ExtrusionPaths> paths;
+    //     for (float h = 0.f; h < height; h += layer_height) {
+    //         ExtrusionPath path(ExtrusionRole::erWipeTower, 0.0, 0.0, layer_height);
+    //         path.polyline = {minCorner, {maxCorner.x(), minCorner.y()}, maxCorner, {minCorner.x(), maxCorner.y()}, minCorner};
+    //         paths.push_back({path});
+    //
+    //         if (h == 0.f) { // add brim
+    //             ExtrusionPath fakeBrim(ExtrusionRole::erBrim, 0.0, 0.0, layer_height);
+    //             Point         wtbminCorner = {minCorner - Point{bd, bd}};
+    //             Point         wtbmaxCorner = {maxCorner + Point{bd, bd}};
+    //             fakeBrim.polyline          = {wtbminCorner, {wtbmaxCorner.x(), wtbminCorner.y()}, wtbmaxCorner, {wtbminCorner.x(), wtbmaxCorner.y()}, wtbminCorner};
+    //             paths.back().push_back(fakeBrim);
+    //         }
+    //     }
+    //     return paths;
+    // }
+    //
+    // std::vector<ExtrusionPaths> getFakeExtrusionPathsFromWipeTower2() const
+    // {
+    //     float h = height;
+    //     float lh = layer_height;
+    //     int   d = scale_(depth);
+    //     int   w = scale_(width);
+    //     int   bd = scale_(brim_width);
+    //     Point minCorner = { -bd, -bd };
+    //     Point maxCorner = { minCorner.x() + w + bd, minCorner.y() + d + bd };
+    //
+    //    // const auto [cone_base_R, cone_scale_x] = WipeTower2::get_wipe_tower_cone_base(width, height, depth, cone_angle);
+    //
+    //     std::vector<ExtrusionPaths> paths;
+    //     // for (float hh = 0.f; hh < h; hh += lh) {
+    //     //
+    //     //     if (hh != 0.f) {
+    //     //         // The wipe tower may be getting smaller. Find the depth for this layer.
+    //     //         size_t i = 0;
+    //     //         for (i=0; i<z_and_depth_pairs.size()-1; ++i)
+    //     //             if (hh >= z_and_depth_pairs[i].first && hh < z_and_depth_pairs[i+1].first)
+    //     //                 break;
+    //     //         d = scale_(z_and_depth_pairs[i].second);
+    //     //         minCorner = {0.f, -d/2 + scale_(z_and_depth_pairs.front().second/2.f)};
+    //     //         maxCorner = { minCorner.x() + w, minCorner.y() + d };
+    //     //     }
+    //     //
+    //     //
+    //     //     ExtrusionPath path(ExtrusionRole::erWipeTower, 0.0, 0.0, lh);
+    //     //     path.polyline = { minCorner, {maxCorner.x(), minCorner.y()}, maxCorner, {minCorner.x(), maxCorner.y()}, minCorner };
+    //     //     paths.push_back({ path });
+    //     //
+    //     //     // We added the border, now add several parallel lines so we can detect an object that is fully inside the tower.
+    //     //     // For now, simply use fixed spacing of 3mm.
+    //     //     for (coord_t y=minCorner.y()+scale_(3.); y<maxCorner.y(); y+=scale_(3.)) {
+    //     //         path.polyline = { {minCorner.x(), y}, {maxCorner.x(), y} };
+    //     //         paths.back().emplace_back(path);
+    //     //     }
+    //     //
+    //     //     // And of course the stabilization cone and its base...
+    //     //     if (cone_base_R > 0.) {
+    //     //         path.polyline.clear();
+    //     //         double r = cone_base_R * (1 - hh/height);
+    //     //         for (double alpha=0; alpha<2.01*M_PI; alpha+=2*M_PI/20.)
+    //     //             path.polyline.points.emplace_back(Point::new_scale(width/2. + r * std::cos(alpha)/cone_scale_x, depth/2. + r * std::sin(alpha)));
+    //     //         paths.back().emplace_back(path);
+    //     //         if (hh == 0.f) { // Cone brim.
+    //     //             for (float bw=brim_width; bw>0.f; bw-=3.f) {
+    //     //                 path.polyline.clear();
+    //     //                 for (double alpha=0; alpha<2.01*M_PI; alpha+=2*M_PI/20.) // see load_wipe_tower_preview, where the same is a bit clearer
+    //     //                     path.polyline.points.emplace_back(Point::new_scale(
+    //     //                         width/2. + cone_base_R * std::cos(alpha)/cone_scale_x * (1. + cone_scale_x*bw/cone_base_R),
+    //     //                         depth/2. + cone_base_R * std::sin(alpha) * (1. + bw/cone_base_R))
+    //     //                     );
+    //     //                 paths.back().emplace_back(path);
+    //     //             }
+    //     //         }
+    //     //     }
+    //     //
+    //     //     // Only the first layer has brim.
+    //     //     if (hh == 0.f) {
+    //     //         minCorner = minCorner + Point(bd, bd);
+    //     //         maxCorner = maxCorner - Point(bd, bd);
+    //     //     }
+    //     // }
+    //
+    //     // Rotate and translate the tower into the final position.
+    //     for (ExtrusionPaths& ps : paths) {
+    //         for (ExtrusionPath& p : ps) {
+    //             p.polyline.rotate(Geometry::deg2rad(rotation_angle));
+    //             p.polyline.translate(scale_(pos.x()), scale_(pos.y()));
+    //         }
+    //     }
+    //
+    //     return paths;
+    // }
 };
 
-struct WipeTowerData
-{
-    // Following section will be consumed by the GCodeGenerator.
-    // Tool ordering of a non-sequential print has to be known to calculate the wipe tower.
-    // Cache it here, so it does not need to be recalculated during the G-code generation.
-    ToolOrdering                                         &tool_ordering;
-    // Cache of tool changes per print layer.
-    std::unique_ptr<std::vector<WipeTower::ToolChangeResult>> priming;
-    std::vector<std::vector<WipeTower::ToolChangeResult>> tool_changes;
-    std::unique_ptr<WipeTower::ToolChangeResult>          final_purge;
-    std::vector<float>                                    used_filament;
-    int                                                   number_of_toolchanges;
-
-    // Depth of the wipe tower to pass to GLCanvas3D for exact bounding box:
-    float                                                 depth;
-    std::vector<std::pair<float, float>>                  z_and_depth_pairs;
-    float                                                 brim_width;
-    float                                                 height;
-
-    void clear() {
-        priming.reset(nullptr);
-        tool_changes.clear();
-        final_purge.reset(nullptr);
-        used_filament.clear();
-        number_of_toolchanges = -1;
-        depth = 0.f;
-        brim_width = 0.f;
-    }
-
-private:
-	// Only allow the WipeTowerData to be instantiated internally by Print, 
-	// as this WipeTowerData shares reference to Print::m_tool_ordering.
-	friend class Print;
-	WipeTowerData(ToolOrdering &tool_ordering) : tool_ordering(tool_ordering) { clear(); }
-	WipeTowerData(const WipeTowerData & /* rhs */) = delete;
-	WipeTowerData &operator=(const WipeTowerData & /* rhs */) = delete;
-};
+// struct WipeTowerData
+// {
+//     // Following section will be consumed by the GCodeGenerator.
+//     // Tool ordering of a non-sequential print has to be known to calculate the wipe tower.
+//     // Cache it here, so it does not need to be recalculated during the G-code generation.
+//     ToolOrdering                                         &tool_ordering;
+//     // Cache of tool changes per print layer.
+//     std::unique_ptr<std::vector<WipeTower::ToolChangeResult>> priming;
+//     std::vector<std::vector<WipeTower::ToolChangeResult>> tool_changes;
+//     std::unique_ptr<WipeTower::ToolChangeResult>          final_purge;
+//     std::vector<float>                                    used_filament;
+//     int                                                   number_of_toolchanges;
+//
+//     // Depth of the wipe tower to pass to GLCanvas3D for exact bounding box:
+//     float                                                 depth;
+//     std::vector<std::pair<float, float>>                  z_and_depth_pairs;
+//     float                                                 brim_width;
+//     float                                                 height;
+//
+//     void clear() {
+//         priming.reset(nullptr);
+//         tool_changes.clear();
+//         final_purge.reset(nullptr);
+//         used_filament.clear();
+//         number_of_toolchanges = -1;
+//         depth = 0.f;
+//         brim_width = 0.f;
+//     }
+//
+// private:
+// 	// Only allow the WipeTowerData to be instantiated internally by Print,
+// 	// as this WipeTowerData shares reference to Print::m_tool_ordering.
+// 	friend class Print;
+// 	WipeTowerData(ToolOrdering &tool_ordering) : tool_ordering(tool_ordering) { clear(); }
+// 	WipeTowerData(const WipeTowerData & /* rhs */) = delete;
+// 	WipeTowerData &operator=(const WipeTowerData & /* rhs */) = delete;
+// };
 
 struct PrintStatistics
 {
@@ -844,10 +841,10 @@ public:
     void                process(long long *time_cost_with_cache = nullptr, bool use_cache = false) override;
     // Exports G-code into a file name based on the path_template, returns the file path of the generated G-code file.
     // If preview_data is not null, the preview_data is filled in for the G-code visualization (not used by the command line Slic3r).
-    std::string         export_gcode(const std::string& path_template, GCodeProcessorResult* result, ThumbnailsGeneratorCallback thumbnail_cb = nullptr);
+  //  std::string         export_gcode(const std::string& path_template, GCodeProcessorResult* result, ThumbnailsGeneratorCallback thumbnail_cb = nullptr);
     //return 0 means successful
-    int                 export_cached_data(const std::string& dir_path, bool with_space=false);
-    int                 load_cached_data(const std::string& directory);
+  //  int                 export_cached_data(const std::string& dir_path, bool with_space=false);
+   // int                 load_cached_data(const std::string& directory);
 
     // methods for handling state
     bool                is_step_done(PrintStep step) const { return Inherited::is_step_done(step); }
@@ -867,8 +864,8 @@ public:
     // Returns an empty string if valid, otherwise returns an error message.
     StringObjectException validate(StringObjectException *warning = nullptr, Polygons* collison_polygons = nullptr, std::vector<std::pair<Polygon, float>>* height_polygons = nullptr) const override;
     double              skirt_first_layer_height() const;
-    Flow                brim_flow() const;
-    Flow                skirt_flow() const;
+    //Flow                brim_flow() const;
+    //Flow                skirt_flow() const;
 
     std::vector<unsigned int> object_extruders() const;
     std::vector<unsigned int> support_material_extruders() const;
@@ -891,9 +888,6 @@ public:
             [object_id](const PrintObject *obj) { return obj->id() == object_id; });
         return (it == m_objects.end()) ? nullptr : *it;
     }
-    //BBS: Function to get m_brimMap;
-    std::map<ObjectID, ExtrusionEntityCollection>&
-        get_brimMap() { return m_brimMap; }
 
     // How many of PrintObject::copies() over all print objects are there?
     // If zero, then the print is empty and the print shall not be executed.
@@ -903,7 +897,7 @@ public:
     PrintObjectPtrs&            objects_mutable() { return m_objects; }
     PrintRegionPtrs&            print_regions_mutable() { return m_print_regions; }
     std::vector<size_t>         layers_sorted_for_object(float start, float end, std::vector<LayerPtrs> &layers_of_objects, std::vector<BoundingBox> &boundingBox_for_objects, std::vector<Points>& objects_instances_shift);
-    const ExtrusionEntityCollection& skirt() const { return m_skirt; }
+    //const ExtrusionEntityCollection& skirt() const { return m_skirt; }
     // Convex hull of the 1st layer extrusions, for bed leveling and placing the initial purge line.
     // It encompasses the object extrusions, support extrusions, skirt, brim, wipe tower.
     // It does NOT encompass user extrusions generated by custom G-code,
@@ -916,8 +910,8 @@ public:
 
     // Wipe tower support.
     bool                        has_wipe_tower() const;
-    const WipeTowerData&        wipe_tower_data(size_t filaments_cnt = 0) const;
-    const ToolOrdering& 		tool_ordering() const { return m_tool_ordering; }
+   // const WipeTowerData&        wipe_tower_data(size_t filaments_cnt = 0) const;
+   // const ToolOrdering& 		tool_ordering() const { return m_tool_ordering; }
 
     bool                        enable_timelapse_print() const;
 
@@ -928,15 +922,15 @@ public:
 
     size_t                      num_print_regions() const throw() { return m_print_regions.size(); }
     const PrintRegion&          get_print_region(size_t idx) const  { return *m_print_regions[idx]; }
-    const ToolOrdering&         get_tool_ordering() const { return m_wipe_tower_data.tool_ordering; }
+   // const ToolOrdering&         get_tool_ordering() const { return m_wipe_tower_data.tool_ordering; }
 
     //BBS: plate's origin related functions
     void set_plate_origin(Vec3d origin) { m_origin = origin; }
     const Vec3d get_plate_origin() const { return m_origin; }
     //BBS: export gcode from previous gcode file from 3mf
-    void set_gcode_file_ready();
-    void set_gcode_file_invalidated();
-    void export_gcode_from_previous_file(const std::string& file, GCodeProcessorResult* result, ThumbnailsGeneratorCallback thumbnail_cb = nullptr);
+    // void set_gcode_file_ready();
+    // void set_gcode_file_invalidated();
+    // void export_gcode_from_previous_file(const std::string& file, GCodeProcessorResult* result, ThumbnailsGeneratorCallback thumbnail_cb = nullptr);
     //BBS: add modify_count logic
     int get_modified_count() const {return m_modified_count;}
     //BBS: add status for whether support used
@@ -944,27 +938,28 @@ public:
     std::string get_conflict_string() const
     {
         std::string result;
-        if (m_conflict_result) {
-            result = "Found gcode path conflicts between object " + m_conflict_result.value()._objName1 + " and " + m_conflict_result.value()._objName2;
-        }
+        // if (m_conflict_result) {
+        //     result = "Found gcode path conflicts between object " + m_conflict_result.value()._objName1 + " and " + m_conflict_result.value()._objName2;
+        // }
 
         return result;
     }
 
     //BBS
     static StringObjectException sequential_print_clearance_valid(const Print &print, Polygons *polygons = nullptr, std::vector<std::pair<Polygon, float>>* height_polygons = nullptr);
-    ConflictResultOpt            get_conflict_result() const { return m_conflict_result; }
+   // ConflictResultOpt            get_conflict_result() const { return m_conflict_result; }
+   // ConflictResultOpt            get_conflict_result() const { return m_conflict_result; }
 
     // Return 4 wipe tower corners in the world coordinates (shifted and rotated), including the wipe tower brim.
-    std::vector<Point>  first_layer_wipe_tower_corners(bool check_wipe_tower_existance=true) const;
+  //  std::vector<Point>  first_layer_wipe_tower_corners(bool check_wipe_tower_existance=true) const;
 
     //SoftFever
     bool &is_BBL_printer() { return m_isBBLPrinter; }
     const bool is_BBL_printer() const { return m_isBBLPrinter; }
-    CalibMode& calib_mode() { return m_calib_params.mode; }
-    const CalibMode calib_mode() const { return m_calib_params.mode; }
-    void set_calib_params(const Calib_Params& params);
-    const Calib_Params& calib_params() const { return m_calib_params; }
+  //  CalibMode& calib_mode() { return m_calib_params.mode; }
+  //  const CalibMode calib_mode() const { return m_calib_params.mode; }
+  //  void set_calib_params(const Calib_Params& params);
+  //  const Calib_Params& calib_params() const { return m_calib_params; }
     Vec2d translate_to_print_space(const Vec2d &point) const;
     // scaled point
     Vec2d translate_to_print_space(const Point &point) const;
@@ -1003,12 +998,12 @@ private:
 
     bool                invalidate_state_by_config_options(const ConfigOptionResolver &new_config, const std::vector<t_config_option_key> &opt_keys);
 
-    void                _make_skirt();
+    //void                _make_skirt();
     void                _make_wipe_tower();
     void                finalize_first_layer_convex_hull();
 
     // Islands of objects and their supports extruded at the 1st layer.
-    Polygons            first_layer_islands() const;
+    // Polygons            first_layer_islands() const;
 
     PrintConfig                             m_config;
     PrintObjectConfig                       m_default_object_config;
@@ -1019,11 +1014,7 @@ private:
     //SoftFever
     bool m_isBBLPrinter;
 
-    // Ordered collections of extrusion paths to build skirt loops and brim.
-    ExtrusionEntityCollection               m_skirt;
-    // BBS: collecting extrusion paths to build brim by objs
-    std::map<ObjectID, ExtrusionEntityCollection>         m_brimMap;
-    std::map<ObjectID, ExtrusionEntityCollection>         m_supportBrimMap;
+
     // Convex hull of the 1st layer extrusions.
     // It encompasses the object extrusions, support extrusions, skirt, brim, wipe tower.
     // It does NOT encompass user extrusions generated by custom G-code,
@@ -1033,8 +1024,8 @@ private:
     Points                                  m_skirt_convex_hull;
 
     // Following section will be consumed by the GCodeGenerator.
-    ToolOrdering 							m_tool_ordering;
-    WipeTowerData                           m_wipe_tower_data {m_tool_ordering};
+  //  ToolOrdering 							m_tool_ordering;
+  //  WipeTowerData                           m_wipe_tower_data {m_tool_ordering};
 
     // Estimated print time, filament consumed.
     PrintStatistics                         m_print_statistics;
@@ -1045,11 +1036,11 @@ private:
     //BBS: modified_count
     int     m_modified_count {0};
     //BBS
-    ConflictResultOpt m_conflict_result;
+   // ConflictResultOpt m_conflict_result;
     FakeWipeTower     m_fake_wipe_tower;
     
     //SoftFever: calibration
-    Calib_Params m_calib_params;
+   // Calib_Params m_calib_params;
 
     // To allow GCode to set the Print's GCodeExport step status.
     friend class GCode;

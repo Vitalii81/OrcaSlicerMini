@@ -11,7 +11,7 @@
 
 #include "ObjectID.hpp"
 #include "Model.hpp"
-#include "PlaceholderParser.hpp"
+//#include "PlaceholderParser.hpp"
 #include "PrintConfig.hpp"
 
 namespace Slic3r {
@@ -380,7 +380,7 @@ private:
 class PrintBase : public ObjectBase
 {
 public:
-	PrintBase() : m_placeholder_parser(&m_full_print_config) { this->restart(); }
+	PrintBase() { this->restart(); }
     inline virtual ~PrintBase() {}
 
     virtual PrinterTechnology technology() const noexcept = 0;
@@ -504,7 +504,7 @@ public:
     // Returns true if the last step was finished with success.
     virtual bool               finished() const = 0;
 
-    const PlaceholderParser&   placeholder_parser() const { return m_placeholder_parser; }
+    //const PlaceholderParser&   placeholder_parser() const { return m_placeholder_parser; }
     const DynamicPrintConfig&  full_print_config() const { return m_full_print_config; }
 
     virtual std::string        output_filename(const std::string &filename_base = std::string()) const = 0;
@@ -550,7 +550,7 @@ protected:
 
 	Model                                   m_model;
 	DynamicPrintConfig						m_full_print_config;
-    PlaceholderParser                       m_placeholder_parser;
+    //PlaceholderParser                       m_placeholder_parser;
 
     //BBS: add plate id into print base
     int m_plate_index{ 0 };

@@ -3,7 +3,7 @@
 #include "../Model.hpp"
 #include "../Utils.hpp"
 #include "../LocalesUtils.hpp"
-#include "../GCode.hpp"
+//#include "../GCode.hpp"
 #include "../Geometry.hpp"
 #include "../GCode/ThumbnailData.hpp"
 #include "../Semver.hpp"

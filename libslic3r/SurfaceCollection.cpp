@@ -1,6 +1,6 @@
 #include "SurfaceCollection.hpp"
 #include "BoundingBox.hpp"
-#include "SVG.hpp"
+//#include "SVG.hpp"
 
 #include <map>
 
@@ -139,6 +139,7 @@ void SurfaceCollection::remove_types(std::initializer_list<SurfaceType> types)
 
 void SurfaceCollection::export_to_svg(const char *path, bool show_labels) 
 {
+#if 0
     BoundingBox bbox;
     for (Surfaces::const_iterator surface = this->surfaces.begin(); surface != this->surfaces.end(); ++surface)
         bbox.merge(get_extents(surface->expolygon));
@@ -157,8 +158,9 @@ void SurfaceCollection::export_to_svg(const char *path, bool show_labels)
             svg.draw_text(surface->expolygon.contour.points.front(), label, "black");
         }
     }
-    export_surface_type_legend_to_svg(svg, legend_pos);
+   // export_surface_type_legend_to_svg(svg, legend_pos);
     svg.Close();
+#endif
 }
 
 }

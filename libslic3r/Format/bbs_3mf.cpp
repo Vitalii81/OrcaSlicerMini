@@ -4,9 +4,9 @@
 #include "../Preset.hpp"
 #include "../Utils.hpp"
 #include "../LocalesUtils.hpp"
-#include "../GCode.hpp"
+//#include "../GCode.hpp"
 #include "../Geometry.hpp"
-#include "../GCode/ThumbnailData.hpp"
+//#include "../GCode/ThumbnailData.hpp"
 #include "../Semver.hpp"
 #include "../Time.hpp"
 
@@ -571,38 +571,38 @@ bool bbs_is_valid_object_type(const std::string& type)
 
 namespace Slic3r {
 
-void PlateData::parse_filament_info(GCodeProcessorResult *result)
-{
-    if (!result) return;
-
-    PrintEstimatedStatistics &ps                            = result->print_statistics;
-    std::vector<float>        m_filament_diameters          = result->filament_diameters;
-    std::vector<float>        m_filament_densities          = result->filament_densities;
-    auto get_used_filament_from_volume = [m_filament_diameters, m_filament_densities](double volume, int extruder_id) {
-        double                    koef = 0.001;
-        std::pair<double, double> ret = {koef * volume / (PI * sqr(0.5 * m_filament_diameters[extruder_id])), volume * m_filament_densities[extruder_id] * 0.001};
-        return ret;
-    };
-
-    for (auto it = ps.total_volumes_per_extruder.begin(); it != ps.total_volumes_per_extruder.end(); it++) {
-        double volume                           = it->second;
-        auto [used_filament_m, used_filament_g] = get_used_filament_from_volume(volume, it->first);
-
-        FilamentInfo info;
-        info.id = it->first;
-        info.used_g = used_filament_g;
-        info.used_m = used_filament_m;
-        slice_filaments_info.push_back(info);
-    }
-
-    /* only for test
-    GCodeProcessorResult::SliceWarning sw;
-    sw.msg = BED_TEMP_TOO_HIGH_THAN_FILAMENT;
-    sw.level = 1;
-    result->warnings.push_back(sw);
-    */
-    warnings = result->warnings;
-}
+// void PlateData::parse_filament_info(GCodeProcessorResult *result)
+// {
+//     if (!result) return;
+//
+//     PrintEstimatedStatistics &ps                            = result->print_statistics;
+//     std::vector<float>        m_filament_diameters          = result->filament_diameters;
+//     std::vector<float>        m_filament_densities          = result->filament_densities;
+//     auto get_used_filament_from_volume = [m_filament_diameters, m_filament_densities](double volume, int extruder_id) {
+//         double                    koef = 0.001;
+//         std::pair<double, double> ret = {koef * volume / (PI * sqr(0.5 * m_filament_diameters[extruder_id])), volume * m_filament_densities[extruder_id] * 0.001};
+//         return ret;
+//     };
+//
+//     for (auto it = ps.total_volumes_per_extruder.begin(); it != ps.total_volumes_per_extruder.end(); it++) {
+//         double volume                           = it->second;
+//         auto [used_filament_m, used_filament_g] = get_used_filament_from_volume(volume, it->first);
+//
+//         FilamentInfo info;
+//         info.id = it->first;
+//         info.used_g = used_filament_g;
+//         info.used_m = used_filament_m;
+//         slice_filaments_info.push_back(info);
+//     }
+//
+//     /* only for test
+//     GCodeProcessorResult::SliceWarning sw;
+//     sw.msg = BED_TEMP_TOO_HIGH_THAN_FILAMENT;
+//     sw.level = 1;
+//     result->warnings.push_back(sw);
+//     */
+//     warnings = result->warnings;
+// }
 
 
 //! macro used to mark string used at localization,
@@ -812,7 +812,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
         //typedef std::map<Id, Geometry> IdToGeometryMap;
         typedef std::map<int, std::vector<coordf_t>> IdToLayerHeightsProfileMap;
         typedef std::map<int, t_layer_config_ranges> IdToLayerConfigRangesMap;
-        typedef std::map<int, BrimPoints>             IdToBrimPointsMap;
+       // typedef std::map<int, BrimPoints>             IdToBrimPointsMap;
         /*typedef std::map<int, std::vector<sla::SupportPoint>> IdToSlaSupportPointsMap;
         typedef std::map<int, std::vector<sla::DrainHole>> IdToSlaDrainHolesMap;*/
         using PathToEmbossShapeFileMap = std::map<std::string, std::shared_ptr<std::string>>;
@@ -1005,7 +1005,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
         IdToCutObjectInfoMap       m_cut_object_infos;
         IdToLayerHeightsProfileMap m_layer_heights_profiles;
         IdToLayerConfigRangesMap m_layer_config_ranges;
-        IdToBrimPointsMap m_brim_ear_points;
+      //  IdToBrimPointsMap m_brim_ear_points;
         /*IdToSlaSupportPointsMap m_sla_support_points;
         IdToSlaDrainHolesMap    m_sla_drain_holes;*/
         PathToEmbossShapeFileMap m_path_to_emboss_shape_files;
@@ -1274,7 +1274,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
         m_objects_metadata.clear();
         m_layer_heights_profiles.clear();
         m_layer_config_ranges.clear();
-        m_brim_ear_points.clear();
+        //m_brim_ear_points.clear();
         //m_sla_support_points.clear();
         m_curr_metadata_name.clear();
         m_curr_characters.clear();
@@ -1489,7 +1489,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
             plate->slice_filaments_info = it->second->slice_filaments_info;
             plate->printer_model_id = it->second->printer_model_id;
             plate->nozzle_diameters = it->second->nozzle_diameters;
-            plate->warnings = it->second->warnings;
+           // plate->warnings = it->second->warnings;
             plate->thumbnail_file = it->second->thumbnail_file;
             if (plate->thumbnail_file.empty()) {
                 plate->thumbnail_file = plate->gcode_file;
@@ -1951,9 +1951,9 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
             if (obj_layer_config_ranges != m_layer_config_ranges.end())
                 model_object->layer_config_ranges = std::move(obj_layer_config_ranges->second);
 
-            IdToBrimPointsMap::iterator obj_brim_points = m_brim_ear_points.find(object.second + 1);
-            if (obj_brim_points != m_brim_ear_points.end())
-                model_object->brim_points = std::move(obj_brim_points->second);
+            // IdToBrimPointsMap::iterator obj_brim_points = m_brim_ear_points.find(object.second + 1);
+            // if (obj_brim_points != m_brim_ear_points.end())
+            //     model_object->brim_points = std::move(obj_brim_points->second);
 
             // m_sla_support_points are indexed by a 1 based model object index.
             /*IdToSlaSupportPointsMap::iterator obj_sla_support_points = m_sla_support_points.find(object.second + 1);
@@ -2147,7 +2147,7 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
             plate_data_list[it->first-1]->is_label_object_enabled = it->second->is_label_object_enabled;
             plate_data_list[it->first-1]->slice_filaments_info = it->second->slice_filaments_info;
             plate_data_list[it->first-1]->skipped_objects = it->second->skipped_objects;
-            plate_data_list[it->first-1]->warnings = it->second->warnings;
+            // plate_data_list[it->first-1]->warnings = it->second->warnings;
             plate_data_list[it->first-1]->thumbnail_file = (m_load_restore || it->second->thumbnail_file.empty()) ? it->second->thumbnail_file : m_backup_path + "/" + it->second->thumbnail_file;
             //plate_data_list[it->first-1]->pattern_file = (m_load_restore || it->second->pattern_file.empty()) ? it->second->pattern_file : m_backup_path + "/" + it->second->pattern_file;
             plate_data_list[it->first-1]->no_light_thumbnail_file = (m_load_restore || it->second->no_light_thumbnail_file.empty()) ? it->second->no_light_thumbnail_file : m_backup_path + "/" + it->second->no_light_thumbnail_file;
@@ -2823,26 +2823,26 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
                     continue;
                 }
 
-                IdToBrimPointsMap::iterator object_item = m_brim_ear_points.find(object_id);
-                if (object_item != m_brim_ear_points.end()) {
-                    add_error("Found duplicated brim ear points");
-                    continue;
-                }
+                // IdToBrimPointsMap::iterator object_item = m_brim_ear_points.find(object_id);
+                // if (object_item != m_brim_ear_points.end()) {
+                //     add_error("Found duplicated brim ear points");
+                //     continue;
+                // }
 
                 std::vector<std::string> object_data_points;
                 boost::split(object_data_points, object_data[1], boost::is_any_of(" "), boost::token_compress_off);
 
-                std::vector<BrimPoint> brim_ear_points;
-                if (version == 0) {
-                    for (unsigned int i=0; i<object_data_points.size(); i+=4)
-                    brim_ear_points.emplace_back(float(std::atof(object_data_points[i+0].c_str())),
-                                                    float(std::atof(object_data_points[i+1].c_str())),
-                                                    float(std::atof(object_data_points[i+2].c_str())),
-                                                    float(std::atof(object_data_points[i+3].c_str())));
-                }
+                //std::vector<BrimPoint> brim_ear_points;
+                // if (version == 0) {
+                //     for (unsigned int i=0; i<object_data_points.size(); i+=4)
+                //     brim_ear_points.emplace_back(float(std::atof(object_data_points[i+0].c_str())),
+                //                                     float(std::atof(object_data_points[i+1].c_str())),
+                //                                     float(std::atof(object_data_points[i+2].c_str())),
+                //                                     float(std::atof(object_data_points[i+3].c_str())));
+                // }
 
-                if (!brim_ear_points.empty())
-                    m_brim_ear_points.insert({ object_id, brim_ear_points });
+                // if (!brim_ear_points.empty())
+                //     m_brim_ear_points.insert({ object_id, brim_ear_points });
             }
         }
     }
@@ -4334,15 +4334,15 @@ void PlateData::parse_filament_info(GCodeProcessorResult *result)
         if (m_curr_plater) {
             std::string msg     = bbs_get_attribute_value_string(attributes, num_attributes, WARNING_MSG_TAG);
             std::string lvl_str = bbs_get_attribute_value_string(attributes, num_attributes, "level");
-            GCodeProcessorResult::SliceWarning sw;
-            sw.msg = msg;
-            try {
-                sw.level = atoi(lvl_str.c_str());
-            }
-            catch(...) {
-            };
-
-            m_curr_plater->warnings.push_back(sw);
+            // GCodeProcessorResult::SliceWarning sw;
+            // sw.msg = msg;
+            // try {
+            //     sw.level = atoi(lvl_str.c_str());
+            // }
+            // catch(...) {
+            // };
+            //
+            // m_curr_plater->warnings.push_back(sw);
         }
         return true;
     }

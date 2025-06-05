@@ -306,7 +306,7 @@ void BackgroundSlicingProcess::thread_proc()
 {
 	//BBS: thread name
 	set_current_thread_name("bbl_BgSlcPcs");
-    name_tbb_thread_pool_threads_set_locale();
+   /// name_tbb_thread_pool_threads_set_locale();
 
 	assert(m_print != nullptr);
 	assert(m_print == m_fff_print || m_print == m_sla_print);

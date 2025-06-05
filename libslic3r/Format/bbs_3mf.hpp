@@ -3,7 +3,7 @@
 
 #include "../GCode/ThumbnailData.hpp"
 #include "libslic3r/ProjectTask.hpp"
-#include "libslic3r/GCode/GCodeProcessor.hpp"
+//#include "libslic3r/GCode/GCodeProcessor.hpp"
 #include <functional>
 
 namespace Slic3r {
@@ -66,7 +66,7 @@ struct PlateData
         objects_and_instances.clear();
     }
 
-    void parse_filament_info(GCodeProcessorResult *result);
+   // void parse_filament_info(GCodeProcessorResult *result);
 
     int plate_index;
     std::vector<std::pair<int, int>> objects_and_instances;
@@ -95,7 +95,7 @@ struct PlateData
     bool            is_label_object_enabled {false};
     int             timelapse_warning_code = 0; // 1<<0 sprial vase, 1<<1 by object
 
-    std::vector<GCodeProcessorResult::SliceWarning> warnings;
+   // std::vector<GCodeProcessorResult::SliceWarning> warnings;
 
     std::string get_gcode_prediction_str() {
         return gcode_prediction;

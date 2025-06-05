@@ -97,7 +97,7 @@ std::unique_ptr<CompressedImageBuffer> compress_thumbnail_jpg(const ThumbnailDat
     ::memcpy(out->data, (const void*)compressed_data.data(), out->size);
     return out;
 }
-
+#if 0
 std::unique_ptr<CompressedImageBuffer> compress_thumbnail_qoi(const ThumbnailData &data)
 {
     qoi_desc desc;
@@ -112,12 +112,13 @@ std::unique_ptr<CompressedImageBuffer> compress_thumbnail_qoi(const ThumbnailDat
     for (size_t y = 0; y < data.height; ++ y)
         memcpy(rgba_pixels.data() + (data.height - y - 1) * row_size, data.pixels.data() + y * row_size, row_size);
 
-    auto out = std::make_unique<CompressedQOI>();
+    auto out = std::mavke_unique<CompressedQOI>();
     int  size;
     out->data = qoi_encode((const void*)rgba_pixels.data(), &desc, &size);
     out->size = size;
     return out;
 }
+#endif
 
 int ColPic_EncodeStr(unsigned short* fromcolor16, int picw, int pich, unsigned char* outputdata, int outputmaxtsize, int colorsmax);
 
@@ -251,7 +252,7 @@ std::unique_ptr<CompressedImageBuffer> compress_thumbnail(const ThumbnailData &d
     case GCodeThumbnailsFormat::JPG:
         return compress_thumbnail_jpg(data);
     case GCodeThumbnailsFormat::QOI:
-        return compress_thumbnail_qoi(data);
+        // return compress_thumbnail_qoi(data);
     case GCodeThumbnailsFormat::BTT_TFT:
         return compress_thumbnail_btt_tft(data);
     case GCodeThumbnailsFormat::ColPic:

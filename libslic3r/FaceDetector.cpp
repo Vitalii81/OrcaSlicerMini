@@ -1,6 +1,6 @@
 #include "FaceDetector.hpp"
 #include "TriangleMesh.hpp"
-#include "SLA/IndexedMesh.hpp"
+//#include "SLA/IndexedMesh.hpp"
 #include "Model.hpp"
 #include <unordered_set>
 

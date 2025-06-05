@@ -1,12 +1,12 @@
-#include "ElephantFootCompensation.hpp"
+//#include "ElephantFootCompensation.hpp"
 #include "I18N.hpp"
 #include "Layer.hpp"
-#include "MultiMaterialSegmentation.hpp"
+//#include "MultiMaterialSegmentation.hpp"
 #include "Print.hpp"
 #include "ClipperUtils.hpp"
-#include "Interlocking/InterlockingGenerator.hpp"
+//#include "Interlocking/InterlockingGenerator.hpp"
 //BBS
-#include "ShortestPath.hpp"
+//#include "ShortestPath.hpp"
 
 #include <boost/log/trivial.hpp>
 
@@ -842,134 +842,6 @@ void PrintObject::slice()
     this->set_done(posSlice);
 }
 
-template<typename ThrowOnCancel>
-static inline void apply_mm_segmentation(PrintObject &print_object, ThrowOnCancel throw_on_cancel)
-{
-    // Returns MMU segmentation based on painting in MMU segmentation gizmo
-    std::vector<std::vector<ExPolygons>> segmentation = multi_material_segmentation_by_painting(print_object, throw_on_cancel);
-    assert(segmentation.size() == print_object.layer_count());
-    tbb::parallel_for(
-        tbb::blocked_range<size_t>(0, segmentation.size(), std::max(segmentation.size() / 128, size_t(1))),
-        [&print_object, &segmentation, throw_on_cancel](const tbb::blocked_range<size_t> &range) {
-            const auto  &layer_ranges   = print_object.shared_regions()->layer_ranges;
-            double       z              = print_object.get_layer(range.begin())->slice_z;
-            auto         it_layer_range = layer_range_first(layer_ranges, z);
-            // BBS
-            const size_t num_extruders = print_object.print()->config().filament_diameter.size();
-            struct ByExtruder {
-                ExPolygons  expolygons;
-                BoundingBox bbox;
-            };
-            std::vector<ByExtruder> by_extruder;
-            struct ByRegion {
-                ExPolygons  expolygons;
-                bool        needs_merge { false };
-            };
-            std::vector<ByRegion> by_region;
-            for (size_t layer_id = range.begin(); layer_id < range.end(); ++ layer_id) {
-                throw_on_cancel();
-                Layer *layer = print_object.get_layer(layer_id);
-                it_layer_range = layer_range_next(layer_ranges, it_layer_range, layer->slice_z);
-                const PrintObjectRegions::LayerRangeRegions &layer_range = *it_layer_range;
-                // Gather per extruder expolygons.
-                by_extruder.assign(num_extruders, ByExtruder());
-                by_region.assign(layer->region_count(), ByRegion());
-                bool layer_split = false;
-                for (size_t extruder_id = 0; extruder_id < num_extruders; ++ extruder_id) {
-                    ByExtruder &region = by_extruder[extruder_id];
-                    append(region.expolygons, std::move(segmentation[layer_id][extruder_id]));
-                    if (! region.expolygons.empty()) {
-                        region.bbox = get_extents(region.expolygons);
-                        layer_split = true;
-                    }
-                }
-                if (! layer_split)
-                    continue;
-                // Split LayerRegions by by_extruder regions.
-                // layer_range.painted_regions are sorted by extruder ID and parent PrintObject region ID.
-                auto it_painted_region = layer_range.painted_regions.begin();
-                for (int region_id = 0; region_id < int(layer->region_count()); ++ region_id)
-                    if (LayerRegion &layerm = *layer->get_region(region_id); ! layerm.slices.surfaces.empty()) {
-                        assert(layerm.region().print_object_region_id() == region_id);
-                        const BoundingBox bbox = get_extents(layerm.slices.surfaces);
-                        assert(it_painted_region < layer_range.painted_regions.end());
-                        // Find the first it_painted_region which overrides this region.
-                        for (; layer_range.volume_regions[it_painted_region->parent].region->print_object_region_id() < region_id; ++ it_painted_region)
-                            assert(it_painted_region != layer_range.painted_regions.end());
-                        assert(it_painted_region != layer_range.painted_regions.end());
-                        assert(layer_range.volume_regions[it_painted_region->parent].region == &layerm.region());
-                        // 1-based extruder ID
-                        bool   self_trimmed = false;
-                        int    self_extruder_id = -1;
-                        for (int extruder_id = 1; extruder_id <= int(by_extruder.size()); ++ extruder_id)
-                            if (ByExtruder &segmented = by_extruder[extruder_id - 1]; segmented.bbox.defined && bbox.overlap(segmented.bbox)) {
-                                // Find the target region.
-                                for (; int(it_painted_region->extruder_id) < extruder_id; ++ it_painted_region)
-                                    assert(it_painted_region != layer_range.painted_regions.end());
-                                assert(layer_range.volume_regions[it_painted_region->parent].region == &layerm.region() && int(it_painted_region->extruder_id) == extruder_id);
-                                //FIXME Don't trim by self, it is not reliable.
-                                if (&layerm.region() == it_painted_region->region) {
-                                    self_extruder_id = extruder_id;
-                                    continue;
-                                }
-                                // Steal from this region.
-                                int         target_region_id = it_painted_region->region->print_object_region_id();
-                                ExPolygons  stolen           = intersection_ex(layerm.slices.surfaces, segmented.expolygons);
-                                if (! stolen.empty()) {
-                                    ByRegion &dst = by_region[target_region_id];
-                                    if (dst.expolygons.empty()) {
-                                        dst.expolygons = std::move(stolen);
-                                    } else {
-                                        append(dst.expolygons, std::move(stolen));
-                                        dst.needs_merge = true;
-                                    }
-                                }
-#if 0
-                                if (&layerm.region() == it_painted_region->region)
-                                    // Slices of this LayerRegion were trimmed by a MMU region of the same PrintRegion.
-                                    self_trimmed = true;
-#endif
-                            }
-                        if (! self_trimmed) {
-                            // Trim slices of this LayerRegion with all the MMU regions.
-                            Polygons mine = to_polygons(std::move(layerm.slices.surfaces));
-                            for (auto &segmented : by_extruder)
-                                if (&segmented - by_extruder.data() + 1 != self_extruder_id && segmented.bbox.defined && bbox.overlap(segmented.bbox)) {
-                                    mine = diff(mine, segmented.expolygons);
-                                    if (mine.empty())
-                                        break;
-                                }
-                            // Filter out unprintable polygons produced by subtraction multi-material painted regions from layerm.region().
-                            // ExPolygon returned from multi-material segmentation does not precisely match ExPolygons in layerm.region()
-                            // (because of preprocessing of the input regions in multi-material segmentation). Therefore, subtraction from
-                            // layerm.region() could produce a huge number of small unprintable regions for the model's base extruder.
-                            // This could, on some models, produce bulges with the model's base color (#7109).
-                            if (! mine.empty())
-                                mine = opening(union_ex(mine), float(scale_(5 * EPSILON)), float(scale_(5 * EPSILON)));
-                            if (! mine.empty()) {
-                                ByRegion &dst = by_region[layerm.region().print_object_region_id()];
-                                if (dst.expolygons.empty()) {
-                                    dst.expolygons = union_ex(mine);
-                                } else {
-                                    append(dst.expolygons, union_ex(mine));
-                                    dst.needs_merge = true;
-                                }
-                            }
-                        }
-                    }
-                // Re-create Surfaces of LayerRegions.
-                for (size_t region_id = 0; region_id < layer->region_count(); ++ region_id) {
-                    ByRegion &src = by_region[region_id];
-                    if (src.needs_merge)
-                        // Multiple regions were merged into one.
-                        src.expolygons = closing_ex(src.expolygons, float(scale_(10 * EPSILON)));
-                    layer->get_region(region_id)->slices.set(std::move(src.expolygons), stInternal);
-                }
-            }
-        });
-}
-
-
 // 1) Decides Z positions of the layers,
 // 2) Initializes layers and their regions
 // 3) Slices the object meshes
@@ -1053,13 +925,13 @@ void PrintObject::slice_volumes()
             BOOST_LOG_TRIVIAL(info) << "xy compensation will not work for object " << this->model_object()->name << " for multi filament.";
         }
 
-        BOOST_LOG_TRIVIAL(debug) << "Slicing volumes - MMU segmentation";
-        apply_mm_segmentation(*this, [print]() { print->throw_if_canceled(); });
+        //BOOST_LOG_TRIVIAL(debug) << "Slicing volumes - MMU segmentation";
+        //apply_mm_segmentation(*this, [print]() { print->throw_if_canceled(); });
     }
 
     m_print->throw_if_canceled();
 
-    InterlockingGenerator::generate_interlocking_structure(this);
+    //InterlockingGenerator::generate_interlocking_structure(this);
     m_print->throw_if_canceled();
 
     BOOST_LOG_TRIVIAL(debug) << "Slicing volumes - make_slices in parallel - begin";
@@ -1104,11 +976,11 @@ void PrintObject::slice_volumes()
                                                                    expolygons_to_compensate);
                             }
                             lslices_elfoot_uncompensated[layer_id] = expolygons_to_compensate;
-							layerm->slices.set(
-								union_ex(
-									Slic3r::elephant_foot_compensation(expolygons_to_compensate,
-	                            		layerm->flow(frExternalPerimeter), unscale<double>(elfoot))),
-								stInternal);
+							// layerm->slices.set(
+							// 	union_ex(
+							// 		Slic3r::elephant_foot_compensation(expolygons_to_compensate,
+	      //                       		layerm->flow(frExternalPerimeter), unscale<double>(elfoot))),
+							// 	stInternal);
 	                    } else {
 	                        // Apply the XY contour and hole size compensation.
                             if (xy_contour_scaled != 0.0f || xy_hole_scaled != 0.0f) {
@@ -1162,8 +1034,8 @@ void PrintObject::slice_volumes()
                             if (elfoot > 0.f) {
                                 ExPolygons expolygons_to_compensate = offset_ex(layer->merged(eps), -eps);
                                 lslices_elfoot_uncompensated[layer_id] = expolygons_to_compensate;
-                                trimming = Slic3r::elephant_foot_compensation(expolygons_to_compensate,
-                                    layer->m_regions.front()->flow(frExternalPerimeter), unscale<double>(elfoot));
+                                // trimming = Slic3r::elephant_foot_compensation(expolygons_to_compensate,
+                                //     layer->m_regions.front()->flow(frExternalPerimeter), unscale<double>(elfoot));
                             } else {
                                 trimming = layer->merged(float(SCALED_EPSILON));
                             }
@@ -1196,12 +1068,13 @@ void PrintObject::slice_volumes()
                 ordering_points.reserve(expolygons_uncompensated.size());
                 for (const ExPolygon &ex : expolygons_uncompensated)
                     ordering_points.push_back(ex.contour.first_point());
-                std::vector<Points::size_type> order = chain_points(ordering_points);
-                ExPolygons lslices_sorted;
-                lslices_sorted.reserve(expolygons_uncompensated.size());
-                for (size_t i : order)
-                    lslices_sorted.emplace_back(std::move(expolygons_uncompensated[i]));
-                m_layers[i]->lslices = std::move(lslices_sorted);
+
+                // std::vector<Points::size_type> order = chain_points(ordering_points);
+                // ExPolygons lslices_sorted;
+                // lslices_sorted.reserve(expolygons_uncompensated.size());
+                // for (size_t i : order)
+                //     lslices_sorted.emplace_back(std::move(expolygons_uncompensated[i]));
+                // m_layers[i]->lslices = std::move(lslices_sorted);
             }
 		}
 	}

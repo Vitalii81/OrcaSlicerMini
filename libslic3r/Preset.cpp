@@ -45,7 +45,7 @@
 #include "libslic3r.h"
 #include "Utils.hpp"
 #include "Time.hpp"
-#include "PlaceholderParser.hpp"
+//#include "PlaceholderParser.hpp"
 #include "libslic3r/GCode/Thumbnails.hpp"
 
 using boost::property_tree::ptree;
@@ -582,15 +582,15 @@ bool is_compatible_with_print(const PresetWithVendorProfile &preset, const Prese
     auto &condition             = preset.preset.compatible_prints_condition();
     auto *compatible_prints     = dynamic_cast<const ConfigOptionStrings*>(preset.preset.config.option("compatible_prints"));
     bool  has_compatible_prints = compatible_prints != nullptr && ! compatible_prints->values.empty();
-    if (! has_compatible_prints && ! condition.empty()) {
-        try {
-            return PlaceholderParser::evaluate_boolean_expression(condition, active_print.preset.config);
-        } catch (const std::runtime_error &err) {
-            //FIXME in case of an error, return "compatible with everything".
-            printf("Preset::is_compatible_with_print - parsing error of compatible_prints_condition %s:\n%s\n", active_print.preset.name.c_str(), err.what());
-            return true;
-        }
-    }
+    // if (! has_compatible_prints && ! condition.empty()) {
+    //     try {
+    //         return PlaceholderParser::evaluate_boolean_expression(condition, active_print.preset.config);
+    //     } catch (const std::runtime_error &err) {
+    //         //FIXME in case of an error, return "compatible with everything".
+    //         printf("Preset::is_compatible_with_print - parsing error of compatible_prints_condition %s:\n%s\n", active_print.preset.name.c_str(), err.what());
+    //         return true;
+    //     }
+    // }
     return preset.preset.is_default || active_print.preset.name.empty() || ! has_compatible_prints ||
         std::find(compatible_prints->values.begin(), compatible_prints->values.end(), active_print.preset.name) !=
             compatible_prints->values.end();
@@ -629,15 +629,15 @@ bool is_compatible_with_printer(const PresetWithVendorProfile &preset, const Pre
     auto &condition               = preset.preset.compatible_printers_condition();
     auto *compatible_printers     = dynamic_cast<const ConfigOptionStrings*>(preset.preset.config.option("compatible_printers"));
     bool  has_compatible_printers = compatible_printers != nullptr && ! compatible_printers->values.empty();
-    if (! has_compatible_printers && ! condition.empty()) {
-        try {
-            return PlaceholderParser::evaluate_boolean_expression(condition, active_printer.preset.config, extra_config);
-        } catch (const std::runtime_error &err) {
-            //FIXME in case of an error, return "compatible with everything".
-            printf("Preset::is_compatible_with_printer - parsing error of compatible_printers_condition %s:\n%s\n", active_printer.preset.name.c_str(), err.what());
-            return true;
-        }
-    }
+    // if (! has_compatible_printers && ! condition.empty()) {
+    //     try {
+    //         return PlaceholderParser::evaluate_boolean_expression(condition, active_printer.preset.config, extra_config);
+    //     } catch (const std::runtime_error &err) {
+    //         //FIXME in case of an error, return "compatible with everything".
+    //         printf("Preset::is_compatible_with_printer - parsing error of compatible_printers_condition %s:\n%s\n", active_printer.preset.name.c_str(), err.what());
+    //         return true;
+    //     }
+    // }
     return preset.preset.is_default || active_printer.preset.name.empty() || !has_compatible_printers ||
            std::find(compatible_printers->values.begin(), compatible_printers->values.end(), active_printer.preset.name) !=
                compatible_printers->values.end() ||

@@ -1,11 +1,11 @@
 #include "ClipperUtils.hpp"
 #include "Geometry.hpp"
-#include "ShortestPath.hpp"
+//#include "ShortestPath.hpp"
 
 // #define CLIPPER_UTILS_DEBUG
 
 #ifdef CLIPPER_UTILS_DEBUG
-#include "SVG.hpp"
+//#include "SVG.hpp"
 #endif /* CLIPPER_UTILS_DEBUG */
 
 // Profiling support using the Shiny intrusive profiler
@@ -949,19 +949,20 @@ ClipperLib::PolyTree union_pt(const ExPolygons &subject)
 // Simple spatial ordering of Polynodes
 ClipperLib::PolyNodes order_nodes(const ClipperLib::PolyNodes &nodes)
 {
-    // collect ordering points
-    Points ordering_points;
-    ordering_points.reserve(nodes.size());
-    
-    for (const ClipperLib::PolyNode *node : nodes)
-        ordering_points.emplace_back(
-            Point(node->Contour.front().x(), node->Contour.front().y()));
-
-    // perform the ordering
-    ClipperLib::PolyNodes ordered_nodes =
-        chain_clipper_polynodes(ordering_points, nodes);
-
-    return ordered_nodes;
+    // // collect ordering points
+    // Points ordering_points;
+    // ordering_points.reserve(nodes.size());
+    //
+    // for (const ClipperLib::PolyNode *node : nodes)
+    //     ordering_points.emplace_back(
+    //         Point(node->Contour.front().x(), node->Contour.front().y()));
+    //
+    // // perform the ordering
+    // ClipperLib::PolyNodes ordered_nodes =
+    //     chain_clipper_polynodes(ordering_points, nodes);
+    //
+    // return ordered_nodes;
+    return {};
 }
 
 static void traverse_pt_noholes(const ClipperLib::PolyNodes &nodes, Polygons *out)
@@ -984,14 +985,14 @@ static void traverse_pt_outside_in(ClipperLib::PolyNodes &&nodes, Polygons *retv
 
     // Perform the ordering, push results recursively.
     //FIXME pass the last point to chain_clipper_polynodes?
-    for (ClipperLib::PolyNode *node : chain_clipper_polynodes(ordering_points, nodes)) {
-        retval->emplace_back(std::move(node->Contour));
-        if (node->IsHole()) 
-            // Orient a hole, which is clockwise oriented, to CCW.
-            retval->back().reverse();
-        // traverse the next depth
-        traverse_pt_outside_in(std::move(node->Childs), retval);
-    }
+    // for (ClipperLib::PolyNode *node : chain_clipper_polynodes(ordering_points, nodes)) {
+    //     retval->emplace_back(std::move(node->Contour));
+    //     if (node->IsHole())
+    //         // Orient a hole, which is clockwise oriented, to CCW.
+    //         retval->back().reverse();
+    //     // traverse the next depth
+    //     traverse_pt_outside_in(std::move(node->Childs), retval);
+    // }
 }
 
 Polygons union_pt_chained_outside_in(const Polygons &subject)
