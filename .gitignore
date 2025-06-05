@@ -1,2 +1,9 @@
-/.cache
-/build
+# Ігнорування папок
+/CMakeFiles/
+/.cache/
+/build/
+/3dModel/
+/src/deps/
+
+*.d
+*.out
