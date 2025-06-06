@@ -59,7 +59,7 @@ TriangleMesh load_model(const std::string& path) {
     Semver file_version;
 
     bool repair = true;
-    bool is_bbs_3mf = false; // має бути оголошено на рівні функції, бо використовується в кількох місцях
+    bool is_bbs_3mf = false; // Should be declared at function level as it's used in multiple places
 
     try {
         switch (type) {
@@ -135,7 +135,7 @@ TriangleMesh load_model(const std::string& path) {
         }
     } catch (const std::exception& e) {
         std::cerr << "ERROR: " << e.what() << " (" << path << ")" << std::endl;
-        return TriangleMesh(); // Повертаємо порожній меш у разі помилки
+        return TriangleMesh(); // Return empty mesh in case of error
     }
 
     return mesh;
@@ -152,7 +152,7 @@ void print_slicing_data(const LayerData &layer) {
     for (size_t j = 0; j < layer.perimeters.size(); ++j) {
         const auto& contour = layer.perimeters[j];
         std::cout << "    Contour " << j
-                  << (contour.is_outer ? " (outer)" : " (hole)")  // <<< тут додаємо!
+                  << (contour.is_outer ? " (outer)" : " (hole)")  // <<< added here!
                   << " points: " << contour.points.size() << std::endl;
         for (const auto& pt : contour.points) {
             std::cout << "      (" << pt.x << ", " << pt.y << ")" << std::endl;
@@ -182,13 +182,13 @@ void create_directory_if_not_exists(const std::string& path) {
 
     try {
         if (fs::exists(path)) {
-            //
+            // Clear directory
             for (const auto& entry : fs::directory_iterator(path)) {
                 fs::remove_all(entry.path());
             }
             std::cout << "Cleared existing directory: " << path << std::endl;
         } else {
-            //
+            // Create new directory
             if (!fs::create_directories(path)) {
                 throw std::runtime_error("Failed to create directory");
             }
@@ -284,11 +284,11 @@ void write_layers(const SlicingData& data, const std::string& path, bool separat
 LayerData read_single_layer(std::istream& in) {
     LayerData layer;
 
-    // Read layer size (можеш використовувати для перевірки або пропуску)
+    // Read layer size (can be used for verification or skipping)
     uint32_t layer_size = 0;
     in.read(reinterpret_cast<char*>(&layer_size), sizeof(layer_size));
 
-    // Створюємо буфер для читання шару
+    // Create buffer for reading layer
     std::vector<char> buffer(layer_size);
     in.read(buffer.data(), layer_size);
     std::istringstream layer_stream(std::string(buffer.data(), layer_size), std::ios::binary);
@@ -392,14 +392,14 @@ void remove_close_duplicates(Contour& contour, double tolerance = 1e-5)
                   return std::abs(a.x - b.x) < tolerance && std::abs(a.y - b.y) < tolerance;
               }), pts.end());
 
-    // Перевірити першу і останню точку (чи замкнено)
+    // Check first and last point (if closed)
     if (!pts.empty()) {
         const auto& first = pts.front();
         const auto& last  = pts.back();
         double dx = first.x - last.x;
         double dy = first.y - last.y;
         if (std::sqrt(dx * dx + dy * dy) < tolerance) {
-            pts.pop_back();  // Прибрати останню, якщо це дублікат першої
+            pts.pop_back();  // Remove last if it's a duplicate of first
         }
     }
 }
@@ -429,7 +429,7 @@ SlicingData collect_layers_data(const Slic3r::Print& print)
 
                     // Outer contour
                     Contour outer;
-                    outer.is_outer = true;   // <<< тут!
+                    outer.is_outer = true;   // <<< here!
                     for (const auto& pt : expoly.contour.points)
                     {
                         Slic3r::Vec2d unscaled_pt = Slic3r::unscale(pt);
@@ -445,7 +445,7 @@ SlicingData collect_layers_data(const Slic3r::Print& print)
                     {
                         std::cout << "Hole contour points: " << hole.points.size() << std::endl;
                         Contour hole_contour;
-                        hole_contour.is_outer = false;   // <<< тут!
+                        hole_contour.is_outer = false;   // <<< here!
                         for (const auto& pt : hole.points)
                         {
                             Slic3r::Vec2d unscaled_pt = Slic3r::unscale(pt);
@@ -506,23 +506,23 @@ std::unique_ptr<Slic3r::Print> slicing_file(const char* path, float layer_height
     config.set_key_value("layer_height", new Slic3r::ConfigOptionFloat(layer_height));
     config.set_key_value("first_layer_height", new Slic3r::ConfigOptionFloatOrPercent(layer_height, false));
 
-    // 2. Налаштування контурів (обов'язково!)
-    config.set_key_value("perimeters", new Slic3r::ConfigOptionInt(1));       // Зовнішній контур
-    config.set_key_value("thin_walls", new Slic3r::ConfigOptionBool(true));  // Для точних контурів
-    config.set_key_value("detect_thin_walls", new Slic3r::ConfigOptionBool(true));  // Для точних контурів
+    // 2. Contour settings (mandatory!)
+    config.set_key_value("perimeters", new Slic3r::ConfigOptionInt(1));       // Outer contour
+    config.set_key_value("thin_walls", new Slic3r::ConfigOptionBool(true));  // For precise contours
+    config.set_key_value("detect_thin_walls", new Slic3r::ConfigOptionBool(true));  // For precise contours
 
-    // 3. Вимкнення всього зайвого
-    config.set_key_value("fill_density", new Slic3r::ConfigOptionPercent(0));    // Ніякого заповнення
-    config.set_key_value("top_solid_layers", new Slic3r::ConfigOptionInt(0));   // Без верхніх шарів
-    config.set_key_value("bottom_solid_layers", new Slic3r::ConfigOptionInt(0));// Без нижніх шарів
-    config.set_key_value("skirts", new Slic3r::ConfigOptionInt(0));             // Без юбок
+    // 3. Disable all unnecessary features
+    config.set_key_value("fill_density", new Slic3r::ConfigOptionPercent(0));    // No infill
+    config.set_key_value("top_solid_layers", new Slic3r::ConfigOptionInt(0));   // No top layers
+    config.set_key_value("bottom_solid_layers", new Slic3r::ConfigOptionInt(0));// No bottom layers
+    config.set_key_value("skirts", new Slic3r::ConfigOptionInt(0));             // No skirts
 
-    // 4. Критичні параметри для уникнення помилок
-    config.set_key_value("extrusion_width", new Slic3r::ConfigOptionFloat(0));  // Вимкнення екструзії
+    // 4. Critical parameters to avoid errors
+    config.set_key_value("extrusion_width", new Slic3r::ConfigOptionFloat(0));  // Disable extrusion
     config.set_key_value("perimeter_extrusion_width", new Slic3r::ConfigOptionFloat(0));
 
-    // 5. Особливість OrcaSlicer 2.3+
-    config.set_key_value("slice_closing_radius", new Slic3r::ConfigOptionFloat(0.1f)); // Для чистих контурів
+    // 5. OrcaSlicer 2.3+ specific
+    config.set_key_value("slice_closing_radius", new Slic3r::ConfigOptionFloat(0.1f)); // For clean contours
     config.set_key_value("gap_fill_enabled", new Slic3r::ConfigOptionBool(false));
 
     if (print->apply(model, config) == Slic3r::Print::APPLY_STATUS_INVALIDATED) {
@@ -561,6 +561,171 @@ std::tuple<std::string, std::string, std::string> split_file_path(const std::str
     return std::make_tuple(directory, filename, extension);
 }
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+
+void render_slicingdata_png(const SlicingData& data, const std::string& filename, int width = 1024, int height = 1024) {
+    std::vector<unsigned char> img(width * height * 3, 240); // Light gray background
+
+    float angle_rad = 0.6f;
+    float fov = 100.0f;     // For perspective
+    float z_scale = 1.0f;
+    float scale = 1.0f;
+
+    // Calculate bounds in perspective projection at an angle
+    float min_px = 1e9f, max_px = -1e9f;
+    float min_py = 1e9f, max_py = -1e9f;
+    for (const auto& layer : data.layers) {
+        float z = layer.z_height;
+        float depth = fov / (fov + z * z_scale);
+        for (const auto& c : layer.perimeters) {
+            for (const auto& pt : c.points) {
+                float px = (pt.x + z * std::cos(angle_rad)) * depth;
+                float py = (pt.y - z * std::sin(angle_rad)) * depth;
+                min_px = std::min(min_px, px);
+                max_px = std::max(max_px, px);
+                min_py = std::min(min_py, py);
+                max_py = std::max(max_py, py);
+            }
+        }
+    }
+
+    float dx = max_px - min_px;
+    float dy = max_py - min_py;
+    scale = std::min(width / dx, height / dy) * 0.9f;
+
+    float offset_x = width / 2.0f - ((min_px + max_px) / 2.0f) * scale;
+    float offset_y = height / 2.0f + ((min_py + max_py) / 2.0f) * scale;
+
+    auto put_pixel = [&](int x, int y, unsigned char r, unsigned char g, unsigned char b) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return;
+        int idx = (y * width + x) * 3;
+        img[idx + 0] = r;
+        img[idx + 1] = g;
+        img[idx + 2] = b;
+    };
+
+    auto draw_line = [&](int x0, int y0, int x1, int y1, unsigned char r, unsigned char g, unsigned char b) {
+        int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy, e2;
+        while (true) {
+            put_pixel(x0, y0, r, g, b);
+            if (x0 == x1 && y0 == y1) break;
+            e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+    };
+
+    size_t total_layers = data.layers.size();
+    for (size_t li = 0; li < total_layers; ++li) {
+        const auto& layer = data.layers[li];
+        float z = layer.z_height;
+        float depth = fov / (fov + z * z_scale);
+
+        // Color gradient
+        float t = static_cast<float>(li) / std::max(total_layers - 1, size_t(1));
+        unsigned char r = static_cast<unsigned char>(255 * t);
+        unsigned char g = static_cast<unsigned char>(100 * (1.0f - t));
+        unsigned char b = static_cast<unsigned char>(255 * (1.0f - t));
+
+        for (const auto& contour : layer.perimeters) {
+            const auto& pts = contour.points;
+            for (size_t i = 0; i < pts.size(); ++i) {
+                const auto& p1 = pts[i];
+                const auto& p2 = pts[(i + 1) % pts.size()];
+
+                float px1 = (p1.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
+                float py1 = (p1.y - z * std::sin(angle_rad)) * depth * scale;
+                float px2 = (p2.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
+                float py2 = (p2.y - z * std::sin(angle_rad)) * depth * scale;
+
+                draw_line(static_cast<int>(px1), static_cast<int>(offset_y - py1),
+                          static_cast<int>(px2), static_cast<int>(offset_y - py2),
+                          r, g, b);
+            }
+        }
+    }
+
+    stbi_write_png(filename.c_str(), width, height, 3, img.data(), width * 3);
+    std::cout << "✅ Perspective image at an angle with colors saved: " << filename << std::endl;
+}
+
+
+#include <fstream>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
+
+static void hsv_to_rgb(float h, float s, float v, float& r, float& g, float& b) {
+    float c = v * s;
+    float x = c * (1 - std::fabs(std::fmod(h * 6, 2) - 1));
+    float m = v - c;
+
+    if (h < 1.0f / 6.0f)      { r = c; g = x; b = 0; }
+    else if (h < 2.0f / 6.0f) { r = x; g = c; b = 0; }
+    else if (h < 3.0f / 6.0f) { r = 0; g = c; b = x; }
+    else if (h < 4.0f / 6.0f) { r = 0; g = x; b = c; }
+    else if (h < 5.0f / 6.0f) { r = x; g = 0; b = c; }
+    else                     { r = c; g = 0; b = x; }
+
+    r += m;
+    g += m;
+    b += m;
+}
+
+void export_slicingdata_to_obj(const SlicingData& data, const std::string& filename) {
+    std::ofstream out(filename);
+    if (!out) { std::cerr << "Failed to open OBJ file\n"; return; }
+
+    std::string base = filename.substr(0, filename.find_last_of('.'));
+    std::string mtl_filename = base + ".mtl";
+    out << "mtllib " << mtl_filename.substr(mtl_filename.find_last_of("/\\") + 1) << "\n";
+
+    std::ofstream mtl(mtl_filename);
+    if (!mtl) { std::cerr << "Failed to open MTL file\n"; return; }
+
+    // 🌈 Rainbow colors
+    size_t total_layers = data.layers.size();
+    for (size_t li = 0; li < total_layers; ++li) {
+        float hue = static_cast<float>(li) / std::max(total_layers - 1, size_t(1)); // 0..1
+        float r, g, b;
+        hsv_to_rgb(hue, 1.0f, 1.0f, r, g, b); // s = 1, v = 1 → full saturation
+
+        mtl << "newmtl layer" << li << "\n";
+        mtl << "Kd " << r << " " << g << " " << b << "\n";
+        mtl << "d 1.0\n\n";
+    }
+
+    // 🟩 Objects: vertices + lines
+    int vertex_id = 1;
+    for (size_t li = 0; li < total_layers; ++li) {
+        const auto& layer = data.layers[li];
+        out << "usemtl layer" << li << "\n";
+        for (const auto& contour : layer.perimeters) {
+            const auto& pts = contour.points;
+            for (size_t i = 0; i < pts.size(); ++i) {
+                const auto& p1 = pts[i];
+                const auto& p2 = pts[(i + 1) % pts.size()];
+                out << "v " << p1.x << " " << p1.y << " " << layer.z_height << "\n";
+                out << "v " << p2.x << " " << p2.y << " " << layer.z_height << "\n";
+                out << "l " << vertex_id << " " << (vertex_id + 1) << "\n";
+                vertex_id += 2;
+            }
+        }
+    }
+
+    out.close();
+    mtl.close();
+    std::cout << "✅ Saved with rainbow layers: " << filename << " + " << mtl_filename << std::endl;
+}
+
+
 int orca_slicer(int argc, char** argv)
 {
     if (argc < 2) {
@@ -594,6 +759,9 @@ int orca_slicer(int argc, char** argv)
     auto layers = collect_layers_data(*print);
     write_layers(layers, path_n, true);
 
+    export_slicingdata_to_obj(layers, (path_n + "/layers.obj") );
+   // render_slicingdata_png(layers, (path_n + "/layers.png") );
+
     // Verify the written data by reading it back
     cout << "Read Bin:\n";
     auto rx = read_layers(path_n, true);
@@ -607,23 +775,30 @@ int orca_slicer(int argc, char** argv)
  * @param argv Argument values
  * @return Exit status code
  */
+
+using namespace std;
+//namespace fs = std::filesystem;
+
 int main(int argc, char** argv) {
-    cout << "--- Stated Orca Slicer App ---" << endl;
-    if (argc  == 1) // When no argument
-    {
-        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] ---\n";
-        cout << "Test slicing model cube.stl\n";
+    cout << "--- Started Orca Slicer App ---" << endl;
+
+    if (argc == 1) {
+        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] ---" << endl;
+        cout << "Test slicing model cube.stl" << endl;
+
+        static std::string model_str = (fs::current_path().parent_path().parent_path() / "3dModel" / "cube.stl").string();
+        const char* c_model = model_str.c_str();
+
         char* _argv[] = {
-            "program_name",              // argv[0] — name of app
-            "/home/vitalii/Desktop/Slice3rCore/3dModel/cube.stl",
-            "0.4"
+            (char*)"program_name",
+            (char*)c_model,
+            (char*)"0.4"
         };
+
         int _argc = sizeof(_argv) / sizeof(_argv[0]);
 
-        return orca_slicer( _argc, _argv);
-    }else
-    {
-        return orca_slicer( argc, argv);
+        return orca_slicer(_argc, _argv);
+    } else {
+        return orca_slicer(argc, argv);
     }
-
 }

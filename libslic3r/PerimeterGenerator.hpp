@@ -106,25 +106,16 @@ public:
         const PrintObjectConfig*    object_config,
         const PrintConfig*          print_config,
         const bool                  spiral_mode
-        // Output:
-        // Loops with the external thin walls
-        // ExtrusionEntityCollection*  loops,
-        // // Gaps without the thin walls
-        // ExtrusionEntityCollection*  gap_fill,
-        // Infills without the gap fills
-       // SurfaceCollection*          fill_surfaces
-        ){}; ///
-        //BBS
-        // ExPolygons*                 fill_no_overlap)
-        // : slices(slices), compatible_regions(compatible_regions), upper_slices(nullptr), lower_slices(nullptr), layer_height(layer_height),
-        //     slice_z(slice_z), layer_id(-1), perimeter_flow(flow), ext_perimeter_flow(flow),
-        //     overhang_flow(flow), solid_infill_flow(flow),
-        //     config(config), object_config(object_config), print_config(print_config),
-        //     m_spiral_vase(spiral_mode),
-        //     m_scaled_resolution(scaled<double>(print_config->resolution.value > EPSILON ? print_config->resolution.value : EPSILON)),
-        //     loops(loops), gap_fill(gap_fill), fill_surfaces(fill_surfaces), fill_no_overlap(fill_no_overlap),
-        //     m_ext_mm3_per_mm(-1), m_mm3_per_mm(-1), m_mm3_per_mm_overhang(-1), m_ext_mm3_per_mm_smaller_width(-1)
-        //{}
+
+        )
+       // BBS
+         : slices(slices), compatible_regions(compatible_regions), upper_slices(nullptr), lower_slices(nullptr), layer_height(layer_height),
+             slice_z(slice_z), layer_id(-1),
+             config(config), object_config(object_config), print_config(print_config),
+             m_spiral_vase(spiral_mode),
+             m_scaled_resolution(scaled<double>(print_config->resolution.value > EPSILON ? print_config->resolution.value : EPSILON)),
+             m_ext_mm3_per_mm(-1), m_mm3_per_mm(-1), m_mm3_per_mm_overhang(-1), m_ext_mm3_per_mm_smaller_width(-1)
+        {}
 
     void        process_classic();
     void        process_arachne();

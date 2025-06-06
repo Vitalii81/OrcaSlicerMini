@@ -10,10 +10,10 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libslic3r_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/libslic3r_version.h @ONLY)
 
-set(OpenVDBUtils_SOURCES "")
-if (TARGET OpenVDB::openvdb)
-    set(OpenVDBUtils_SOURCES OpenVDBUtils.cpp OpenVDBUtils.hpp)
-endif()
+#set(OpenVDBUtils_SOURCES "")
+#if (TARGET OpenVDB::openvdb)
+#    set(OpenVDBUtils_SOURCES OpenVDBUtils.cpp OpenVDBUtils.hpp)
+#endif()
 
 set(lisbslic3r_sources
         ArcFitter.cpp     # Аппроксимация дуг окружностей
@@ -31,11 +31,6 @@ set(lisbslic3r_sources
         AnyPtr.hpp              # Універсальний вказівник (type-erased)
         BoundingBox.cpp         # Визначення прямокутної області об'єкта
         BoundingBox.hpp
-       # BridgeDetector.cpp      # Визначення мостів (перемичок між точками без опори)
-       # BridgeDetector.hpp
-#        Brim.cpp                # Генерація бріма (обідка)
-#        Brim.hpp
-#        BrimEarsPoint.hpp       # Точки "вух" бріма (для складних фігур)
         BuildVolume.cpp         # Обробка об'єму будови
         BuildVolume.hpp
         Circle.cpp              # Геометрія кола
@@ -51,12 +46,8 @@ set(lisbslic3r_sources
         Color.hpp
         Config.cpp              # Конфігураційні параметри
         Config.hpp
-#        CurveAnalyzer.cpp       # Аналіз кривих для дугової апроксимації
-#        CurveAnalyzer.hpp
         EdgeGrid.cpp            # Грані у вигляді сітки
         EdgeGrid.hpp
-#        ElephantFootCompensation.cpp   # Компенсація ефекту розтікання
-#        ElephantFootCompensation.hpp
         Emboss.cpp              # Вирізання/тиснення (embossing)
         Emboss.hpp
         EmbossShape.hpp         # Геометрія для emboss
@@ -68,15 +59,7 @@ set(lisbslic3r_sources
         ExPolygonsIndex.hpp
         Extruder.cpp            # Налаштування екструдера
         Extruder.hpp
-#        ExtrusionEntity.cpp     # Представлення екструдованих елементів
-#        ExtrusionEntity.hpp
-#        ExtrusionEntityCollection.cpp  # Колекція екструдованих елементів
-#        ExtrusionEntityCollection.hpp
-#        ExtrusionSimulator.cpp  # Симуляція екструзії
-#        ExtrusionSimulator.hpp
         FileParserError.hpp     # Обробка помилок парсингу файлів
-#        Flow.cpp                # Розрахунок потоку матеріалу
-#        Flow.hpp
         FlushVolCalc.cpp        # Об'єм виштовхування матеріалу
         FlushVolCalc.hpp
         format.hpp              # Форматування рядків
@@ -104,17 +87,6 @@ set(lisbslic3r_sources
         Geometry/ConvexHull.cpp # Опукла оболонка
         Geometry/ConvexHull.hpp
         Geometry/Curves.hpp
-#        Geometry/MedialAxis.cpp # Вісь середини області (тонкі проходи)
-#        Geometry/MedialAxis.hpp
-#        Geometry/Voronoi.cpp    # Діаграма Вороного
-#        Geometry/Voronoi.hpp
-#        Geometry/VoronoiOffset.cpp # Зсув Вороного
-#        Geometry/VoronoiOffset.hpp
-#        Geometry/VoronoiUtils.hpp
-#        Geometry/VoronoiUtils.cpp
-#        Geometry/VoronoiUtilsCgal.cpp # Версія з CGAL
-#        Geometry/VoronoiUtilsCgal.hpp
-#        Geometry/VoronoiVisualUtils.hpp # Візуальні утиліти для дебагу Вороного
         Int128.hpp              # Робота з 128-бітними цілими
         KDTreeIndirect.hpp      # KD-дерево для швидкого пошуку
         Layer.cpp               # Реалізація шару друку
@@ -132,15 +104,6 @@ set(lisbslic3r_sources
         CutUtils.hpp
         Model.cpp               # Представлення моделі
         Model.hpp
-       # ModelArrange.hpp        # Автоматичне розміщення моделей
-       # ModelArrange.cpp
-#        MultiMaterialSegmentation.cpp # Сегментація для мультиматеріалу
-#        MultiMaterialSegmentation.hpp
-       # Measure.hpp             # Вимірювання
-       # Measure.cpp
-       # MeasureUtils.hpp        # Утиліти вимірювань
-       # Arrange.hpp             # Автоматичне компонування моделей
-       # Arrange.cpp
         NormalUtils.cpp         # Робота з нормалями
         NormalUtils.hpp
         ObjColorUtils.hpp       # Обробка кольорів в OBJ
@@ -155,8 +118,6 @@ set(lisbslic3r_sources
         ParameterUtils.hpp
         PerimeterGenerator.cpp  # Генерація периметрів
         PerimeterGenerator.hpp
-#        PlaceholderParser.cpp   # Парсинг шаблонів для GCode
-#        PlaceholderParser.hpp
         Platform.cpp            # Інфо про платформу
         Platform.hpp
         Point.cpp               # Точка
@@ -195,12 +156,6 @@ set(lisbslic3r_sources
         QuadricEdgeCollapse.hpp
         ShortEdgeCollapse.cpp   # Колапс коротких ребер
         ShortEdgeCollapse.hpp
-#        ShortestPath.cpp        # Найкоротший шлях (graph algo)
-#        ShortestPath.hpp
-#        SLAPrint.cpp            # SLA-друк
-#        SLAPrintSteps.cpp
-#        SLAPrintSteps.hpp
-#        SLAPrint.hpp
         Slicing.cpp             # Основний slicing
         Slicing.hpp
         SlicesToTriangleMesh.hpp
@@ -234,8 +189,6 @@ set(lisbslic3r_sources
         TriangleSetSampling.cpp # Семплювання трикутників
         TriangleSetSampling.hpp
         MTUtils.hpp
-       # VariableWidth.cpp       # Варіативна ширина ліній
-       # VariableWidth.hpp
         Zipper.hpp              # Робота з ZIP-архівами
         Zipper.cpp
         MinAreaBoundingBox.hpp  # Мінімальна обгортка (BBox)
@@ -249,36 +202,6 @@ set(lisbslic3r_sources
         Optimize/Optimizer.hpp          # Загальна оптимізація
         Optimize/NLoptOptimizer.hpp     # Оптимізатор NLopt
         Optimize/BruteforceOptimizer.hpp # Оптимізація перебором
-
-         # Arachne: новий генератор екструзії
-#        Arachne/BeadingStrategy/BeadingStrategy.hpp
-#        Arachne/BeadingStrategy/BeadingStrategy.cpp
-#        Arachne/BeadingStrategy/BeadingStrategyFactory.hpp
-#        Arachne/BeadingStrategy/BeadingStrategyFactory.cpp
-#        Arachne/BeadingStrategy/DistributedBeadingStrategy.hpp
-#        Arachne/BeadingStrategy/DistributedBeadingStrategy.cpp
-#        Arachne/BeadingStrategy/LimitedBeadingStrategy.hpp
-#        Arachne/BeadingStrategy/LimitedBeadingStrategy.cpp
-#        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.hpp
-#        Arachne/BeadingStrategy/OuterWallInsetBeadingStrategy.cpp
-#        Arachne/BeadingStrategy/RedistributeBeadingStrategy.hpp
-#        Arachne/BeadingStrategy/RedistributeBeadingStrategy.cpp
-#        Arachne/BeadingStrategy/WideningBeadingStrategy.hpp
-#        Arachne/BeadingStrategy/WideningBeadingStrategy.cpp
-#        Arachne/utils/ExtrusionLine.hpp
-#        Arachne/utils/ExtrusionLine.cpp
-#        Arachne/utils/SparseGrid.hpp
-#        Arachne/utils/SquareGrid.hpp
-#        Arachne/utils/SquareGrid.cpp
-#        Arachne/utils/PolylineStitcher.hpp
-#        Arachne/utils/PolylineStitcher.cpp
-#        Arachne/SkeletalTrapezoidation.hpp
-#        Arachne/SkeletalTrapezoidation.cpp
-#        Arachne/SkeletalTrapezoidationGraph.hpp
-#        Arachne/SkeletalTrapezoidationGraph.cpp
-#        Arachne/WallToolPaths.hpp
-#        Arachne/WallToolPaths.cpp
-
         Shape/TextShape.cpp             # Текстові мітки
         GCode/Thumbnails.cpp            # Зображення в GCode
 )

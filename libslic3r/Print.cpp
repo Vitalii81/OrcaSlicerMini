@@ -2142,13 +2142,12 @@ void Print::process(long long *time_cost_with_cache, bool use_cache)
         //         append(m_first_layer_convex_hull.points, std::move(poly.points));
         // }
 
-
-        if (has_skirt() && ! draft_shield) {
-            // In case that draft shield is NOT active, generate skirt now.
-            // It will be placed around the brim, so brim has to be ready.
-            assert(m_skirt.empty());
-            //_make_skirt();
-        }
+        // if (has_skirt() && ! draft_shield) {
+        //     // In case that draft shield is NOT active, generate skirt now.
+        //     // It will be placed around the brim, so brim has to be ready.
+        //     assert(m_skirt.empty());
+        //     //_make_skirt();
+        // }
 
         this->finalize_first_layer_convex_hull();
         this->set_done(psSkirtBrim);
