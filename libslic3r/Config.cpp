@@ -2,7 +2,7 @@
 #include "format.hpp"
 #include "Utils.hpp"
 #include "LocalesUtils.hpp"
-#include "Preset.hpp"
+//#include "Preset.hpp"
 
 #include <assert.h>
 #include <fstream>
@@ -805,43 +805,44 @@ int ConfigBase::load_from_json(const std::string &file, ConfigSubstitutionContex
         }
         //parse the json elements
         for (auto it = j.begin(); it != j.end(); it++) {
-            if (boost::iequals(it.key(),BBL_JSON_KEY_VERSION)) {
-                key_values.emplace(BBL_JSON_KEY_VERSION, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_IS_CUSTOM)) {
-                key_values.emplace(BBL_JSON_KEY_IS_CUSTOM, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_NAME)) {
-                key_values.emplace(BBL_JSON_KEY_NAME, it.value());
-                if (it.value() == "project_settings")
-                    is_project_settings = true;
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_URL)) {
-                key_values.emplace(BBL_JSON_KEY_URL, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_TYPE)) {
-                key_values.emplace(BBL_JSON_KEY_TYPE, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_SETTING_ID)) {
-                key_values.emplace(BBL_JSON_KEY_SETTING_ID, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_FILAMENT_ID)) {
-                key_values.emplace(BBL_JSON_KEY_FILAMENT_ID, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_FROM)) {
-                key_values.emplace(BBL_JSON_KEY_FROM, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_DESCRIPTION)) {
-                key_values.emplace(BBL_JSON_KEY_DESCRIPTION, it.value());
-            }
-            else if (boost::iequals(it.key(), BBL_JSON_KEY_INSTANTIATION)) {
-                key_values.emplace(BBL_JSON_KEY_INSTANTIATION, it.value());
-            }
-            else if (!load_inherits_to_config && boost::iequals(it.key(), BBL_JSON_KEY_INHERITS)) {
-                key_values.emplace(BBL_JSON_KEY_INHERITS, it.value());
-            } else if (boost::iequals(it.key(), ORCA_JSON_KEY_RENAMED_FROM)) {
-                key_values.emplace(ORCA_JSON_KEY_RENAMED_FROM, it.value());
-            } else {
+            // if (boost::iequals(it.key(),BBL_JSON_KEY_VERSION)) {
+            //     key_values.emplace(BBL_JSON_KEY_VERSION, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_IS_CUSTOM)) {
+            //     key_values.emplace(BBL_JSON_KEY_IS_CUSTOM, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_NAME)) {
+            //     key_values.emplace(BBL_JSON_KEY_NAME, it.value());
+            //     if (it.value() == "project_settings")
+            //         is_project_settings = true;
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_URL)) {
+            //     key_values.emplace(BBL_JSON_KEY_URL, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_TYPE)) {
+            //     key_values.emplace(BBL_JSON_KEY_TYPE, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_SETTING_ID)) {
+            //     key_values.emplace(BBL_JSON_KEY_SETTING_ID, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_FILAMENT_ID)) {
+            //     key_values.emplace(BBL_JSON_KEY_FILAMENT_ID, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_FROM)) {
+            //     key_values.emplace(BBL_JSON_KEY_FROM, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_DESCRIPTION)) {
+            //     key_values.emplace(BBL_JSON_KEY_DESCRIPTION, it.value());
+            // }
+            // else if (boost::iequals(it.key(), BBL_JSON_KEY_INSTANTIATION)) {
+            //     key_values.emplace(BBL_JSON_KEY_INSTANTIATION, it.value());
+            // }
+            // else if (!load_inherits_to_config && boost::iequals(it.key(), BBL_JSON_KEY_INHERITS)) {
+            //     key_values.emplace(BBL_JSON_KEY_INHERITS, it.value());
+            // } else if (boost::iequals(it.key(), ORCA_JSON_KEY_RENAMED_FROM)) {
+            //     key_values.emplace(ORCA_JSON_KEY_RENAMED_FROM, it.value());
+            // } else
+            {
                 t_config_option_key opt_key = it.key();
                 std::string value_str;
 
@@ -1392,11 +1393,11 @@ void ConfigBase::save_to_json(const std::string &file, const std::string &name, 
 {
     json j;
     //record the headers
-    j[BBL_JSON_KEY_VERSION] = version;
-    j[BBL_JSON_KEY_NAME] = name;
-    j[BBL_JSON_KEY_FROM] = from;
-    if (!is_custom.empty())
-        j[BBL_JSON_KEY_IS_CUSTOM] = is_custom;
+    // j[BBL_JSON_KEY_VERSION] = version;
+    // j[BBL_JSON_KEY_NAME] = name;
+    // j[BBL_JSON_KEY_FROM] = from;
+    // if (!is_custom.empty())
+    //     j[BBL_JSON_KEY_IS_CUSTOM] = is_custom;
 
     //record all the key-values
     for (const std::string &opt_key : this->keys())

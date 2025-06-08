@@ -48,20 +48,15 @@ set(lisbslic3r_sources
         Config.hpp
         EdgeGrid.cpp            # Грані у вигляді сітки
         EdgeGrid.hpp
-        Emboss.cpp              # Вирізання/тиснення (embossing)
-        Emboss.hpp
-        EmbossShape.hpp         # Геометрія для emboss
+
         enum_bitmask.hpp        # Робота з enum'ами як бітовими масками
         ExPolygon.cpp           # Розширений полігон (з отворами)
         ExPolygon.hpp
         ExPolygonSerialize.hpp  # Серіалізація ExPolygon
         ExPolygonsIndex.cpp     # Індексування полігонів
         ExPolygonsIndex.hpp
-        Extruder.cpp            # Налаштування екструдера
-        Extruder.hpp
+
         FileParserError.hpp     # Обробка помилок парсингу файлів
-        FlushVolCalc.cpp        # Об'єм виштовхування матеріалу
-        FlushVolCalc.hpp
         format.hpp              # Форматування рядків
         Format/3mf.cpp          # Парсер 3MF
         Format/3mf.hpp
@@ -77,6 +72,7 @@ set(lisbslic3r_sources
         Format/STL.hpp
         Format/ZipperArchiveImport.hpp # Імпорт ZIP-архівів
         Format/ZipperArchiveImport.cpp
+
         GCode/ThumbnailData.cpp # Генерація прев’ю (thumbnail)
         GCode/ThumbnailData.hpp
         Geometry.cpp            # Геометричні операції
@@ -118,8 +114,7 @@ set(lisbslic3r_sources
         ParameterUtils.hpp
         PerimeterGenerator.cpp  # Генерація периметрів
         PerimeterGenerator.hpp
-        Platform.cpp            # Інфо про платформу
-        Platform.hpp
+
         Point.cpp               # Точка
         Point.hpp
         Polygon.cpp             # Полігони
@@ -130,12 +125,7 @@ set(lisbslic3r_sources
         PolygonTrimmer.hpp
         Polyline.cpp            # Ламані лінії
         Polyline.hpp
-        Preset.cpp              # Пресети (налаштування)
-        Preset.hpp
-        PresetBundle.cpp
-        PresetBundle.hpp
-        ProjectTask.cpp         # Задачі проєкту
-        ProjectTask.hpp
+
         PrincipalComponents2D.hpp # Головні компоненти для 2D
         PrincipalComponents2D.cpp
         AppConfig.cpp           # Глобальна конфігурація
@@ -196,8 +186,7 @@ set(lisbslic3r_sources
         miniz_extension.hpp     # Підтримка архівації
         miniz_extension.cpp
         MarchingSquares.hpp     # Алгоритм Marching Squares
-        Execution/Execution.hpp         # Інтерфейс виконання
-        Execution/ExecutionSeq.hpp      # Послідовне виконання
+
         Execution/ExecutionTBB.hpp      # Паралельне виконання
         Optimize/Optimizer.hpp          # Загальна оптимізація
         Optimize/NLoptOptimizer.hpp     # Оптимізатор NLopt
@@ -227,7 +216,7 @@ find_package(PNG REQUIRED)
 cmake_policy(POP)
 
 add_library(libslic3r_cgal STATIC
-        CutSurface.hpp CutSurface.cpp
+       # CutSurface.hpp CutSurface.cpp
         IntersectionPoints.hpp IntersectionPoints.cpp
         MeshBoolean.hpp MeshBoolean.cpp
         TryCatchSignal.hpp TryCatchSignal.cpp

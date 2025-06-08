@@ -9,7 +9,7 @@
 #include <filesystem>
 
 #include "format.hpp"
-#include "Platform.hpp"
+//#include "Platform.hpp"
 #include "Time.hpp"
 #include "libslic3r.h"
 
@@ -801,14 +801,14 @@ bool copy_file_linux(const boost::filesystem::path &from, const boost::filesyste
 	// If we created a new file with an explicitly added S_IWUSR permission,
 	// we may need to update its mode bits to match the source file.
 	if (to_mode != from_mode && ::fchmod(outfile.fd, from_mode) != 0) {
-		if (platform_flavor() == PlatformFlavor::LinuxOnChromium) {
-			// Ignore that. 9p filesystem does not allow fmod().
-			BOOST_LOG_TRIVIAL(info) << "copy_file_linux() failed to fchmod() the output file \"" << to.string() << "\" to " << from_mode << ": " << ec.message() <<
-				" This may be expected when writing to a 9p filesystem.";
-		} else {
-			// Generic linux. Write out an error to console. At least we may get some feedback.
-			BOOST_LOG_TRIVIAL(error) << "copy_file_linux() failed to fchmod() the output file \"" << to.string() << "\" to " << from_mode << ": " << ec.message();
-		}
+		// if (platform_flavor() == PlatformFlavor::LinuxOnChromium) {
+		// 	// Ignore that. 9p filesystem does not allow fmod().
+		// 	BOOST_LOG_TRIVIAL(info) << "copy_file_linux() failed to fchmod() the output file \"" << to.string() << "\" to " << from_mode << ": " << ec.message() <<
+		// 		" This may be expected when writing to a 9p filesystem.";
+		// } else {
+		// 	// Generic linux. Write out an error to console. At least we may get some feedback.
+		// 	BOOST_LOG_TRIVIAL(error) << "copy_file_linux() failed to fchmod() the output file \"" << to.string() << "\" to " << from_mode << ": " << ec.message();
+		// }
 	}
 
 	// Note: Use fsync/fdatasync followed by close to avoid dealing with the possibility of close failing with EINTR.

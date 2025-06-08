@@ -1,8 +1,9 @@
 #ifndef BBS_3MF_hpp_
 #define BBS_3MF_hpp_
+#include <boost/thread.hpp>
 
 #include "../GCode/ThumbnailData.hpp"
-#include "libslic3r/ProjectTask.hpp"
+//#include "libslic3r/ProjectTask.hpp"
 //#include "libslic3r/GCode/GCodeProcessor.hpp"
 #include <functional>
 
@@ -12,7 +13,7 @@ class ModelObject;
 struct ConfigSubstitutionContext;
 class DynamicPrintConfig;
 class Preset;
-struct FilamentInfo;
+//struct FilamentInfo;
 struct ThumbnailData;
 
 
@@ -86,7 +87,7 @@ struct PlateData
     std::string     gcode_prediction;
     std::string     gcode_weight;
     std::string     plate_name;
-    std::vector<FilamentInfo> slice_filaments_info;
+   // std::vector<FilamentInfo> slice_filaments_info;
     std::vector<size_t> skipped_objects;
     DynamicPrintConfig config;
     bool            is_support_used {false};
@@ -226,8 +227,8 @@ struct StoreParams
     SaveStrategy strategy = SaveStrategy::Zip64;
     Export3mfProgressFn proFn = nullptr;
     std::vector<PlateBBoxData*> id_bboxes;
-    BBLProject* project = nullptr;
-    BBLProfile* profile = nullptr;
+    //BBLProject* project = nullptr;
+    //BBLProfile* profile = nullptr;
 
     StoreParams() {}
 };
@@ -237,7 +238,7 @@ struct StoreParams
 // add restore logic
 // Load the content of a 3mf file into the given model and preset bundle.
 extern bool load_bbs_3mf(const char* path, DynamicPrintConfig* config, ConfigSubstitutionContext* config_substitutions, Model* model, PlateDataPtrs* plate_data_list, std::vector<Preset*>* project_presets,
-        bool* is_bbl_3mf, Semver* file_version, Import3mfProgressFn proFn = nullptr, LoadStrategy strategy = LoadStrategy::Default, BBLProject *project = nullptr, int plate_id = 0);
+        bool* is_bbl_3mf, Semver* file_version, Import3mfProgressFn proFn = nullptr, LoadStrategy strategy = LoadStrategy::Default, void *project = nullptr, int plate_id = 0);
 
 extern std::string bbs_3mf_get_thumbnail(const char * path);
 

@@ -6,7 +6,7 @@
 #include <sstream>
 #include "Polygon.hpp"
 #include "ExPolygon.hpp"
-#include "EmbossShape.hpp" // ExPolygonsWithIds
+//#include "EmbossShape.hpp" // ExPolygonsWithIds
 #include "nanosvg/nanosvg.h"    // load SVG file
 
 // Helper function to work with nano svg
@@ -53,7 +53,7 @@ struct NSVGLineParams
 /// <param name="scale">Multiplicator of point coors
 /// NOTE: Every point coor from image(float) is multiplied by scale and rounded to integer</param>
 /// <returns>Shapes from svg image - fill + stroke</returns>
-ExPolygonsWithIds create_shape_with_ids(const NSVGimage &image, const NSVGLineParams &param);
+//ExPolygonsWithIds create_shape_with_ids(const NSVGimage &image, const NSVGLineParams &param);
 
 // help functions - prepare to be tested
 /// <param name="is_y_negative">Flag is y negative, when true than y coor is multiplied by -1</param>
@@ -67,7 +67,7 @@ std::unique_ptr<std::string> read_from_disk(const std::string &path);
 using NSVGimage_ptr = std::unique_ptr<NSVGimage, void (*)(NSVGimage*)>;
 NSVGimage_ptr nsvgParseFromFile(const std::string &svg_file_path, const char *units = "mm", float dpi = 96.0f);
 NSVGimage_ptr nsvgParse(const std::string& file_data, const char *units = "mm", float dpi = 96.0f);
-NSVGimage *init_image(EmbossShape::SvgFile &svg_file);
+//NSVGimage *init_image(EmbossShape::SvgFile &svg_file);
 
 /// <summary>
 /// Iterate over shapes and calculate count

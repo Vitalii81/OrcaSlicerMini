@@ -1,7 +1,7 @@
 #include "../libslic3r.h"
 #include "../Exception.hpp"
 #include "../Model.hpp"
-#include "../Preset.hpp"
+//#include "../Preset.hpp"
 #include "../Utils.hpp"
 #include "../LocalesUtils.hpp"
 //#include "../GCode.hpp"
@@ -50,7 +50,7 @@ namespace pt = boost::property_tree;
 #include "nlohmann/json.hpp"
 
 #include "TextConfiguration.hpp"
-#include "EmbossShape.hpp"
+//#include "EmbossShape.hpp"
 #include "ExPolygonSerialize.hpp" 
 
 #include "NSVGUtils.hpp"
@@ -763,7 +763,7 @@ namespace Slic3r {
                 RepairedMeshErrors mesh_stats;
                 ModelVolumeType part_type;
                 std::optional<TextConfiguration> text_configuration;
-                std::optional<EmbossShape> shape_configuration;
+            //    std::optional<EmbossShape> shape_configuration;
                 VolumeMetadata(unsigned int first_triangle_id, unsigned int last_triangle_id, ModelVolumeType type = ModelVolumeType::MODEL_PART)
                     : first_triangle_id(first_triangle_id)
                     , last_triangle_id(last_triangle_id)
@@ -978,7 +978,7 @@ namespace Slic3r {
         std::string  m_designer_user_id;
         std::string  m_designer_cover;
         ModelInfo    model_info;
-        BBLProject   project_info;
+        struct   project_info;
         std::string  m_profile_title;
         std::string  m_profile_cover;
         std::string  m_Profile_description;
@@ -1080,7 +1080,7 @@ namespace Slic3r {
         //BBS: add project config file logic
         void _extract_project_config_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, DynamicPrintConfig& config, ConfigSubstitutionContext& subs_context, Model& model);
         //BBS: extract project embedded presets
-        void _extract_project_embedded_presets_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, std::vector<Preset*>&project_presets, Model& model, Preset::Type type, bool use_json = true);
+       // void _extract_project_embedded_presets_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, std::vector<Preset*>&project_presets, Model& model, Preset::Type type, bool use_json = true);
 
         void _extract_auxiliary_file_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, Model& model);
         void _extract_file_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat);
@@ -1486,7 +1486,7 @@ namespace Slic3r {
             plate->is_support_used = it->second->is_support_used;
             plate->is_label_object_enabled = it->second->is_label_object_enabled;
             plate->skipped_objects = it->second->skipped_objects;
-            plate->slice_filaments_info = it->second->slice_filaments_info;
+           // plate->slice_filaments_info = it->second->slice_filaments_info;
             plate->printer_model_id = it->second->printer_model_id;
             plate->nozzle_diameters = it->second->nozzle_diameters;
            // plate->warnings = it->second->warnings;
@@ -1717,8 +1717,8 @@ namespace Slic3r {
 
         //got project id
         if (project) {
-            project->project_model_id = m_model_id;
-            project->project_country_code = m_contry_code;
+            // project->project_model_id = m_model_id;
+            // project->project_country_code = m_contry_code;
         }
 
         // Orca: skip version check
@@ -1793,19 +1793,19 @@ namespace Slic3r {
                 //BBS: project embedded presets
                 else if (!dont_load_config && boost::algorithm::istarts_with(name, PROJECT_EMBEDDED_PRINT_PRESETS_FILE)) {
                     // extract slic3r layer config ranges file
-                    _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINT, false);
+                   // _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINT, false);
                 }
                 else if (!dont_load_config && boost::algorithm::istarts_with(name, PROJECT_EMBEDDED_SLICE_PRESETS_FILE)) {
                     // extract slic3r layer config ranges file
-                    _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINT);
+                   // _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINT);
                 }
                 else if (!dont_load_config && boost::algorithm::istarts_with(name, PROJECT_EMBEDDED_FILAMENT_PRESETS_FILE)) {
                     // extract slic3r layer config ranges file
-                    _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_FILAMENT);
+                   // _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_FILAMENT);
                 }
                 else if (!dont_load_config && boost::algorithm::istarts_with(name, PROJECT_EMBEDDED_PRINTER_PRESETS_FILE)) {
                     // extract slic3r layer config ranges file
-                    _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINTER);
+                   // _extract_project_embedded_presets_from_archive(archive, stat, project_presets, model, Preset::TYPE_PRINTER);
                 }
                 else if (!dont_load_config && boost::algorithm::iequals(name, CUSTOM_GCODE_PER_PRINT_Z_FILE)) {
                     // extract slic3r layer config ranges file
@@ -2145,7 +2145,7 @@ namespace Slic3r {
             plate_data_list[it->first-1]->toolpath_outside = it->second->toolpath_outside;
             plate_data_list[it->first-1]->is_support_used = it->second->is_support_used;
             plate_data_list[it->first-1]->is_label_object_enabled = it->second->is_label_object_enabled;
-            plate_data_list[it->first-1]->slice_filaments_info = it->second->slice_filaments_info;
+            //plate_data_list[it->first-1]->slice_filaments_info = it->second->slice_filaments_info;
             plate_data_list[it->first-1]->skipped_objects = it->second->skipped_objects;
             // plate_data_list[it->first-1]->warnings = it->second->warnings;
             plate_data_list[it->first-1]->thumbnail_file = (m_load_restore || it->second->thumbnail_file.empty()) ? it->second->thumbnail_file : m_backup_path + "/" + it->second->thumbnail_file;
@@ -2501,102 +2501,102 @@ namespace Slic3r {
     }
 
     //BBS: extract project embedded presets
-    void _BBS_3MF_Importer::_extract_project_embedded_presets_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, std::vector<Preset*>&project_presets, Model& model, Preset::Type type, bool use_json)
-    {
-        if (stat.m_uncomp_size > 0) {
-            /*std::string src_file = decode_path(stat.m_filename);
-            std::size_t found = src_file.find(METADATA_DIR);
-            if (found != std::string::npos)
-                src_file = src_file.substr(found + METADATA_STR_LEN);
-            else
-                return;*/
-            std::string dest_file = m_backup_path + std::string("/") + "_temp_2.config";;
-            std::string dest_zip_file = encode_path(dest_file.c_str());
-            mz_bool res = mz_zip_reader_extract_to_file(&archive, stat.m_file_index, dest_zip_file.c_str(), 0);
-            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", extract  %1% from 3mf %2%, ret %3%\n") % dest_file % stat.m_filename % res;
-            if (res == 0) {
-                add_error("Error while extract auxiliary file to file");
-                return;
-            }
-            //load presets
-            DynamicPrintConfig config;
-            //ConfigSubstitutions config_substitutions = config.load_from_ini(dest_file, Enable);
-            std::map<std::string, std::string> key_values;
-            std::string reason;
-            ConfigSubstitutions config_substitutions = use_json? config.load_from_json(dest_file, Enable, key_values, reason) : config.load_from_ini(dest_file, Enable);
-            if (!reason.empty()) {
-                BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", load project embedded config from  %1% failed\n") % dest_file;
-                //skip this file
-                return;
-            }
-            ConfigOptionString* print_name;
-            ConfigOptionStrings* filament_names;
-            std::string preset_name;
-            if (type == Preset::TYPE_PRINT) {
-                print_name = dynamic_cast < ConfigOptionString* > (config.option("print_settings_id"));
-                if (!print_name) {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found print_settings_id from  %1%\n") % dest_file;
-                    //skip this file
-                    return;
-                }
-                preset_name = print_name->value;
-            }
-            else if (type == Preset::TYPE_FILAMENT) {
-                filament_names = dynamic_cast < ConfigOptionStrings* > (config.option("filament_settings_id"));
-                if (!filament_names) {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found filament_settings_id from  %1%\n") % dest_file;
-                    //skip this file
-                    return;
-                }
-                preset_name = filament_names->values[0];
-            }
-            else if (type == Preset::TYPE_PRINTER) {
-                print_name = dynamic_cast < ConfigOptionString* > (config.option("printer_settings_id"));
-                if (!print_name) {
-                    BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found printer_settings_id from  %1%\n") % dest_file;
-                    //skip this file
-                    return;
-                }
-                preset_name = print_name->value;
-            }
-            else {
-                BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", invalid type  %1% from file %2%\n")% Preset::get_type_string(type) % dest_file;
-                //skip this file
-                return;
-            }
-
-            Preset *preset = new Preset(type, preset_name, false);
-            preset->file = dest_file;
-            preset->config = std::move(config);
-            preset->loaded = true;
-            preset->is_project_embedded = true;
-            preset->is_external = true;
-            preset->is_dirty = false;
-
-            std::string version_str = key_values[BBL_JSON_KEY_VERSION];
-            boost::optional<Semver> version = Semver::parse(version_str);
-            if (version) {
-                preset->version = *version;
-            }
-            else
-                preset->version = this->m_bambuslicer_generator_version?*this->m_bambuslicer_generator_version: Semver();
-            /*for (int i = 0; i < config_substitutions.size(); i++)
-            {
-                //ConfigSubstitution config_substitution;
-                //config_substitution.opt_def   = optdef;
-                //config_substitution.old_value = value;
-                //config_substitution.new_value = ConfigOptionUniquePtr(opt->clone());
-                preset->loading_substitutions.emplace_back(std::move(config_substitutions[i]));
-            }*/
-            if (!config_substitutions.empty()) {
-                preset->loading_substitutions = new ConfigSubstitutions();
-                *(preset->loading_substitutions) = std::move(config_substitutions);
-            }
-
-            project_presets.push_back(preset);
-            BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", create one project embedded preset: %1% from %2%, type %3%\n") % preset_name % dest_file %Preset::get_type_string(type);
-        }
-    }
+    // void _BBS_3MF_Importer::_extract_project_embedded_presets_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, std::vector<Preset*>&project_presets, Model& model, Preset::Type type, bool use_json)
+    // {
+    //     if (stat.m_uncomp_size > 0) {
+    //         /*std::string src_file = decode_path(stat.m_filename);
+    //         std::size_t found = src_file.find(METADATA_DIR);
+    //         if (found != std::string::npos)
+    //             src_file = src_file.substr(found + METADATA_STR_LEN);
+    //         else
+    //             return;*/
+    //         std::string dest_file = m_backup_path + std::string("/") + "_temp_2.config";;
+    //         std::string dest_zip_file = encode_path(dest_file.c_str());
+    //         mz_bool res = mz_zip_reader_extract_to_file(&archive, stat.m_file_index, dest_zip_file.c_str(), 0);
+    //         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", extract  %1% from 3mf %2%, ret %3%\n") % dest_file % stat.m_filename % res;
+    //         if (res == 0) {
+    //             add_error("Error while extract auxiliary file to file");
+    //             return;
+    //         }
+    //         //load presets
+    //         DynamicPrintConfig config;
+    //         //ConfigSubstitutions config_substitutions = config.load_from_ini(dest_file, Enable);
+    //         std::map<std::string, std::string> key_values;
+    //         std::string reason;
+    //         ConfigSubstitutions config_substitutions = use_json? config.load_from_json(dest_file, Enable, key_values, reason) : config.load_from_ini(dest_file, Enable);
+    //         if (!reason.empty()) {
+    //             BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", load project embedded config from  %1% failed\n") % dest_file;
+    //             //skip this file
+    //             return;
+    //         }
+    //         ConfigOptionString* print_name;
+    //         ConfigOptionStrings* filament_names;
+    //         std::string preset_name;
+    //         if (type == Preset::TYPE_PRINT) {
+    //             print_name = dynamic_cast < ConfigOptionString* > (config.option("print_settings_id"));
+    //             if (!print_name) {
+    //                 BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found print_settings_id from  %1%\n") % dest_file;
+    //                 //skip this file
+    //                 return;
+    //             }
+    //             preset_name = print_name->value;
+    //         }
+    //         else if (type == Preset::TYPE_FILAMENT) {
+    //             filament_names = dynamic_cast < ConfigOptionStrings* > (config.option("filament_settings_id"));
+    //             if (!filament_names) {
+    //                 BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found filament_settings_id from  %1%\n") % dest_file;
+    //                 //skip this file
+    //                 return;
+    //             }
+    //             preset_name = filament_names->values[0];
+    //         }
+    //         else if (type == Preset::TYPE_PRINTER) {
+    //             print_name = dynamic_cast < ConfigOptionString* > (config.option("printer_settings_id"));
+    //             if (!print_name) {
+    //                 BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", can not found printer_settings_id from  %1%\n") % dest_file;
+    //                 //skip this file
+    //                 return;
+    //             }
+    //             preset_name = print_name->value;
+    //         }
+    //         else {
+    //             BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << boost::format(", invalid type  %1% from file %2%\n")% Preset::get_type_string(type) % dest_file;
+    //             //skip this file
+    //             return;
+    //         }
+    //
+    //         Preset *preset = new Preset(type, preset_name, false);
+    //         preset->file = dest_file;
+    //         preset->config = std::move(config);
+    //         preset->loaded = true;
+    //         preset->is_project_embedded = true;
+    //         preset->is_external = true;
+    //         preset->is_dirty = false;
+    //
+    //         std::string version_str = key_values[BBL_JSON_KEY_VERSION];
+    //         boost::optional<Semver> version = Semver::parse(version_str);
+    //         if (version) {
+    //             preset->version = *version;
+    //         }
+    //         else
+    //             preset->version = this->m_bambuslicer_generator_version?*this->m_bambuslicer_generator_version: Semver();
+    //         /*for (int i = 0; i < config_substitutions.size(); i++)
+    //         {
+    //             //ConfigSubstitution config_substitution;
+    //             //config_substitution.opt_def   = optdef;
+    //             //config_substitution.old_value = value;
+    //             //config_substitution.new_value = ConfigOptionUniquePtr(opt->clone());
+    //             preset->loading_substitutions.emplace_back(std::move(config_substitutions[i]));
+    //         }*/
+    //         if (!config_substitutions.empty()) {
+    //             preset->loading_substitutions = new ConfigSubstitutions();
+    //             *(preset->loading_substitutions) = std::move(config_substitutions);
+    //         }
+    //
+    //         project_presets.push_back(preset);
+    //         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << boost::format(", create one project embedded preset: %1% from %2%, type %3%\n") % preset_name % dest_file %Preset::get_type_string(type);
+    //     }
+    // }
 
     void _BBS_3MF_Importer::_extract_auxiliary_file_from_archive(mz_zip_archive& archive, const mz_zip_archive_file_stat& stat, Model& model)
     {
@@ -3029,14 +3029,14 @@ namespace Slic3r {
         // find embossed volume, for case svg is loaded after volume
         for (const ModelObject* object : m_model->objects)
         for (ModelVolume *volume : object->volumes) {
-            std::optional<EmbossShape> &es = volume->emboss_shape;
-            if (!es.has_value())
-                continue;
-            std::optional<EmbossShape::SvgFile> &svg = es->svg_file;
-            if (!svg.has_value())
-                continue;
-            if (filename.compare(svg->path_in_3mf) == 0)
-                svg->file_data = m_path_to_emboss_shape_files[filename];
+            // std::optional<EmbossShape> &es = volume->emboss_shape;
+            // if (!es.has_value())
+            //     continue;
+            // std::optional<EmbossShape::SvgFile> &svg = es->svg_file;
+            // if (!svg.has_value())
+            //     continue;
+            // if (filename.compare(svg->path_in_3mf) == 0)
+            //     svg->file_data = m_path_to_emboss_shape_files[filename];
         }
     }
 
@@ -3838,7 +3838,7 @@ namespace Slic3r {
 
         static void to_xml(std::stringstream &stream, const TextConfiguration &tc);
         static std::optional<TextConfiguration> read(const char **attributes, unsigned int num_attributes);
-        static EmbossShape read_old(const char **attributes, unsigned int num_attributes);
+        //static EmbossShape read_old(const char **attributes, unsigned int num_attributes);
     };
 
     bool _BBS_3MF_Importer::_handle_start_text_configuration(const char **attributes, unsigned int num_attributes)
@@ -3858,17 +3858,17 @@ namespace Slic3r {
             return false;
 
         // Is 3mf version with shapes?
-        if (volume.shape_configuration.has_value())
-            return true;
-
-        // Back compatibility for 3mf version without shapes
-        volume.shape_configuration = TextConfigurationSerialization::read_old(attributes, num_attributes);
+        // if (volume.shape_configuration.has_value())
+        //     return true;
+        //
+        // // Back compatibility for 3mf version without shapes
+        // volume.shape_configuration = TextConfigurationSerialization::read_old(attributes, num_attributes);
         return true;
     }
 
     // Definition of read/write method for EmbossShape
-    static void to_xml(std::stringstream &stream, const EmbossShape &es, const ModelVolume &volume, mz_zip_archive &archive);
-    static std::optional<EmbossShape> read_emboss_shape(const char **attributes, unsigned int num_attributes);
+    // static void to_xml(std::stringstream &stream, const EmbossShape &es, const ModelVolume &volume, mz_zip_archive &archive);
+    // static std::optional<EmbossShape> read_emboss_shape(const char **attributes, unsigned int num_attributes);
 
     bool _BBS_3MF_Importer::_handle_start_shape_configuration(const char **attributes, unsigned int num_attributes)
     {
@@ -3883,24 +3883,24 @@ namespace Slic3r {
             return false;
         }
         ObjectMetadata::VolumeMetadata &volume = volumes.back();
-        volume.shape_configuration = read_emboss_shape(attributes, num_attributes);
-        if (!volume.shape_configuration.has_value())
-            return false;
+        // volume.shape_configuration = read_emboss_shape(attributes, num_attributes);
+        // if (!volume.shape_configuration.has_value())
+        //     return false;
 
-        // Fill svg file content into shape_configuration
-        std::optional<EmbossShape::SvgFile> &svg = volume.shape_configuration->svg_file;
-        if (!svg.has_value())
-            return true; // do not contain svg file
+        // // Fill svg file content into shape_configuration
+        // std::optional<EmbossShape::SvgFile> &svg = volume.shape_configuration->svg_file;
+        // if (!svg.has_value())
+        //     return true; // do not contain svg file
 
-        const std::string &path = svg->path_in_3mf;
-        if (path.empty()) 
-            return true; // do not contain svg file
+        // const std::string &path = svg->path_in_3mf;
+        // if (path.empty())
+        //     return true; // do not contain svg file
 
-        auto it = m_path_to_emboss_shape_files.find(path);
-        if (it == m_path_to_emboss_shape_files.end())
-            return true; // svg file is not loaded yet
+        // auto it = m_path_to_emboss_shape_files.find(path);
+        // if (it == m_path_to_emboss_shape_files.end())
+        //     return true; // svg file is not loaded yet
 
-        svg->file_data = it->second;
+        //svg->file_data = it->second;
         return true;
     }
 
@@ -4311,14 +4311,14 @@ namespace Slic3r {
             std::string used_m = bbs_get_attribute_value_string(attributes, num_attributes, FILAMENT_USED_M_TAG);
             std::string used_g = bbs_get_attribute_value_string(attributes, num_attributes, FILAMENT_USED_G_TAG);
             std::string filament_id = bbs_get_attribute_value_string(attributes, num_attributes, FILAMENT_TRAY_INFO_ID_TAG);
-            FilamentInfo filament_info;
-            filament_info.id = atoi(id.c_str()) - 1;
-            filament_info.type = type;
-            filament_info.color = color;
-            filament_info.used_m = atof(used_m.c_str());
-            filament_info.used_g = atof(used_g.c_str());
-            filament_info.filament_id = filament_id;
-            m_curr_plater->slice_filaments_info.push_back(filament_info);
+            //FilamentInfo filament_info;
+            // filament_info.id = atoi(id.c_str()) - 1;
+            // filament_info.type = type;
+            // filament_info.color = color;
+            // filament_info.used_m = atof(used_m.c_str());
+            // filament_info.used_g = atof(used_g.c_str());
+            // filament_info.filament_id = filament_id;
+            // m_curr_plater->slice_filaments_info.push_back(filament_info);
         }
         return true;
     }
@@ -4781,8 +4781,8 @@ namespace Slic3r {
 
             volume->set_type(volume_data->part_type);
             
-            if (auto &es = volume_data->shape_configuration; es.has_value())
-                volume->emboss_shape = std::move(es);            
+            // if (auto &es = volume_data->shape_configuration; es.has_value())
+            //     volume->emboss_shape = std::move(es);
             if (auto &tc = volume_data->text_configuration; tc.has_value())
                 volume->text_configuration = std::move(tc);
 
@@ -8409,7 +8409,7 @@ private:
 
 //BBS: add plate data list related logic
 bool load_bbs_3mf(const char* path, DynamicPrintConfig* config, ConfigSubstitutionContext* config_substitutions, Model* model, PlateDataPtrs* plate_data_list, std::vector<Preset*>* project_presets,
-                    bool* is_bbl_3mf, Semver* file_version, Import3mfProgressFn proFn, LoadStrategy strategy, BBLProject *project, int plate_id)
+                    bool* is_bbl_3mf, Semver* file_version, Import3mfProgressFn proFn, LoadStrategy strategy, void *project, int plate_id)
 {
     if (path == nullptr || config == nullptr || model == nullptr)
         return false;
@@ -8417,7 +8417,7 @@ bool load_bbs_3mf(const char* path, DynamicPrintConfig* config, ConfigSubstituti
     // All import should use "C" locales for number formatting.
     CNumericLocalesSetter locales_setter;
     _BBS_3MF_Importer importer;
-    bool res = importer.load_model_from_file(path, *model, *plate_data_list, *project_presets, *config, *config_substitutions, strategy, *is_bbl_3mf, *file_version, proFn, project, plate_id);
+    bool res = importer.load_model_from_file(path, *model, *plate_data_list, *project_presets, *config, *config_substitutions, strategy, *is_bbl_3mf, *file_version, proFn, nullptr, plate_id);
     importer.log_errors();
     //BBS: remove legacy project logic currently
     //handle_legacy_project_loaded(importer.version(), *config);
@@ -8759,25 +8759,25 @@ std::optional<TextConfiguration> TextConfigurationSerialization::read(const char
     return TextConfiguration{std::move(es), std::move(text)};
 }
 
-EmbossShape TextConfigurationSerialization::read_old(const char **attributes, unsigned int num_attributes)
-{
-    EmbossShape es;
-    std::string fix_tr_mat_str = bbs_get_attribute_value_string(attributes, num_attributes, TRANSFORM_ATTR);
-    if (!fix_tr_mat_str.empty())
-        es.fix_3mf_tr = bbs_get_transform_from_3mf_specs_string(fix_tr_mat_str);
-
-
-    if (bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR) == 1)
-        es.projection.use_surface = true;
-
-    es.projection.depth = bbs_get_attribute_value_float(attributes, num_attributes, DEPTH_ATTR);
-
-    int use_surface = bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR);
-    if (use_surface == 1)
-        es.projection.use_surface = true;
-
-    return es;
-}
+// EmbossShape TextConfigurationSerialization::read_old(const char **attributes, unsigned int num_attributes)
+// {
+//     EmbossShape es;
+//     std::string fix_tr_mat_str = bbs_get_attribute_value_string(attributes, num_attributes, TRANSFORM_ATTR);
+//     if (!fix_tr_mat_str.empty())
+//         es.fix_3mf_tr = bbs_get_transform_from_3mf_specs_string(fix_tr_mat_str);
+//
+//
+//     if (bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR) == 1)
+//         es.projection.use_surface = true;
+//
+//     es.projection.depth = bbs_get_attribute_value_float(attributes, num_attributes, DEPTH_ATTR);
+//
+//     int use_surface = bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR);
+//     if (use_surface == 1)
+//         es.projection.use_surface = true;
+//
+//     return es;
+// }
 
 namespace {
 Transform3d create_fix(const std::optional<Transform3d> &prev, const ModelVolume &volume)
@@ -8868,40 +8868,40 @@ void to_xml(std::stringstream &stream, const EmbossShape &es, const ModelVolume 
     stream << "/>\n"; // end SHAPE_TAG    
 }
 #endif
-std::optional<EmbossShape> read_emboss_shape(const char **attributes, unsigned int num_attributes) {    
-    double scale = bbs_get_attribute_value_float(attributes, num_attributes, SHAPE_SCALE_ATTR);
-    int unhealed = bbs_get_attribute_value_int(attributes, num_attributes, UNHEALED_ATTR);
-    bool is_healed = unhealed != 1;
-
-    EmbossProjection projection;
-    projection.depth = bbs_get_attribute_value_float(attributes, num_attributes, DEPTH_ATTR);
-    if (is_approx(projection.depth, 0.))
-        projection.depth = 10.;
-
-    int use_surface  = bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR);
-    if (use_surface == 1)
-        projection.use_surface = true;     
-
-    std::optional<Transform3d> fix_tr_mat;
-    std::string fix_tr_mat_str = bbs_get_attribute_value_string(attributes, num_attributes, TRANSFORM_ATTR);
-    if (!fix_tr_mat_str.empty()) { 
-        fix_tr_mat = bbs_get_transform_from_3mf_specs_string(fix_tr_mat_str);
-    }
-
-    std::string file_path = bbs_get_attribute_value_string(attributes, num_attributes, SVG_FILE_PATH_ATTR);
-    std::string file_path_3mf = bbs_get_attribute_value_string(attributes, num_attributes, SVG_FILE_PATH_IN_3MF_ATTR);
-
-    // MayBe: store also shapes to not store svg
-    // But be carefull curve will be lost -> scale will not change sampling
-    // shapes could be loaded from SVG
-    ExPolygonsWithIds shapes; 
-    // final shape could be calculated from shapes
-    HealedExPolygons final_shape;
-    final_shape.is_healed = is_healed;
-
-    EmbossShape::SvgFile svg{file_path, file_path_3mf};
-    return EmbossShape{std::move(shapes), std::move(final_shape), scale, std::move(projection), std::move(fix_tr_mat), std::move(svg)};
-}
+// std::optional<EmbossShape> read_emboss_shape(const char **attributes, unsigned int num_attributes) {
+//     double scale = bbs_get_attribute_value_float(attributes, num_attributes, SHAPE_SCALE_ATTR);
+//     int unhealed = bbs_get_attribute_value_int(attributes, num_attributes, UNHEALED_ATTR);
+//     bool is_healed = unhealed != 1;
+//
+//     EmbossProjection projection;
+//     projection.depth = bbs_get_attribute_value_float(attributes, num_attributes, DEPTH_ATTR);
+//     if (is_approx(projection.depth, 0.))
+//         projection.depth = 10.;
+//
+//     int use_surface  = bbs_get_attribute_value_int(attributes, num_attributes, USE_SURFACE_ATTR);
+//     if (use_surface == 1)
+//         projection.use_surface = true;
+//
+//     std::optional<Transform3d> fix_tr_mat;
+//     std::string fix_tr_mat_str = bbs_get_attribute_value_string(attributes, num_attributes, TRANSFORM_ATTR);
+//     if (!fix_tr_mat_str.empty()) {
+//         fix_tr_mat = bbs_get_transform_from_3mf_specs_string(fix_tr_mat_str);
+//     }
+//
+//     std::string file_path = bbs_get_attribute_value_string(attributes, num_attributes, SVG_FILE_PATH_ATTR);
+//     std::string file_path_3mf = bbs_get_attribute_value_string(attributes, num_attributes, SVG_FILE_PATH_IN_3MF_ATTR);
+//
+//     // MayBe: store also shapes to not store svg
+//     // But be carefull curve will be lost -> scale will not change sampling
+//     // shapes could be loaded from SVG
+//     ExPolygonsWithIds shapes;
+//     // final shape could be calculated from shapes
+//     HealedExPolygons final_shape;
+//     final_shape.is_healed = is_healed;
+//
+//     EmbossShape::SvgFile svg{file_path, file_path_3mf};
+//     return EmbossShape{std::move(shapes), std::move(final_shape), scale, std::move(projection), std::move(fix_tr_mat), std::move(svg)};
+// }
 
 
 } // namespace Slic3r

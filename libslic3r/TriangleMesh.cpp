@@ -7,7 +7,7 @@
 #include "Geometry/ConvexHull.hpp"
 #include "Point.hpp"
 #include "Execution/ExecutionTBB.hpp"
-#include "Execution/ExecutionSeq.hpp"
+//#include "Execution/ExecutionSeq.hpp"
 #include "CutUtils.hpp"
 #include "Utils.hpp"
 #include "Format/STL.hpp"
@@ -205,7 +205,8 @@ bool TriangleMesh::from_stl(stl_file& stl, bool repair)
 #endif
 
     stl_generate_shared_vertices(&stl, this->its);
-    fill_initial_stats(this->its, this->m_stats);
+
+   fill_initial_stats(this->its, this->m_stats);
     return true;
 }
 
@@ -1505,10 +1506,11 @@ void VertexFaceIndex::create(const indexed_triangle_set &its)
         m_vertex_to_face_start[i] = m_vertex_to_face_start[i - 1];
     m_vertex_to_face_start.front() = 0;
 }
-
+    struct DummyExecPolicy {};
 std::vector<Vec3i32> its_face_neighbors(const indexed_triangle_set &its)
 {
-    return create_face_neighbors_index(ex_seq, its);
+
+    return create_face_neighbors_index(DummyExecPolicy{}, its);
 }
 
 std::vector<Vec3i32> its_face_neighbors_par(const indexed_triangle_set &its)

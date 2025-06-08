@@ -2,7 +2,7 @@
 #include "libslic3r/Utils.hpp"
 #include "AppConfig.hpp"
 //BBS
-#include "Preset.hpp"
+//#include "Preset.hpp"
 #include "Exception.hpp"
 #include "LocalesUtils.hpp"
 //#include "Thread.hpp"
@@ -1340,11 +1340,11 @@ void AppConfig::reset_selections()
 {
     auto it = m_storage.find("presets");
     if (it != m_storage.end()) {
-        it->second.erase(PRESET_PRINT_NAME);
-        it->second.erase(PRESET_FILAMENT_NAME);
-        it->second.erase("sla_print");
-        it->second.erase("sla_material");
-        it->second.erase(PRESET_PRINTER_NAME);
+        //it->second.erase(PRESET_PRINT_NAME);
+        //it->second.erase(PRESET_FILAMENT_NAME);
+        //it->second.erase("sla_print");
+        //it->second.erase("sla_material");
+        //it->second.erase(PRESET_PRINTER_NAME);
         it->second.erase("physical_printer");
         m_dirty = true;
     }
