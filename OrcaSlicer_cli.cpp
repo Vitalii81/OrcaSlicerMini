@@ -38,6 +38,179 @@ void log(const char* msg) { std::cout << "=== " << msg << " ===" << std::endl; }
 void signal_handler(int signum) { std::cerr << "Signal " << signum << " caught!" << std::endl; std::exit(signum); }
 
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#include <vector>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+
+void render_slicingdata_png(const SlicingData& data, const std::string& filename, int width = 1024, int height = 1024) {
+    std::vector<unsigned char> img(width * height * 3, 240); // Light gray background
+
+    float angle_rad = 0.6f;
+    float fov = 100.0f;     // For perspective
+    float z_scale = 1.0f;
+    float scale = 1.0f;
+
+    // Calculate bounds in perspective projection at an angle
+    float min_px = 1e9f, max_px = -1e9f;
+    float min_py = 1e9f, max_py = -1e9f;
+    for (const auto& layer : data.layers) {
+        float z = layer.z_height;
+        float depth = fov / (fov + z * z_scale);
+        for (const auto& c : layer.perimeters) {
+            for (const auto& pt : c.points) {
+                float px = (pt.x + z * std::cos(angle_rad)) * depth;
+                float py = (pt.y - z * std::sin(angle_rad)) * depth;
+                min_px = std::min(min_px, px);
+                max_px = std::max(max_px, px);
+                min_py = std::min(min_py, py);
+                max_py = std::max(max_py, py);
+            }
+        }
+    }
+
+    float dx = max_px - min_px;
+    float dy = max_py - min_py;
+    scale = std::min(width / dx, height / dy) * 0.9f;
+
+    float offset_x = width / 2.0f - ((min_px + max_px) / 2.0f) * scale;
+    float offset_y = height / 2.0f + ((min_py + max_py) / 2.0f) * scale;
+
+    auto put_pixel = [&](int x, int y, unsigned char r, unsigned char g, unsigned char b) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return;
+        int idx = (y * width + x) * 3;
+        img[idx + 0] = r;
+        img[idx + 1] = g;
+        img[idx + 2] = b;
+    };
+
+    auto draw_line = [&](int x0, int y0, int x1, int y1, unsigned char r, unsigned char g, unsigned char b) {
+        int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy, e2;
+        while (true) {
+            put_pixel(x0, y0, r, g, b);
+            if (x0 == x1 && y0 == y1) break;
+            e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+    };
+
+    size_t total_layers = data.layers.size();
+    for (size_t li = 0; li < total_layers; ++li) {
+        const auto& layer = data.layers[li];
+        float z = layer.z_height;
+        float depth = fov / (fov + z * z_scale);
+
+        // Color gradient
+        float t = static_cast<float>(li) / std::max(total_layers - 1, size_t(1));
+        unsigned char r = static_cast<unsigned char>(255 * t);
+        unsigned char g = static_cast<unsigned char>(100 * (1.0f - t));
+        unsigned char b = static_cast<unsigned char>(255 * (1.0f - t));
+
+        for (const auto& contour : layer.perimeters) {
+            const auto& pts = contour.points;
+            for (size_t i = 0; i < pts.size(); ++i) {
+                const auto& p1 = pts[i];
+                const auto& p2 = pts[(i + 1) % pts.size()];
+
+                float px1 = (p1.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
+                float py1 = (p1.y - z * std::sin(angle_rad)) * depth * scale;
+                float px2 = (p2.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
+                float py2 = (p2.y - z * std::sin(angle_rad)) * depth * scale;
+
+                draw_line(static_cast<int>(px1), static_cast<int>(offset_y - py1),
+                          static_cast<int>(px2), static_cast<int>(offset_y - py2),
+                          r, g, b);
+            }
+        }
+    }
+
+    stbi_write_png(filename.c_str(), width, height, 3, img.data(), width * 3);
+    std::cout << "✅ Perspective image at an angle with colors saved: " << filename << std::endl;
+}
+
+
+#include <fstream>
+#include <cmath>
+#include <iostream>
+#include <algorithm>
+
+static void hsv_to_rgb(float h, float s, float v, float& r, float& g, float& b) {
+    float c = v * s;
+    float x = c * (1 - std::fabs(std::fmod(h * 6, 2) - 1));
+    float m = v - c;
+
+    if (h < 1.0f / 6.0f)      { r = c; g = x; b = 0; }
+    else if (h < 2.0f / 6.0f) { r = x; g = c; b = 0; }
+    else if (h < 3.0f / 6.0f) { r = 0; g = c; b = x; }
+    else if (h < 4.0f / 6.0f) { r = 0; g = x; b = c; }
+    else if (h < 5.0f / 6.0f) { r = x; g = 0; b = c; }
+    else                     { r = c; g = 0; b = x; }
+
+    r += m;
+    g += m;
+    b += m;
+}
+
+#include <cstdlib>
+
+void openObjFile(const std::string& path) {
+    std::string command = "xdg-open \"" + path + "\"";
+    std::system(command.c_str());
+}
+
+void export_slicingdata_to_obj(const SlicingData& data, const std::string& filename) {
+    std::ofstream out(filename);
+    if (!out) { std::cerr << "Failed to open OBJ file\n"; return; }
+
+    std::string base = filename.substr(0, filename.find_last_of('.'));
+    std::string mtl_filename = base + ".mtl";
+    out << "mtllib " << mtl_filename.substr(mtl_filename.find_last_of("/\\") + 1) << "\n";
+
+    std::ofstream mtl(mtl_filename);
+    if (!mtl) { std::cerr << "Failed to open MTL file\n"; return; }
+
+    // 🌈 Rainbow colors
+    size_t total_layers = data.layers.size();
+    for (size_t li = 0; li < total_layers; ++li) {
+        float hue = static_cast<float>(li) / std::max(total_layers - 1, size_t(1)); // 0..1
+        float r, g, b;
+        hsv_to_rgb(hue, 1.0f, 1.0f, r, g, b); // s = 1, v = 1 → full saturation
+
+        mtl << "newmtl layer" << li << "\n";
+        mtl << "Kd " << r << " " << g << " " << b << "\n";
+        mtl << "d 1.0\n\n";
+    }
+
+    // 🟩 Objects: vertices + lines
+    int vertex_id = 1;
+    for (size_t li = 0; li < total_layers; ++li) {
+        const auto& layer = data.layers[li];
+        out << "usemtl layer" << li << "\n";
+        for (const auto& contour : layer.perimeters) {
+            const auto& pts = contour.points;
+            for (size_t i = 0; i < pts.size(); ++i) {
+                const auto& p1 = pts[i];
+                const auto& p2 = pts[(i + 1) % pts.size()];
+                out << "v " << p1.x << " " << p1.y << " " << layer.z_height << "\n";
+                out << "v " << p2.x << " " << p2.y << " " << layer.z_height << "\n";
+                out << "l " << vertex_id << " " << (vertex_id + 1) << "\n";
+                vertex_id += 2;
+            }
+        }
+    }
+
+    out.close();
+    mtl.close();
+    std::cout << "✅ Saved with rainbow layers: " << filename << " + " << mtl_filename << std::endl;
+
+    openObjFile(filename);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 TypeFile get_file_type(const std::string& path) {
@@ -561,171 +734,6 @@ std::tuple<std::string, std::string, std::string> split_file_path(const std::str
     return std::make_tuple(directory, filename, extension);
 }
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
-#include <vector>
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-
-void render_slicingdata_png(const SlicingData& data, const std::string& filename, int width = 1024, int height = 1024) {
-    std::vector<unsigned char> img(width * height * 3, 240); // Light gray background
-
-    float angle_rad = 0.6f;
-    float fov = 100.0f;     // For perspective
-    float z_scale = 1.0f;
-    float scale = 1.0f;
-
-    // Calculate bounds in perspective projection at an angle
-    float min_px = 1e9f, max_px = -1e9f;
-    float min_py = 1e9f, max_py = -1e9f;
-    for (const auto& layer : data.layers) {
-        float z = layer.z_height;
-        float depth = fov / (fov + z * z_scale);
-        for (const auto& c : layer.perimeters) {
-            for (const auto& pt : c.points) {
-                float px = (pt.x + z * std::cos(angle_rad)) * depth;
-                float py = (pt.y - z * std::sin(angle_rad)) * depth;
-                min_px = std::min(min_px, px);
-                max_px = std::max(max_px, px);
-                min_py = std::min(min_py, py);
-                max_py = std::max(max_py, py);
-            }
-        }
-    }
-
-    float dx = max_px - min_px;
-    float dy = max_py - min_py;
-    scale = std::min(width / dx, height / dy) * 0.9f;
-
-    float offset_x = width / 2.0f - ((min_px + max_px) / 2.0f) * scale;
-    float offset_y = height / 2.0f + ((min_py + max_py) / 2.0f) * scale;
-
-    auto put_pixel = [&](int x, int y, unsigned char r, unsigned char g, unsigned char b) {
-        if (x < 0 || x >= width || y < 0 || y >= height) return;
-        int idx = (y * width + x) * 3;
-        img[idx + 0] = r;
-        img[idx + 1] = g;
-        img[idx + 2] = b;
-    };
-
-    auto draw_line = [&](int x0, int y0, int x1, int y1, unsigned char r, unsigned char g, unsigned char b) {
-        int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-        int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-        int err = dx + dy, e2;
-        while (true) {
-            put_pixel(x0, y0, r, g, b);
-            if (x0 == x1 && y0 == y1) break;
-            e2 = 2 * err;
-            if (e2 >= dy) { err += dy; x0 += sx; }
-            if (e2 <= dx) { err += dx; y0 += sy; }
-        }
-    };
-
-    size_t total_layers = data.layers.size();
-    for (size_t li = 0; li < total_layers; ++li) {
-        const auto& layer = data.layers[li];
-        float z = layer.z_height;
-        float depth = fov / (fov + z * z_scale);
-
-        // Color gradient
-        float t = static_cast<float>(li) / std::max(total_layers - 1, size_t(1));
-        unsigned char r = static_cast<unsigned char>(255 * t);
-        unsigned char g = static_cast<unsigned char>(100 * (1.0f - t));
-        unsigned char b = static_cast<unsigned char>(255 * (1.0f - t));
-
-        for (const auto& contour : layer.perimeters) {
-            const auto& pts = contour.points;
-            for (size_t i = 0; i < pts.size(); ++i) {
-                const auto& p1 = pts[i];
-                const auto& p2 = pts[(i + 1) % pts.size()];
-
-                float px1 = (p1.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
-                float py1 = (p1.y - z * std::sin(angle_rad)) * depth * scale;
-                float px2 = (p2.x + z * std::cos(angle_rad)) * depth * scale + offset_x;
-                float py2 = (p2.y - z * std::sin(angle_rad)) * depth * scale;
-
-                draw_line(static_cast<int>(px1), static_cast<int>(offset_y - py1),
-                          static_cast<int>(px2), static_cast<int>(offset_y - py2),
-                          r, g, b);
-            }
-        }
-    }
-
-    stbi_write_png(filename.c_str(), width, height, 3, img.data(), width * 3);
-    std::cout << "✅ Perspective image at an angle with colors saved: " << filename << std::endl;
-}
-
-
-#include <fstream>
-#include <cmath>
-#include <iostream>
-#include <algorithm>
-
-static void hsv_to_rgb(float h, float s, float v, float& r, float& g, float& b) {
-    float c = v * s;
-    float x = c * (1 - std::fabs(std::fmod(h * 6, 2) - 1));
-    float m = v - c;
-
-    if (h < 1.0f / 6.0f)      { r = c; g = x; b = 0; }
-    else if (h < 2.0f / 6.0f) { r = x; g = c; b = 0; }
-    else if (h < 3.0f / 6.0f) { r = 0; g = c; b = x; }
-    else if (h < 4.0f / 6.0f) { r = 0; g = x; b = c; }
-    else if (h < 5.0f / 6.0f) { r = x; g = 0; b = c; }
-    else                     { r = c; g = 0; b = x; }
-
-    r += m;
-    g += m;
-    b += m;
-}
-
-void export_slicingdata_to_obj(const SlicingData& data, const std::string& filename) {
-    std::ofstream out(filename);
-    if (!out) { std::cerr << "Failed to open OBJ file\n"; return; }
-
-    std::string base = filename.substr(0, filename.find_last_of('.'));
-    std::string mtl_filename = base + ".mtl";
-    out << "mtllib " << mtl_filename.substr(mtl_filename.find_last_of("/\\") + 1) << "\n";
-
-    std::ofstream mtl(mtl_filename);
-    if (!mtl) { std::cerr << "Failed to open MTL file\n"; return; }
-
-    // 🌈 Rainbow colors
-    size_t total_layers = data.layers.size();
-    for (size_t li = 0; li < total_layers; ++li) {
-        float hue = static_cast<float>(li) / std::max(total_layers - 1, size_t(1)); // 0..1
-        float r, g, b;
-        hsv_to_rgb(hue, 1.0f, 1.0f, r, g, b); // s = 1, v = 1 → full saturation
-
-        mtl << "newmtl layer" << li << "\n";
-        mtl << "Kd " << r << " " << g << " " << b << "\n";
-        mtl << "d 1.0\n\n";
-    }
-
-    // 🟩 Objects: vertices + lines
-    int vertex_id = 1;
-    for (size_t li = 0; li < total_layers; ++li) {
-        const auto& layer = data.layers[li];
-        out << "usemtl layer" << li << "\n";
-        for (const auto& contour : layer.perimeters) {
-            const auto& pts = contour.points;
-            for (size_t i = 0; i < pts.size(); ++i) {
-                const auto& p1 = pts[i];
-                const auto& p2 = pts[(i + 1) % pts.size()];
-                out << "v " << p1.x << " " << p1.y << " " << layer.z_height << "\n";
-                out << "v " << p2.x << " " << p2.y << " " << layer.z_height << "\n";
-                out << "l " << vertex_id << " " << (vertex_id + 1) << "\n";
-                vertex_id += 2;
-            }
-        }
-    }
-
-    out.close();
-    mtl.close();
-    std::cout << "✅ Saved with rainbow layers: " << filename << " + " << mtl_filename << std::endl;
-}
-
-
 int orca_slicer(int argc, char** argv)
 {
     if (argc < 2) {
@@ -779,26 +787,50 @@ int orca_slicer(int argc, char** argv)
 using namespace std;
 //namespace fs = std::filesystem;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     cout << "--- Started Orca Slicer App ---" << endl;
 
-    if (argc == 1) {
-        cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] ---" << endl;
-        cout << "Test slicing model cube.stl" << endl;
+    if (argc >= 2)
+    {
+        if (argc == 2 && strcmp(argv[1], "test") == 0) {
+            cout << "--- Usage: " << argv[0] << " <path_to_file> [layer_height] ---" << endl;
+            cout << "Test slicing model cube.stl" << endl;
 
-        static std::string model_str = (fs::current_path().parent_path().parent_path() / "3dModel" / "cube.stl").string();
-        const char* c_model = model_str.c_str();
+            fs::path exe_path = fs::canonical(argv[0]);
+            fs::path base_dir = exe_path.parent_path().parent_path().parent_path();
+            static std::string model_str = (base_dir / "3dModel" / "cube.stl").string();
+            const char* c_model = model_str.c_str();
 
-        char* _argv[] = {
-            (char*)"program_name",
-            (char*)c_model,
-            (char*)"0.4"
-        };
+            char* _argv[] = {
+                (char*)"program_name",
+                (char*)c_model,
+                (char*)"0.4"
+            };
 
-        int _argc = sizeof(_argv) / sizeof(_argv[0]);
+            int _argc = sizeof(_argv) / sizeof(_argv[0]);
+            return orca_slicer(_argc, _argv);
 
-        return orca_slicer(_argc, _argv);
-    } else {
-        return orca_slicer(argc, argv);
+        } else if (argc == 2 && strcmp(argv[1], "-h") == 0) {
+            cout << "Usage:\n";
+            cout << "  ./run.sh <path_to_file> [layer_height]    Slice specified model with optional layer height\n";
+            cout << "  ./run.sh test                             Slice default test model (cube.stl) with 0.4mm layer height\n";
+            cout << "  ./run.sh -h                               Show this help message\n";
+            cout << "\nAlternatively:\n";
+            cout << "  " << argv[0] << " <path_to_file> [layer_height]\n";
+            cout << "  " << argv[0] << " test\n";
+            cout << "  " << argv[0] << " -h\n";
+
+
+            return 0;
+
+        } else {
+            return orca_slicer(argc, argv);
+        }
     }
+
+    cout << "  " << argv[0] << " -h                                 Show this help message\n";
+
+    return -1;
 }
+
