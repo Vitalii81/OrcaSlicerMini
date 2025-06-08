@@ -186,12 +186,9 @@ set(lisbslic3r_sources
         miniz_extension.hpp     # Підтримка архівації
         miniz_extension.cpp
         MarchingSquares.hpp     # Алгоритм Marching Squares
-
+        Execution/Execution.hpp         # Інтерфейс виконання
+        Execution/ExecutionSeq.hpp      # Послідовне виконання
         Execution/ExecutionTBB.hpp      # Паралельне виконання
-        Optimize/Optimizer.hpp          # Загальна оптимізація
-        Optimize/NLoptOptimizer.hpp     # Оптимізатор NLopt
-        Optimize/BruteforceOptimizer.hpp # Оптимізація перебором
-        Shape/TextShape.cpp             # Текстові мітки
         GCode/Thumbnails.cpp            # Зображення в GCode
 )
 
