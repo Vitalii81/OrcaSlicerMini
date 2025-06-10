@@ -5,12 +5,9 @@ project(OrcaSlicer)
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
-if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "No build type selected, default to Release")
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
-endif()
+message(STATUS "Build type selected: ${CMAKE_BUILD_TYPE}")
 
-set(SLIC3R_STATIC_INITIAL 0)
+set(SLIC3R_STATIC_INITIAL 1)
 
 option(SLIC3R_STATIC 			"Compile OrcaSlicer with static libraries (Boost, TBB, glew)" ${SLIC3R_STATIC_INITIAL})
 option(SLIC3R_FHS               "Assume OrcaSlicer is to be installed in a FHS directory structure" 0)
@@ -131,14 +128,11 @@ endif()
 
 #set(Boost_DEBUG ON)
 find_package(Boost 1.83.0 REQUIRED COMPONENTS system filesystem thread log log_setup locale regex chrono atomic date_time iostreams program_options nowide)
-
 add_library(boost_libs INTERFACE)
 add_library(boost_headeronly INTERFACE)
-
 if(NOT SLIC3R_STATIC)
     target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
 endif()
-
 target_include_directories(boost_headeronly INTERFACE ${Boost_INCLUDE_DIRS})
 target_link_libraries(boost_libs INTERFACE boost_headeronly ${Boost_LIBRARIES})
 
@@ -150,28 +144,28 @@ set(TBB_DEBUG 1)
 set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release "")
 find_package(TBB REQUIRED)
 
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
+#
+#add_library(libcurl INTERFACE)
+#target_link_libraries(libcurl INTERFACE CURL::libcurl)
+#
+#find_package(ZLIB REQUIRED)
+#target_link_libraries(libcurl INTERFACE ZLIB::ZLIB)
 
-add_library(libcurl INTERFACE)
-target_link_libraries(libcurl INTERFACE CURL::libcurl)
-
-find_package(ZLIB REQUIRED)
-target_link_libraries(libcurl INTERFACE ZLIB::ZLIB)
-
-if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_CURL)
-        # libcurl is always linked dynamically to the system libcurl on OSX.
-        # On other systems, libcurl is linked statically if SLIC3R_STATIC is set.
-        target_compile_definitions(libcurl INTERFACE CURL_STATICLIB)
-
-    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        # As of now, our build system produces a statically linked libcurl,
-        # which links the OpenSSL library dynamically.
-        #find_package(OpenSSL REQUIRED)
-        message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
-        message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
-
-    endif()
-endif()
+#if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_CURL)
+#        # libcurl is always linked dynamically to the system libcurl on OSX.
+#        # On other systems, libcurl is linked statically if SLIC3R_STATIC is set.
+#        target_compile_definitions(libcurl INTERFACE CURL_STATICLIB)
+#
+#    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#        # As of now, our build system produces a statically linked libcurl,
+#        # which links the OpenSSL library dynamically.
+#        #find_package(OpenSSL REQUIRED)
+#        message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
+#        message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+#
+#    endif()
+#endif()
 
 ## OPTIONAL packages
 
@@ -288,7 +282,7 @@ else ()
     install(DIRECTORY "${SLIC3R_RESOURCES_DIR}/" DESTINATION "${CMAKE_INSTALL_PREFIX}/resources")
 endif ()
 
-install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.txt DESTINATION ".")
+#install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.txt DESTINATION ".")
 
 set (CPACK_PACKAGE_NAME "OrcaSlicer")
 set (CPACK_PACKAGE_VENDOR "SoftFever")
@@ -299,14 +293,14 @@ set (CPACK_PACKAGE_FILE_NAME "OrcaSlicer_Windows_Installer_V${SoftFever_VERSION}
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Orca Slicer is an open source slicer for FDM printers")
 set (CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/SoftFever/OrcaSlicer")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
-set (CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images\\\\OrcaSlicer.ico")
-set (CPACK_NSIS_MUI_ICON "${CPACK_PACKAGE_ICON}")
-set (CPACK_NSIS_MUI_UNIICON "${CPACK_PACKAGE_ICON}")
+#set (CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images\\\\OrcaSlicer.ico")
+#set (CPACK_NSIS_MUI_ICON "${CPACK_PACKAGE_ICON}")
+#set (CPACK_NSIS_MUI_UNIICON "${CPACK_PACKAGE_ICON}")
 set (CPACK_PACKAGE_CHECKSUM SHA256)
-set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "OrcaSlicer")
-set (CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-set (CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
+#set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "OrcaSlicer")
+#set (CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+#set (CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 set(CPACK_PACKAGE_EXECUTABLES "orca-slicer;OrcaSlicer")
-set(CPACK_CREATE_DESKTOP_LINKS "orca-slicer")
-set(CPACK_GENERATOR NSIS)
+#set(CPACK_CREATE_DESKTOP_LINKS "orca-slicer")
+#set(CPACK_GENERATOR NSIS)
 
