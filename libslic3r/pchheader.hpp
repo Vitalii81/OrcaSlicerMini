@@ -122,11 +122,8 @@
 #include "Point.hpp"
 #include "Polygon.hpp"
 #include "Polyline.hpp"
-//#include "SVG.hpp"
 
 #include "libslic3r.h"
 #include "libslic3r_version.h"
-
-#include <Shiny/Shiny.h>
 
 #include <admesh/stl.h>

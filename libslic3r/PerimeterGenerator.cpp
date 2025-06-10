@@ -22,7 +22,7 @@
 #include "libslic3r/AABBTreeLines.hpp"
 #include "Print.hpp"
 #include "Algorithm/LineSplit.hpp"
-#include "libnoise/noise.h"
+//#include "libnoise/noise.h"
 static const int overhang_sampling_number = 6;
 static const double narrow_loop_length_threshold = 10;
 static const double min_degree_gap = 0.1;
@@ -45,13 +45,13 @@ static double random_value() {
     return dist(gen);
 }
 
-class UniformNoise: public noise::module::Module {
-    public:
-        UniformNoise(): Module (GetSourceModuleCount ()) {};
-
-        virtual int GetSourceModuleCount() const { return 0; }
-        virtual double GetValue(double x, double y, double z) const { return random_value() * 2 - 1; }
-};
+// class UniformNoise: public noise::module::Module {
+//     public:
+//         UniformNoise(): Module (GetSourceModuleCount ()) {};
+//
+//         virtual int GetSourceModuleCount() const { return 0; }
+//         virtual double GetValue(double x, double y, double z) const { return random_value() * 2 - 1; }
+// };
 
 // Hierarchy of perimeters.
 class PerimeterGeneratorLoop {
@@ -66,7 +66,7 @@ public:
     unsigned short                      depth;
     // Children contour, may be both CCW and CW oriented (outer contours or holes).
     std::vector<PerimeterGeneratorLoop> children;
-    
+
     PerimeterGeneratorLoop(const Polygon &polygon, unsigned short depth, bool is_contour, bool is_small_width_perimeter = false) :
         polygon(polygon), is_contour(is_contour), is_smaller_width_perimeter(is_small_width_perimeter), depth(depth) {}
     // External perimeter. It may be CCW or CW oriented (outer contour or hole contour).
@@ -75,77 +75,77 @@ public:
     bool is_internal_contour() const;
 };
 
-static std::unique_ptr<noise::module::Module> get_noise_module(const FuzzySkinConfig& cfg) {
-    if (cfg.noise_type == NoiseType::Perlin) {
-        auto perlin_noise = noise::module::Perlin();
-        perlin_noise.SetFrequency(1 / cfg.noise_scale);
-        perlin_noise.SetOctaveCount(cfg.noise_octaves);
-        perlin_noise.SetPersistence(cfg.noise_persistence);
-        return std::make_unique<noise::module::Perlin>(perlin_noise);
-    } else if (cfg.noise_type == NoiseType::Billow) {
-        auto billow_noise = noise::module::Billow();
-        billow_noise.SetFrequency(1 / cfg.noise_scale);
-        billow_noise.SetOctaveCount(cfg.noise_octaves);
-        billow_noise.SetPersistence(cfg.noise_persistence);
-        return std::make_unique<noise::module::Billow>(billow_noise);
-    } else if (cfg.noise_type == NoiseType::RidgedMulti) {
-        auto ridged_multi_noise = noise::module::RidgedMulti();
-        ridged_multi_noise.SetFrequency(1 / cfg.noise_scale);
-        ridged_multi_noise.SetOctaveCount(cfg.noise_octaves);
-        return std::make_unique<noise::module::RidgedMulti>(ridged_multi_noise);
-    } else if (cfg.noise_type == NoiseType::Voronoi) {
-        auto voronoi_noise = noise::module::Voronoi();
-        voronoi_noise.SetFrequency(1 / cfg.noise_scale);
-        voronoi_noise.SetDisplacement(1.0);
-        return std::make_unique<noise::module::Voronoi>(voronoi_noise);
-    } else {
-        return std::make_unique<UniformNoise>();
-    }
-}
-
-// Thanks Cura developers for this function.
-static void fuzzy_polyline(Points& poly, bool closed, coordf_t slice_z, const FuzzySkinConfig& cfg)
-{
-    std::unique_ptr<noise::module::Module> noise = get_noise_module(cfg);
-
-    const double min_dist_between_points = cfg.point_distance * 3. / 4.; // hardcoded: the point distance may vary between 3/4 and 5/4 the supplied value
-    const double range_random_point_dist = cfg.point_distance / 2.;
-    double dist_left_over = random_value() * (min_dist_between_points / 2.); // the distance to be traversed on the line before making the first new point
-    Point* p0 = &poly.back();
-    Points out;
-    out.reserve(poly.size());
-    for (Point &p1 : poly)
-    {
-        if (!closed) {
-            // Skip the first point for open path
-            closed = true;
-            p0 = &p1;
-            continue;
-        }
-        // 'a' is the (next) new point between p0 and p1
-        Vec2d  p0p1      = (p1 - *p0).cast<double>();
-        double p0p1_size = p0p1.norm();
-        double p0pa_dist = dist_left_over;
-        for (; p0pa_dist < p0p1_size;
-            p0pa_dist += min_dist_between_points + random_value() * range_random_point_dist)
-        {
-            Point pa = *p0 + (p0p1 * (p0pa_dist / p0p1_size)).cast<coord_t>();
-            double r = noise->GetValue(unscale_(pa.x()), unscale_(pa.y()), slice_z) * cfg.thickness;
-            out.emplace_back(pa + (perp(p0p1).cast<double>().normalized() * r).cast<coord_t>());
-        }
-        dist_left_over = p0pa_dist - p0p1_size;
-        p0 = &p1;
-    }
-    while (out.size() < 3) {
-        size_t point_idx = poly.size() - 2;
-        out.emplace_back(poly[point_idx]);
-        if (point_idx == 0)
-            break;
-        -- point_idx;
-    }
-    if (out.size() >= 3)
-        poly = std::move(out);
-}
+// static std::unique_ptr<noise::module::Module> get_noise_module(const FuzzySkinConfig& cfg) {
+//     if (cfg.noise_type == NoiseType::Perlin) {
+//         auto perlin_noise = noise::module::Perlin();
+//         perlin_noise.SetFrequency(1 / cfg.noise_scale);
+//         perlin_noise.SetOctaveCount(cfg.noise_octaves);
+//         perlin_noise.SetPersistence(cfg.noise_persistence);
+//         return std::make_unique<noise::module::Perlin>(perlin_noise);
+//     } else if (cfg.noise_type == NoiseType::Billow) {
+//         auto billow_noise = noise::module::Billow();
+//         billow_noise.SetFrequency(1 / cfg.noise_scale);
+//         billow_noise.SetOctaveCount(cfg.noise_octaves);
+//         billow_noise.SetPersistence(cfg.noise_persistence);
+//         return std::make_unique<noise::module::Billow>(billow_noise);
+//     } else if (cfg.noise_type == NoiseType::RidgedMulti) {
+//         auto ridged_multi_noise = noise::module::RidgedMulti();
+//         ridged_multi_noise.SetFrequency(1 / cfg.noise_scale);
+//         ridged_multi_noise.SetOctaveCount(cfg.noise_octaves);
+//         return std::make_unique<noise::module::RidgedMulti>(ridged_multi_noise);
+//     } else if (cfg.noise_type == NoiseType::Voronoi) {
+//         auto voronoi_noise = noise::module::Voronoi();
+//         voronoi_noise.SetFrequency(1 / cfg.noise_scale);
+//         voronoi_noise.SetDisplacement(1.0);
+//         return std::make_unique<noise::module::Voronoi>(voronoi_noise);
+//     } else {
+//         return std::make_unique<UniformNoise>();
+//     }
+// }
+//
+// // Thanks Cura developers for this function.
+// static void fuzzy_polyline(Points& poly, bool closed, coordf_t slice_z, const FuzzySkinConfig& cfg)
+// {
+//     std::unique_ptr<noise::module::Module> noise = get_noise_module(cfg);
+//
+//     const double min_dist_between_points = cfg.point_distance * 3. / 4.; // hardcoded: the point distance may vary between 3/4 and 5/4 the supplied value
+//     const double range_random_point_dist = cfg.point_distance / 2.;
+//     double dist_left_over = random_value() * (min_dist_between_points / 2.); // the distance to be traversed on the line before making the first new point
+//     Point* p0 = &poly.back();
+//     Points out;
+//     out.reserve(poly.size());
+//     for (Point &p1 : poly)
+//     {
+//         if (!closed) {
+//             // Skip the first point for open path
+//             closed = true;
+//             p0 = &p1;
+//             continue;
+//         }
+//         // 'a' is the (next) new point between p0 and p1
+//         Vec2d  p0p1      = (p1 - *p0).cast<double>();
+//         double p0p1_size = p0p1.norm();
+//         double p0pa_dist = dist_left_over;
+//         for (; p0pa_dist < p0p1_size;
+//             p0pa_dist += min_dist_between_points + random_value() * range_random_point_dist)
+//         {
+//             Point pa = *p0 + (p0p1 * (p0pa_dist / p0p1_size)).cast<coord_t>();
+//             double r = noise->GetValue(unscale_(pa.x()), unscale_(pa.y()), slice_z) * cfg.thickness;
+//             out.emplace_back(pa + (perp(p0p1).cast<double>().normalized() * r).cast<coord_t>());
+//         }
+//         dist_left_over = p0pa_dist - p0p1_size;
+//         p0 = &p1;
+//     }
+//     while (out.size() < 3) {
+//         size_t point_idx = poly.size() - 2;
+//         out.emplace_back(poly[point_idx]);
+//         if (point_idx == 0)
+//             break;
+//         -- point_idx;
+//     }
+//     if (out.size() >= 3)
+//         poly = std::move(out);
+// }
 
 using PerimeterGeneratorLoops = std::vector<PerimeterGeneratorLoop>;
 

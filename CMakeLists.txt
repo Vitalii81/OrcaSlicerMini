@@ -10,7 +10,6 @@ add_subdirectory(miniz)
 add_subdirectory(minilzo)
 add_subdirectory(glu-libtess)
 add_subdirectory(qhull)
-add_subdirectory(Shiny)
 add_subdirectory(semver)
 add_subdirectory(libigl)
 add_subdirectory(hints)
@@ -18,7 +17,7 @@ add_subdirectory(mcut)
 #add_subdirectory(qoi)
 
 # Adding libnest2d project for bin packing...
-add_subdirectory(libnest2d)
+#add_subdirectory(libnest2d)
 
 add_subdirectory(libslic3r)
 
@@ -27,7 +26,7 @@ add_executable(OrcaSlicer OrcaSlicer_cli.cpp OrcaSlicer_cli.hpp)
     # Binary name on unix like systems (Linux, Unix)
     set_target_properties(OrcaSlicer PROPERTIES OUTPUT_NAME "orca-slicer")
     set(SLIC3R_APP_CMD "orca-slicer")
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/unix/BuildLinuxImage.sh.in ${CMAKE_CURRENT_BINARY_DIR}/BuildLinuxImage.sh @ONLY)
+#    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/platform/unix/BuildLinuxImage.sh.in ${CMAKE_CURRENT_BINARY_DIR}/BuildLinuxImage.sh @ONLY)
 
 target_link_libraries(OrcaSlicer libslic3r cereal::cereal)
 

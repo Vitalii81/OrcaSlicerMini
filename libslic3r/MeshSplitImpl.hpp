@@ -8,7 +8,7 @@
 #endif
 
 #include "TriangleMesh.hpp"
-#include "libnest2d/tools/benchmark.h"
+
 #include "Execution/ExecutionTBB.hpp"
 
 namespace Slic3r {

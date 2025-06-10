@@ -10,188 +10,181 @@ endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libslic3r_version.h.in ${CMAKE_CURRENT_BINARY_DIR}/libslic3r_version.h @ONLY)
 
-#set(OpenVDBUtils_SOURCES "")
-#if (TARGET OpenVDB::openvdb)
-#    set(OpenVDBUtils_SOURCES OpenVDBUtils.cpp OpenVDBUtils.hpp)
-#endif()
-
 set(lisbslic3r_sources
-        ArcFitter.cpp     # Аппроксимация дуг окружностей
-        ArcFitter.hpp     # Заголовок для ArcFitter
-        pchheader.cpp     # Прекомпіляція заголовків
-        pchheader.hpp     # Заголовок для пре-компіляції
-        AABBTreeIndirect.hpp    # Просторова структура AABB (індексована)
-        AABBTreeLines.hpp       # AABB для ліній
-        AABBMesh.hpp            # AABB для трикутної сітки
+        ArcFitter.cpp     # Arc approximation
+        ArcFitter.hpp     # Header for ArcFitter
+        pchheader.cpp     # Precompiled headers
+        pchheader.hpp     # Header for precompiled headers
+        AABBTreeIndirect.hpp    # Spatial structure AABB (indexed)
+        AABBTreeLines.hpp       # AABB for lines
+        AABBMesh.hpp            # AABB for triangle mesh
         AABBMesh.cpp
-        Algorithm/LineSplit.hpp         # Алгоритм поділу ліній
+        Algorithm/LineSplit.hpp         # Line splitting algorithm
         Algorithm/LineSplit.cpp
-        Algorithm/RegionExpansion.hpp   # Розширення регіону (області друку)
+        Algorithm/RegionExpansion.hpp   # Region (print area) expansion
         Algorithm/RegionExpansion.cpp
-        AnyPtr.hpp              # Універсальний вказівник (type-erased)
-        BoundingBox.cpp         # Визначення прямокутної області об'єкта
+        AnyPtr.hpp              # Universal pointer (type-erased)
+        BoundingBox.cpp         # Bounding box definition
         BoundingBox.hpp
-        BuildVolume.cpp         # Обробка об'єму будови
+        BuildVolume.cpp         # Build volume handling
         BuildVolume.hpp
-        Circle.cpp              # Геометрія кола
+        Circle.cpp              # Circle geometry
         Circle.hpp
-        clipper.cpp             # Boolean-операції над полігонами
+        clipper.cpp             # Boolean operations on polygons
         clipper.hpp
-        ClipperUtils.cpp        # Утиліти для Clipper
+        ClipperUtils.cpp        # Utilities for Clipper
         ClipperUtils.hpp
-        Clipper2Utils.cpp       # Утиліти для Clipper2
+        Clipper2Utils.cpp       # Utilities for Clipper2
         Clipper2Utils.hpp
-        ClipperZUtils.hpp       # 3D Clipper утиліти
-        Color.cpp               # Кольори об'єктів
+        ClipperZUtils.hpp       # 3D Clipper utilities
+        Color.cpp               # Object colors
         Color.hpp
-        Config.cpp              # Конфігураційні параметри
+        Config.cpp              # Configuration parameters
         Config.hpp
-        EdgeGrid.cpp            # Грані у вигляді сітки
+        EdgeGrid.cpp            # Edges as a grid
         EdgeGrid.hpp
 
-        enum_bitmask.hpp        # Робота з enum'ами як бітовими масками
-        ExPolygon.cpp           # Розширений полігон (з отворами)
+        enum_bitmask.hpp        # Working with enums as bitmasks
+        ExPolygon.cpp           # Extended polygon (with holes)
         ExPolygon.hpp
-        ExPolygonSerialize.hpp  # Серіалізація ExPolygon
-        ExPolygonsIndex.cpp     # Індексування полігонів
+        ExPolygonSerialize.hpp  # ExPolygon serialization
+        ExPolygonsIndex.cpp     # Polygon indexing
         ExPolygonsIndex.hpp
 
-        FileParserError.hpp     # Обробка помилок парсингу файлів
-        format.hpp              # Форматування рядків
-        Format/3mf.cpp          # Парсер 3MF
+        FileParserError.hpp     # File parsing error handling
+        format.hpp              # String formatting
+        Format/3mf.cpp          # 3MF parser
         Format/3mf.hpp
-        Format/bbs_3mf.cpp      # Парсер кастомного Bambu 3MF
+        Format/bbs_3mf.cpp      # Custom Bambu 3MF parser
         Format/bbs_3mf.hpp
-        Format/OBJ.cpp          # Парсер OBJ-файлів
+        Format/OBJ.cpp          # OBJ file parser
         Format/OBJ.hpp
         Format/objparser.cpp
         Format/objparser.hpp
-        Format/STEP.cpp         # Парсер STEP
+        Format/STEP.cpp         # STEP parser
         Format/STEP.hpp
-        Format/STL.cpp          # Парсер STL
+        Format/STL.cpp          # STL parser
         Format/STL.hpp
-        Format/ZipperArchiveImport.hpp # Імпорт ZIP-архівів
+        Format/ZipperArchiveImport.hpp # ZIP archive import
         Format/ZipperArchiveImport.cpp
 
-        GCode/ThumbnailData.cpp # Генерація прев’ю (thumbnail)
+        GCode/ThumbnailData.cpp # Preview thumbnail generation
         GCode/ThumbnailData.hpp
-        Geometry.cpp            # Геометричні операції
+        Geometry.cpp            # Geometric operations
         Geometry.hpp
-        Geometry/Bicubic.hpp    # Бікубічна інтерполяція
+        Geometry/Bicubic.hpp    # Bicubic interpolation
         Geometry/Circle.cpp
         Geometry/Circle.hpp
-        Geometry/ConvexHull.cpp # Опукла оболонка
+        Geometry/ConvexHull.cpp # Convex hull
         Geometry/ConvexHull.hpp
         Geometry/Curves.hpp
-        Int128.hpp              # Робота з 128-бітними цілими
-        KDTreeIndirect.hpp      # KD-дерево для швидкого пошуку
-        Layer.cpp               # Реалізація шару друку
+        Int128.hpp              # 128-bit integer handling
+        KDTreeIndirect.hpp      # KD-tree for fast lookup
+        Layer.cpp               # Print layer implementation
         Layer.hpp
-        LayerRegion.cpp         # Область в шарі
-        libslic3r.h             # Основний заголовок
-        libslic3r.cpp           # Основна точка входу
+        LayerRegion.cpp         # Region within a layer
+        libslic3r.h             # Main header
+        libslic3r.cpp           # Main entry point
         Line.cpp
         Line.hpp
-        BlacklistedLibraryCheck.cpp # Перевірка проблемних бібліотек
+        BlacklistedLibraryCheck.cpp # Problematic libraries check
         BlacklistedLibraryCheck.hpp
-        LocalesUtils.cpp        # Мовна локалізація
+        LocalesUtils.cpp        # Language localization
         LocalesUtils.hpp
-        CutUtils.cpp            # Нарізка моделей
+        CutUtils.cpp            # Model cutting
         CutUtils.hpp
-        Model.cpp               # Представлення моделі
+        Model.cpp               # Model representation
         Model.hpp
-        NormalUtils.cpp         # Робота з нормалями
+        NormalUtils.cpp         # Normal vector handling
         NormalUtils.hpp
-        ObjColorUtils.hpp       # Обробка кольорів в OBJ
-        Orient.hpp              # Орієнтація моделей
+        ObjColorUtils.hpp       # OBJ color handling
+        Orient.hpp              # Model orientation
         Orient.cpp
         MultiPoint.cpp
         MultiPoint.hpp
-        MutablePriorityQueue.hpp # Черга з пріоритетами
-        ObjectID.cpp            # Унікальні ID об'єктів
+        MutablePriorityQueue.hpp # Priority queue
+        ObjectID.cpp            # Unique object IDs
         ObjectID.hpp
-        ParameterUtils.cpp      # Утиліти для параметрів
+        ParameterUtils.cpp      # Parameter utilities
         ParameterUtils.hpp
-        PerimeterGenerator.cpp  # Генерація периметрів
+        PerimeterGenerator.cpp  # Perimeter generation
         PerimeterGenerator.hpp
 
-        Point.cpp               # Точка
+        Point.cpp               # Point
         Point.hpp
-        Polygon.cpp             # Полігони
+        Polygon.cpp             # Polygons
         Polygon.hpp
-        MutablePolygon.cpp      # Змінні полігони
+        MutablePolygon.cpp      # Mutable polygons
         MutablePolygon.hpp
-        PolygonTrimmer.cpp      # Обрізка полігонів
+        PolygonTrimmer.cpp      # Polygon trimming
         PolygonTrimmer.hpp
-        Polyline.cpp            # Ламані лінії
+        Polyline.cpp            # Polylines
         Polyline.hpp
 
-        PrincipalComponents2D.hpp # Головні компоненти для 2D
+        PrincipalComponents2D.hpp # Principal components for 2D
         PrincipalComponents2D.cpp
-        AppConfig.cpp           # Глобальна конфігурація
+        AppConfig.cpp           # Global configuration
         AppConfig.hpp
-        Print.cpp               # Головний клас друку
+        Print.cpp               # Main print class
         Print.hpp
-        PrintApply.cpp          # Застосування параметрів
+        PrintApply.cpp          # Parameter application
         PrintBase.cpp
         PrintBase.hpp
-        PrintConfig.cpp         # Конфігурація принта
+        PrintConfig.cpp         # Print configuration
         PrintConfig.hpp
-        PrintObject.cpp         # Об'єкт для друку
-        PrintObjectSlice.cpp    # Нарізка об'єкта
-        PrintRegion.cpp         # Регіони в об'єкті
-        PNGReadWrite.hpp        # Читання/запис PNG
+        PrintObject.cpp         # Printable object
+        PrintObjectSlice.cpp    # Object slicing
+        PrintRegion.cpp         # Regions in the object
+        PNGReadWrite.hpp        # PNG read/write
         PNGReadWrite.cpp
-        QuadricEdgeCollapse.cpp # Спрощення сітки
+        QuadricEdgeCollapse.cpp # Mesh simplification
         QuadricEdgeCollapse.hpp
-        ShortEdgeCollapse.cpp   # Колапс коротких ребер
+        ShortEdgeCollapse.cpp   # Short edge collapse
         ShortEdgeCollapse.hpp
-        Slicing.cpp             # Основний slicing
+        Slicing.cpp             # Main slicing logic
         Slicing.hpp
         SlicesToTriangleMesh.hpp
         SlicesToTriangleMesh.cpp
-        SlicingAdaptive.cpp     # Адаптивне slicing
+        SlicingAdaptive.cpp     # Adaptive slicing
         SlicingAdaptive.hpp
-        MinimumSpanningTree.hpp # Алгоритм MST
+        MinimumSpanningTree.hpp # MST algorithm
         MinimumSpanningTree.cpp
-        Surface.cpp             # Поверхні друку
+        Surface.cpp             # Print surfaces
         Surface.hpp
         SurfaceCollection.cpp
         SurfaceCollection.hpp
-        SurfaceMesh.hpp         # Поверхнева сітка
-        Technologies.hpp        # Технології (типи друку)
-        Tesselate.cpp           # Теселяція геометрії
+        SurfaceMesh.hpp         # Surface mesh
+        Technologies.hpp        # Print technologies
+        Tesselate.cpp           # Geometry tessellation
         Tesselate.hpp
-        TextConfiguration.hpp   # Конфігурація тексту
-        TriangleMesh.cpp        # Меш (сітка)
+        TextConfiguration.hpp   # Text configuration
+        TriangleMesh.cpp        # Mesh
         TriangleMesh.hpp
-        TriangleMeshSlicer.cpp  # Нарізка сітки
+        TriangleMeshSlicer.cpp  # Mesh slicing
         TriangleMeshSlicer.hpp
-        MeshSplitImpl.hpp       # Поділ мешу
-        TriangulateWall.hpp     # Триангуляція стінок
+        MeshSplitImpl.hpp       # Mesh splitting
+        TriangulateWall.hpp     # Wall triangulation
         TriangulateWall.cpp
-        utils.cpp               # Загальні утиліти
+        utils.cpp               # General utilities
         Utils.hpp
         Time.cpp
         Time.hpp
-        TriangleSelector.cpp    # Вибір трикутників
+        TriangleSelector.cpp    # Triangle selection
         TriangleSelector.hpp
-        TriangleSetSampling.cpp # Семплювання трикутників
+        TriangleSetSampling.cpp # Triangle sampling
         TriangleSetSampling.hpp
         MTUtils.hpp
-        Zipper.hpp              # Робота з ZIP-архівами
+        Zipper.hpp              # ZIP archive handling
         Zipper.cpp
-        MinAreaBoundingBox.hpp  # Мінімальна обгортка (BBox)
-        MinAreaBoundingBox.cpp
-        miniz_extension.hpp     # Підтримка архівації
-        miniz_extension.cpp
-        MarchingSquares.hpp     # Алгоритм Marching Squares
-        Execution/Execution.hpp         # Інтерфейс виконання
-        Execution/ExecutionSeq.hpp      # Послідовне виконання
-        Execution/ExecutionTBB.hpp      # Паралельне виконання
-        GCode/Thumbnails.cpp            # Зображення в GCode
-)
 
+        miniz_extension.hpp     # Archiving support
+        miniz_extension.cpp
+        MarchingSquares.hpp     # Marching Squares algorithm
+        Execution/Execution.hpp         # Execution interface
+        Execution/ExecutionSeq.hpp      # Sequential execution
+        Execution/ExecutionTBB.hpp      # Parallel execution
+        GCode/Thumbnails.cpp            # Thumbnails in GCode
+)
 
 add_library(libslic3r STATIC ${lisbslic3r_sources}
         "${CMAKE_CURRENT_BINARY_DIR}/libslic3r_version.h"
@@ -277,7 +270,7 @@ set(OCCT_LIBS
 )
 
 target_link_libraries(libslic3r
-        libnest2d
+
         admesh
         cereal::cereal
         libigl
@@ -298,17 +291,7 @@ target_link_libraries(libslic3r
         Clipper2
         mcut
         JPEG::JPEG
-        #qoi
-        #OpenCV::OpenCV
         noise
         freetype
         fontconfig
 )
-
-#if (TARGET OpenVDB::openvdb)
-#    target_link_libraries(libslic3r OpenVDB::openvdb)
-#endif()
-
-if(SLIC3R_PROFILE)
-    target_link_libraries(libslic3r Shiny)
-endif()

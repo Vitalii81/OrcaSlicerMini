@@ -18,14 +18,13 @@ if(Qhull_FOUND)
 
 message(STATUS "Using qhull from system.")
 if(SLIC3R_STATIC)
-    slic3r_remap_configs("Qhull::qhullcpp;Qhull::qhullstatic_r" RelWithDebInfo Release)
+
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         target_link_libraries(qhull INTERFACE Qhull::qhullcpp_d Qhull::qhullstatic_rd)
     else()
         target_link_libraries(qhull INTERFACE Qhull::qhullcpp Qhull::qhullstatic_r)
     endif()
 else()
-    slic3r_remap_configs("Qhull::qhullcpp;Qhull::qhull_r" RelWithDebInfo Release)
     target_link_libraries(qhull INTERFACE Qhull::qhullcpp Qhull::qhull_r)
 endif()
 
@@ -38,13 +37,7 @@ cmake_minimum_required(VERSION 3.1)
 set(qhull_VERSION2 "2015.2 2016/01/18")  # not used, See global.c, global_r.c, rbox.c, rbox_r.c
 set(qhull_VERSION     "7.2.0")  # Advance every release
 
-#include(CMakeModules/CheckLFS.cmake)
-#option(WITH_LFS "Enable Large File Support" ON)
-#check_lfs(WITH_LFS)
-
-
 message(STATUS "qhull Version: ${qhull_VERSION} (static linking)")
-
 
 set(libqhull_HEADERS
     # reentrant qhull HEADERS:

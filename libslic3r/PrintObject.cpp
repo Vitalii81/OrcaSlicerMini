@@ -33,8 +33,6 @@
 #include <tbb/parallel_for.h>
 #include <tbb/spin_mutex.h>
 
-#include <Shiny/Shiny.h>
-
 using namespace std::literals;
 
 //! macro used to mark string used at localization,

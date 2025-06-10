@@ -7,7 +7,7 @@
 #include "Polygon.hpp"
 #include "ExPolygon.hpp"
 //#include "EmbossShape.hpp" // ExPolygonsWithIds
-#include "nanosvg/nanosvg.h"    // load SVG file
+//#include "nanosvg/nanosvg.h"    // load SVG file
 
 // Helper function to work with nano svg
 namespace Slic3r {
@@ -57,16 +57,16 @@ struct NSVGLineParams
 
 // help functions - prepare to be tested
 /// <param name="is_y_negative">Flag is y negative, when true than y coor is multiplied by -1</param>
-Polygons to_polygons(const NSVGimage &image, const NSVGLineParams &param);
+//Polygons to_polygons(const NSVGimage &image, const NSVGLineParams &param);
 
-void bounds(const NSVGimage &image, Vec2f &min, Vec2f &max);
+//void bounds(const NSVGimage &image, Vec2f &min, Vec2f &max);
 
 // read text data from file
 std::unique_ptr<std::string> read_from_disk(const std::string &path);
 
-using NSVGimage_ptr = std::unique_ptr<NSVGimage, void (*)(NSVGimage*)>;
-NSVGimage_ptr nsvgParseFromFile(const std::string &svg_file_path, const char *units = "mm", float dpi = 96.0f);
-NSVGimage_ptr nsvgParse(const std::string& file_data, const char *units = "mm", float dpi = 96.0f);
+//using NSVGimage_ptr = std::unique_ptr<NSVGimage, void (*)(NSVGimage*)>;
+//NSVGimage_ptr nsvgParseFromFile(const std::string &svg_file_path, const char *units = "mm", float dpi = 96.0f);
+//NSVGimage_ptr nsvgParse(const std::string& file_data, const char *units = "mm", float dpi = 96.0f);
 //NSVGimage *init_image(EmbossShape::SvgFile &svg_file);
 
 /// <summary>
@@ -74,7 +74,7 @@ NSVGimage_ptr nsvgParse(const std::string& file_data, const char *units = "mm", 
 /// </summary>
 /// <param name="image">Contain pointer to first shape</param>
 /// <returns>Count of shapes</returns>
-size_t get_shapes_count(const NSVGimage &image);
+//size_t get_shapes_count(const NSVGimage &image);
 
 //void save(const NSVGimage &image, std::ostream &data);
 //bool save(const NSVGimage &image, const std::string &svg_file_path);
