@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 
 project(OrcaSlicer)
 
-#include("version.inc")
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
@@ -11,21 +10,11 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
 endif()
 
-if(DEFINED ENV{SLIC3R_STATIC})
-        set(SLIC3R_STATIC_INITIAL $ENV{SLIC3R_STATIC})
-else()
-    set(SLIC3R_STATIC_INITIAL 0)
-endif()
+set(SLIC3R_STATIC_INITIAL 0)
 
 option(SLIC3R_STATIC 			"Compile OrcaSlicer with static libraries (Boost, TBB, glew)" ${SLIC3R_STATIC_INITIAL})
-option(SLIC3R_GUI    			"Compile OrcaSlicer with GUI components (OpenGL, wxWidgets)" 0)
 option(SLIC3R_FHS               "Assume OrcaSlicer is to be installed in a FHS directory structure" 0)
-option(SLIC3R_WX_STABLE         "Build against wxWidgets stable (3.0) as oppsed to dev (3.1) on Linux" 0)
-option(SLIC3R_PROFILE 			"Compile OrcaSlicer with an invasive Shiny profiler" 0)
 option(SLIC3R_PCH               "Use precompiled headers" 1)
-option(SLIC3R_MSVC_COMPILE_PARALLEL "Compile on Visual Studio in parallel" 0)
-option(SLIC3R_MSVC_PDB          "Generate PDB files on MSVC in Release mode" 0)
-option(SLIC3R_PERL_XS           "Compile XS Perl module and enable Perl unit and integration tests" 0)
 option(SLIC3R_ASAN              "Enable ASan on Clang and GCC" 0)
 
 set(IS_CROSS_COMPILE FALSE)
@@ -41,10 +30,8 @@ foreach (_cache_var ${_cache_vars})
     endif ()
 endforeach()
 
-
 # ARMs (Raspberry PI) use an unsigned char by default. Let's make it consistent for OrcaSlicer on all platforms.
 add_compile_options(-fsigned-char)
-
 
 # Display and check CMAKE_PREFIX_PATH
 message(STATUS "SLIC3R_STATIC: ${SLIC3R_STATIC}")
@@ -78,11 +65,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Add DEBUG flags to debug builds.
 add_compile_definitions("$<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>")
 
-
-# To be able to link libslic3r with the Perl XS module.
-# Once we get rid of Perl and libslic3r is linked statically, we can get rid of -fPIC
-#set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(PkgConfig REQUIRED)
 
@@ -110,8 +92,7 @@ message(STATUS "LIBDIR_BIN: ${LIBDIR_BIN}")
 
 # For the bundled boost libraries (boost::nowide)
 include_directories(${LIBDIR})
-# For generated header files
-#include_directories(${LIBDIR_BIN}/platform)
+
 # For ligigl
 include_directories(${LIBDIR}/libigl)
 
@@ -147,10 +128,8 @@ if(SLIC3R_STATIC)
 else()
     add_definitions(-DBOOST_LOG_DYN_LINK)
 endif()
+
 #set(Boost_DEBUG ON)
-# set(Boost_COMPILER "-mgw81")
-# boost::process was introduced first in version 1.64.0,
-# boost::beast::detail::base64 was introduced first in version 1.66.0
 find_package(Boost 1.83.0 REQUIRED COMPONENTS system filesystem thread log log_setup locale regex chrono atomic date_time iostreams program_options nowide)
 
 add_library(boost_libs INTERFACE)
@@ -159,12 +138,6 @@ add_library(boost_headeronly INTERFACE)
 if(NOT SLIC3R_STATIC)
     target_compile_definitions(boost_headeronly INTERFACE BOOST_LOG_DYN_LINK)
 endif()
-
-function(slic3r_remap_configs targets from_Cfg to_Cfg)
-    if(MSVC)
-
-    endif()
-endfunction()
 
 target_include_directories(boost_headeronly INTERFACE ${Boost_INCLUDE_DIRS})
 target_link_libraries(boost_libs INTERFACE boost_headeronly ${Boost_LIBRARIES})
@@ -196,8 +169,7 @@ if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_CURL)
         #find_package(OpenSSL REQUIRED)
         message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
         message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
-        #target_include_directories(libcurl INTERFACE ${OPENSSL_INCLUDE_DIR})
-        #target_link_libraries(libcurl INTERFACE ${OPENSSL_LIBRARIES})
+
     endif()
 endif()
 
@@ -228,8 +200,6 @@ if (NOT EXPAT_FOUND)
     set(EXPAT_INCLUDE_DIRS ${LIBDIR}/expat/)
     set(EXPAT_LIBRARIES expat)
 endif ()
-
-#find_package(PNG REQUIRED)
 
 set(GLEW_ROOT "${CMAKE_PREFIX_PATH}")
 message("GLEW_ROOT: ${GLEW_ROOT}")
@@ -299,9 +269,6 @@ endif()
 add_subdirectory(src)
 
 set(SLIC3R_APP_CMD "orca-slicer")
-configure_file(${LIBDIR}/platform/unix/build_appimage.sh.in ${CMAKE_CURRENT_BINARY_DIR}/build_appimage.sh @ONLY)
-
-
 
 # Resources install target, configure fhs.hpp on UNIX
 if (SLIC3R_FHS)
@@ -322,7 +289,6 @@ else ()
 endif ()
 
 install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.txt DESTINATION ".")
-configure_file(${LIBDIR}/platform/unix/fhs.hpp.in ${LIBDIR_BIN}/platform/unix/fhs.hpp)
 
 set (CPACK_PACKAGE_NAME "OrcaSlicer")
 set (CPACK_PACKAGE_VENDOR "SoftFever")
@@ -336,19 +302,11 @@ set (CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
 set (CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images\\\\OrcaSlicer.ico")
 set (CPACK_NSIS_MUI_ICON "${CPACK_PACKAGE_ICON}")
 set (CPACK_NSIS_MUI_UNIICON "${CPACK_PACKAGE_ICON}")
-set (CPACK_NSIS_INSTALLED_ICON_NAME  "$INSTDIR\\\\orca-slicer.exe")
-set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
-    CreateShortCut \\\"$DESKTOP\\\\OrcaSlicer.lnk\\\" \\\"$INSTDIR\\\\orca-slicer.exe\\\"
-")
 set (CPACK_PACKAGE_CHECKSUM SHA256)
 set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "OrcaSlicer")
 set (CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set (CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
-# set (CPACK_NSIS_MODIFY_PATH "ON")
 set(CPACK_PACKAGE_EXECUTABLES "orca-slicer;OrcaSlicer")
 set(CPACK_CREATE_DESKTOP_LINKS "orca-slicer")
-set (CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt) # must also include in install command
-
-#set(CPACK_WIX_UPGRADE_GUID "058245e8-20e0-4a95-9ab7-1acfe17ad511")
 set(CPACK_GENERATOR NSIS)
-#include(CPack)
+

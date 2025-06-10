@@ -2,14 +2,14 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/Clipper2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/admesh" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/libigl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/libnest2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/libnoise" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/nlopt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/__deps/qhull" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/Clipper2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/admesh" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/cereal" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/libigl" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/libnest2d" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/libnoise" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/nlopt" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/deps/qhull" vcs="Git" />
   </component>
 </project>
