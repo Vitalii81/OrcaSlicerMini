@@ -155,8 +155,8 @@ set(lisbslic3r_sources
         SurfaceCollection.hpp
         SurfaceMesh.hpp         # Surface mesh
         Technologies.hpp        # Print technologies
-        Tesselate.cpp           # Geometry tessellation
-        Tesselate.hpp
+        #Tesselate.cpp           # Geometry tessellation
+        #Tesselate.hpp
         TextConfiguration.hpp   # Text configuration
         TriangleMesh.cpp        # Mesh
         TriangleMesh.hpp
@@ -188,7 +188,6 @@ set(lisbslic3r_sources
 
 add_library(libslic3r STATIC ${lisbslic3r_sources}
         "${CMAKE_CURRENT_BINARY_DIR}/libslic3r_version.h"
-#        ${OpenVDBUtils_SOURCES}
 )
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${lisbslic3r_sources})
 
@@ -200,13 +199,11 @@ set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
 cmake_policy(PUSH)
 cmake_policy(SET CMP0011 NEW)
 find_package(CGAL REQUIRED)
-#find_package(OpenCV REQUIRED core)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 cmake_policy(POP)
 
 add_library(libslic3r_cgal STATIC
-       # CutSurface.hpp CutSurface.cpp
         IntersectionPoints.hpp IntersectionPoints.cpp
         MeshBoolean.hpp MeshBoolean.cpp
         TryCatchSignal.hpp TryCatchSignal.cpp
@@ -278,7 +275,7 @@ target_link_libraries(libslic3r
         boost_libs
         clipper
         ${EXPAT_LIBRARIES}
-        glu-libtess
+        #glu-libtess
         qhull
         semver
         TBB::tbb

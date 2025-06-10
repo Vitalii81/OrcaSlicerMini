@@ -5,7 +5,7 @@
 //#include "libslic3r/MTUtils.hpp"
 #include "libslic3r/Execution/ExecutionTBB.hpp"
 #include "libslic3r/ClipperUtils.hpp"
-#include "libslic3r/Tesselate.hpp"
+//#include "libslic3r/Tesselate.hpp"
 
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_reduce.h>
@@ -95,8 +95,8 @@ indexed_triangle_set slices_to_mesh(
         // by its_remove_degenerate_faces.
         ExPolygons free_top = diff_ex(lower, upper);
         ExPolygons overhang = diff_ex(upper, lower);
-        its_merge(layers[i], triangulate_expolygons_3d(free_top, grid[i], NORMALS_UP));
-        its_merge(layers[i], triangulate_expolygons_3d(overhang, grid[i], NORMALS_DOWN));
+        //its_merge(layers[i], triangulate_expolygons_3d(free_top, grid[i], NORMALS_UP));
+        //its_merge(layers[i], triangulate_expolygons_3d(overhang, grid[i], NORMALS_DOWN));
         its_merge(layers[i], straight_walls(upper, grid[i], grid[i + 1]));
     });
 

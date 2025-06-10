@@ -32,14 +32,7 @@
 #include <tbb/blocked_range.h>
 #include <tbb/parallel_for.h>
 
-//BBS: add json support
-#include "nlohmann/json.hpp"
-
-//#include "GCode/ConflictChecker.hpp"
-
 #include <codecvt>
-
-using namespace nlohmann;
 
 // Mark string for localization and translate.
 #define L(s) Slic3r::I18N::translate(s)
@@ -51,10 +44,6 @@ template class PrintState<PrintObjectStep, posCount>;
 
 PrintRegion::PrintRegion(const PrintRegionConfig &config) : PrintRegion(config, config.hash()) {}
 PrintRegion::PrintRegion(PrintRegionConfig &&config) : PrintRegion(std::move(config), config.hash()) {}
-
-//BBS
-// ORCA: Now this is a parameter
-//float Print::min_skirt_length = 0;
 
 void Print::clear()
 {
@@ -2508,72 +2497,72 @@ Vec2d Print::translate_to_print_space(const Point &point) const {
 
 FilamentTempType Print::get_filament_temp_type(const std::string& filament_type)
 {
-    const static std::string HighTempFilamentStr = "high_temp_filament";
-    const static std::string LowTempFilamentStr = "low_temp_filament";
-    const static std::string HighLowCompatibleFilamentStr = "high_low_compatible_filament";
-    static std::unordered_map<std::string, std::unordered_set<std::string>>filament_temp_type_map;
-
-    if (filament_temp_type_map.empty()) {
-        fs::path file_path = fs::path(resources_dir()) / "info" / "filament_info.json";
-        std::ifstream in(file_path.string());
-        json j;
-        try{
-            j = json::parse(in);
-            in.close();
-            auto&&high_temp_filament_arr =j[HighTempFilamentStr].get < std::vector<std::string>>();
-            filament_temp_type_map[HighTempFilamentStr] = std::unordered_set<std::string>(high_temp_filament_arr.begin(), high_temp_filament_arr.end());
-            auto&& low_temp_filament_arr = j[LowTempFilamentStr].get < std::vector<std::string>>();
-            filament_temp_type_map[LowTempFilamentStr] = std::unordered_set<std::string>(low_temp_filament_arr.begin(), low_temp_filament_arr.end());
-            auto&& high_low_compatible_filament_arr = j[HighLowCompatibleFilamentStr].get < std::vector<std::string>>();
-            filament_temp_type_map[HighLowCompatibleFilamentStr] = std::unordered_set<std::string>(high_low_compatible_filament_arr.begin(), high_low_compatible_filament_arr.end());
-        }
-        catch (const json::parse_error& err){
-            in.close();
-            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << file_path.string() << " got a nlohmann::detail::parse_error, reason = " << err.what();
-            filament_temp_type_map[HighTempFilamentStr] = {"ABS","ASA","PC","PA","PA-CF","PA-GF","PA6-CF","PET-CF", "PETG-GF","PPS","PPS-CF","PPA-GF","PPA-CF","ABS-Aero","ABS-GF"};
-            filament_temp_type_map[LowTempFilamentStr] = {"PLA","TPU","PLA-CF","PLA-AERO","PVA","BVOH","SBS"};
-            filament_temp_type_map[HighLowCompatibleFilamentStr] = { "HIPS","PETG","PCTG","PE","PP","EVA","PE-CF","PP-CF","PP-GF","PHA"};
-        }
-    }
-
-    if (filament_temp_type_map[HighLowCompatibleFilamentStr].find(filament_type) != filament_temp_type_map[HighLowCompatibleFilamentStr].end())
-        return HighLowCompatible;
-    if (filament_temp_type_map[HighTempFilamentStr].find(filament_type) != filament_temp_type_map[HighTempFilamentStr].end())
-        return HighTemp;
-    if (filament_temp_type_map[LowTempFilamentStr].find(filament_type) != filament_temp_type_map[LowTempFilamentStr].end())
-        return LowTemp;
+    // const static std::string HighTempFilamentStr = "high_temp_filament";
+    // const static std::string LowTempFilamentStr = "low_temp_filament";
+    // const static std::string HighLowCompatibleFilamentStr = "high_low_compatible_filament";
+    // static std::unordered_map<std::string, std::unordered_set<std::string>>filament_temp_type_map;
+    //
+    // if (filament_temp_type_map.empty()) {
+    //     fs::path file_path = fs::path(resources_dir()) / "info" / "filament_info.json";
+    //     std::ifstream in(file_path.string());
+    //     json j;
+    //     try{
+    //         j = json::parse(in);
+    //         in.close();
+    //         auto&&high_temp_filament_arr =j[HighTempFilamentStr].get < std::vector<std::string>>();
+    //         filament_temp_type_map[HighTempFilamentStr] = std::unordered_set<std::string>(high_temp_filament_arr.begin(), high_temp_filament_arr.end());
+    //         auto&& low_temp_filament_arr = j[LowTempFilamentStr].get < std::vector<std::string>>();
+    //         filament_temp_type_map[LowTempFilamentStr] = std::unordered_set<std::string>(low_temp_filament_arr.begin(), low_temp_filament_arr.end());
+    //         auto&& high_low_compatible_filament_arr = j[HighLowCompatibleFilamentStr].get < std::vector<std::string>>();
+    //         filament_temp_type_map[HighLowCompatibleFilamentStr] = std::unordered_set<std::string>(high_low_compatible_filament_arr.begin(), high_low_compatible_filament_arr.end());
+    //     }
+    //     catch (const json::parse_error& err){
+    //         in.close();
+    //         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << file_path.string() << " got a nlohmann::detail::parse_error, reason = " << err.what();
+    //         filament_temp_type_map[HighTempFilamentStr] = {"ABS","ASA","PC","PA","PA-CF","PA-GF","PA6-CF","PET-CF", "PETG-GF","PPS","PPS-CF","PPA-GF","PPA-CF","ABS-Aero","ABS-GF"};
+    //         filament_temp_type_map[LowTempFilamentStr] = {"PLA","TPU","PLA-CF","PLA-AERO","PVA","BVOH","SBS"};
+    //         filament_temp_type_map[HighLowCompatibleFilamentStr] = { "HIPS","PETG","PCTG","PE","PP","EVA","PE-CF","PP-CF","PP-GF","PHA"};
+    //     }
+    // }
+    //
+    // if (filament_temp_type_map[HighLowCompatibleFilamentStr].find(filament_type) != filament_temp_type_map[HighLowCompatibleFilamentStr].end())
+    //     return HighLowCompatible;
+    // if (filament_temp_type_map[HighTempFilamentStr].find(filament_type) != filament_temp_type_map[HighTempFilamentStr].end())
+    //     return HighTemp;
+    // if (filament_temp_type_map[LowTempFilamentStr].find(filament_type) != filament_temp_type_map[LowTempFilamentStr].end())
+    //     return LowTemp;
     return Undefine;
 }
 
 int Print::get_hrc_by_nozzle_type(const NozzleType&type)
 {
-    static std::map<std::string, int>nozzle_type_to_hrc;
-    if (nozzle_type_to_hrc.empty()) {
-        fs::path file_path = fs::path(resources_dir()) / "info" / "nozzle_info.json";
-        boost::nowide::ifstream in(file_path.string());
-        //std::ifstream in(file_path.string());
-        json j;
-        try {
-            j = json::parse(in);
-            in.close();
-            for (const auto& elem : j["nozzle_hrc"].items())
-                nozzle_type_to_hrc[elem.key()] = elem.value();
-        }
-        catch (const json::parse_error& err) {
-            in.close();
-            BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << file_path.string() << " got a nlohmann::detail::parse_error, reason = " << err.what();
-            nozzle_type_to_hrc = {
-                {"hardened_steel",55},
-                {"stainless_steel",20},
-                {"brass",2},
-                {"undefine",0}
-            };
-        }
-    }
-    auto iter = nozzle_type_to_hrc.find(NozzleTypeEumnToStr[type]);
-    if (iter != nozzle_type_to_hrc.end())
-        return iter->second;
-    //0 represents undefine
+    // static std::map<std::string, int>nozzle_type_to_hrc;
+    // if (nozzle_type_to_hrc.empty()) {
+    //     fs::path file_path = fs::path(resources_dir()) / "info" / "nozzle_info.json";
+    //     boost::nowide::ifstream in(file_path.string());
+    //     //std::ifstream in(file_path.string());
+    //     json j;
+    //     try {
+    //         j = json::parse(in);
+    //         in.close();
+    //         for (const auto& elem : j["nozzle_hrc"].items())
+    //             nozzle_type_to_hrc[elem.key()] = elem.value();
+    //     }
+    //     catch (const json::parse_error& err) {
+    //         in.close();
+    //         BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": parse " << file_path.string() << " got a nlohmann::detail::parse_error, reason = " << err.what();
+    //         nozzle_type_to_hrc = {
+    //             {"hardened_steel",55},
+    //             {"stainless_steel",20},
+    //             {"brass",2},
+    //             {"undefine",0}
+    //         };
+    //     }
+    // }
+    // auto iter = nozzle_type_to_hrc.find(NozzleTypeEumnToStr[type]);
+    // if (iter != nozzle_type_to_hrc.end())
+    //     return iter->second;
+    // //0 represents undefine
     return 0;
 }
 
@@ -3191,88 +3180,88 @@ const std::string PrintStatistics::TotalFilamentUsedWipeTowerValueMask = "; tota
 #define JSON_EXTRUSION_LOOP_ROLE               "loop_role"
 
 
-static void to_json(json& j, const Points& p_s) {
-    for (const Point& p : p_s)
-    {
-        j.push_back(p.x());
-        j.push_back(p.y());
-    }
-}
-
-static void to_json(json& j, const BoundingBox& bb) {
-    j.push_back(bb.min.x());
-    j.push_back(bb.min.y());
-    j.push_back(bb.max.x());
-    j.push_back(bb.max.y());
-}
-
-static void to_json(json& j, const ExPolygon& polygon) {
-    json contour_json = json::array(), holes_json = json::array();
-
-    //contour
-    const Polygon& slice_contour =   polygon.contour;
-    contour_json = slice_contour.points;
-    j[JSON_POLYGON_CONTOUR] = std::move(contour_json);
-
-    //holes
-    const Polygons& slice_holes =   polygon.holes;
-    for (const Polygon& hole_polyon : slice_holes)
-    {
-        json hole_json = json::array();
-        hole_json =  hole_polyon.points;
-        holes_json.push_back(std::move(hole_json));
-    }
-    j[JSON_POLYGON_HOLES] = std::move(holes_json);
-}
-
-static void to_json(json& j, const Surface& surf) {
-    j[JSON_EXPOLYGON] = surf.expolygon;
-    j[JSON_SURF_TYPE] = surf.surface_type;
-    j[JSON_SURF_THICKNESS] = surf.thickness;
-    j[JSON_SURF_THICKNESS_LAYER] = surf.thickness_layers;
-    j[JSON_SURF_BRIDGE_ANGLE] = surf.bridge_angle;
-    j[JSON_SURF_EXTRA_PERIMETERS] = surf.extra_perimeters;
-}
-
-static void to_json(json& j, const ArcSegment& arc_seg) {
-    json start_point_json = json::array(), end_point_json = json::array(), center_point_json = json::array();
-    j[JSON_IS_ARC] = arc_seg.is_arc;
-    j[JSON_ARC_LENGTH] = arc_seg.length;
-    j[JSON_ARC_ANGLE_RADIUS] = arc_seg.angle_radians;
-    j[JSON_ARC_POLAY_START_THETA] = arc_seg.polar_start_theta;
-    j[JSON_ARC_POLAY_END_THETA] = arc_seg.polar_end_theta;
-    start_point_json.push_back(arc_seg.start_point.x());
-    start_point_json.push_back(arc_seg.start_point.y());
-    j[JSON_ARC_START_POINT] = std::move(start_point_json);
-    end_point_json.push_back(arc_seg.end_point.x());
-    end_point_json.push_back(arc_seg.end_point.y());
-    j[JSON_ARC_END_POINT] = std::move(end_point_json);
-    j[JSON_ARC_DIRECTION] = arc_seg.direction;
-    j[JSON_ARC_RADIUS] = arc_seg.radius;
-    center_point_json.push_back(arc_seg.center.x());
-    center_point_json.push_back(arc_seg.center.y());
-    j[JSON_ARC_CENTER] = std::move(center_point_json);
-}
-
-
-static void to_json(json& j, const Polyline& poly_line) {
-    json points_json = json::array(), fittings_json = json::array();
-    points_json = poly_line.points;
-
-    j[JSON_POINTS] = std::move(points_json);
-    for (const PathFittingData& path_fitting : poly_line.fitting_result)
-    {
-        json fitting_json;
-        fitting_json[JSON_ARC_START_INDEX] = path_fitting.start_point_index;
-        fitting_json[JSON_ARC_END_INDEX] = path_fitting.end_point_index;
-        fitting_json[JSON_ARC_PATH_TYPE] = path_fitting.path_type;
-        if (path_fitting.arc_data.is_arc)
-            fitting_json[JSON_ARC_DATA] = path_fitting.arc_data;
-
-        fittings_json.push_back(std::move(fitting_json));
-    }
-    j[JSON_ARC_FITTING] = fittings_json;
-}
+// static void to_json(json& j, const Points& p_s) {
+//     for (const Point& p : p_s)
+//     {
+//         j.push_back(p.x());
+//         j.push_back(p.y());
+//     }
+// }
+//
+// static void to_json(json& j, const BoundingBox& bb) {
+//     j.push_back(bb.min.x());
+//     j.push_back(bb.min.y());
+//     j.push_back(bb.max.x());
+//     j.push_back(bb.max.y());
+// }
+//
+// static void to_json(json& j, const ExPolygon& polygon) {
+//     json contour_json = json::array(), holes_json = json::array();
+//
+//     //contour
+//     const Polygon& slice_contour =   polygon.contour;
+//     contour_json = slice_contour.points;
+//     j[JSON_POLYGON_CONTOUR] = std::move(contour_json);
+//
+//     //holes
+//     const Polygons& slice_holes =   polygon.holes;
+//     for (const Polygon& hole_polyon : slice_holes)
+//     {
+//         json hole_json = json::array();
+//         hole_json =  hole_polyon.points;
+//         holes_json.push_back(std::move(hole_json));
+//     }
+//     j[JSON_POLYGON_HOLES] = std::move(holes_json);
+// }
+//
+// static void to_json(json& j, const Surface& surf) {
+//     j[JSON_EXPOLYGON] = surf.expolygon;
+//     j[JSON_SURF_TYPE] = surf.surface_type;
+//     j[JSON_SURF_THICKNESS] = surf.thickness;
+//     j[JSON_SURF_THICKNESS_LAYER] = surf.thickness_layers;
+//     j[JSON_SURF_BRIDGE_ANGLE] = surf.bridge_angle;
+//     j[JSON_SURF_EXTRA_PERIMETERS] = surf.extra_perimeters;
+// }
+//
+// static void to_json(json& j, const ArcSegment& arc_seg) {
+//     json start_point_json = json::array(), end_point_json = json::array(), center_point_json = json::array();
+//     j[JSON_IS_ARC] = arc_seg.is_arc;
+//     j[JSON_ARC_LENGTH] = arc_seg.length;
+//     j[JSON_ARC_ANGLE_RADIUS] = arc_seg.angle_radians;
+//     j[JSON_ARC_POLAY_START_THETA] = arc_seg.polar_start_theta;
+//     j[JSON_ARC_POLAY_END_THETA] = arc_seg.polar_end_theta;
+//     start_point_json.push_back(arc_seg.start_point.x());
+//     start_point_json.push_back(arc_seg.start_point.y());
+//     j[JSON_ARC_START_POINT] = std::move(start_point_json);
+//     end_point_json.push_back(arc_seg.end_point.x());
+//     end_point_json.push_back(arc_seg.end_point.y());
+//     j[JSON_ARC_END_POINT] = std::move(end_point_json);
+//     j[JSON_ARC_DIRECTION] = arc_seg.direction;
+//     j[JSON_ARC_RADIUS] = arc_seg.radius;
+//     center_point_json.push_back(arc_seg.center.x());
+//     center_point_json.push_back(arc_seg.center.y());
+//     j[JSON_ARC_CENTER] = std::move(center_point_json);
+// }
+//
+//
+// static void to_json(json& j, const Polyline& poly_line) {
+//     json points_json = json::array(), fittings_json = json::array();
+//     points_json = poly_line.points;
+//
+//     j[JSON_POINTS] = std::move(points_json);
+//     for (const PathFittingData& path_fitting : poly_line.fitting_result)
+//     {
+//         json fitting_json;
+//         fitting_json[JSON_ARC_START_INDEX] = path_fitting.start_point_index;
+//         fitting_json[JSON_ARC_END_INDEX] = path_fitting.end_point_index;
+//         fitting_json[JSON_ARC_PATH_TYPE] = path_fitting.path_type;
+//         if (path_fitting.arc_data.is_arc)
+//             fitting_json[JSON_ARC_DATA] = path_fitting.arc_data;
+//
+//         fittings_json.push_back(std::move(fitting_json));
+//     }
+//     j[JSON_ARC_FITTING] = fittings_json;
+// }
 
 // static void to_json(json& j, const ExtrusionPath& extrusion_path) {
 //     j[JSON_EXTRUSION_POLYLINE] = extrusion_path.polyline;
@@ -3447,110 +3436,110 @@ static void to_json(json& j, const Polyline& poly_line) {
 //     return;
 // }
 
-static void to_json(json& j, const groupedVolumeSlices& first_layer_group) {
-    json volumes_json = json::array(), slices_json = json::array();
-    j[JSON_FIRSTLAYER_GROUP_ID] = first_layer_group.groupId;
-
-    for (const ObjectID& obj_id : first_layer_group.volume_ids)
-    {
-        volumes_json.push_back(obj_id.id);
-    }
-    j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS] = std::move(volumes_json);
-
-    for (const ExPolygon& slice_expolygon : first_layer_group.slices) {
-        json slice_expolygon_json = slice_expolygon;
-
-        slices_json.push_back(std::move(slice_expolygon_json));
-    }
-    j[JSON_FIRSTLAYER_GROUP_SLICES] = std::move(slices_json);
-}
-
-//load apis from json
-static void from_json(const json& j, Points& p_s) {
-    int array_size = j.size();
-    for (int index = 0; index < array_size/2; index++)
-    {
-        coord_t x = j[2*index], y = j[2*index+1];
-        Point p(x, y);
-        p_s.push_back(std::move(p));
-    }
-    return;
-}
-
-static void from_json(const json& j, BoundingBox& bbox) {
-    bbox.min[0] = j[0];
-    bbox.min[1] = j[1];
-    bbox.max[0] = j[2];
-    bbox.max[1] = j[3];
-    bbox.defined = true;
-
-    return;
-}
-
-static void from_json(const json& j, ExPolygon& polygon) {
-    polygon.contour.points = j[JSON_POLYGON_CONTOUR];
-
-    int holes_count = j[JSON_POLYGON_HOLES].size();
-    for (int holes_index = 0; holes_index < holes_count; holes_index++)
-    {
-        Polygon poly;
-
-        poly.points = j[JSON_POLYGON_HOLES][holes_index];
-        polygon.holes.push_back(std::move(poly));
-    }
-    return;
-}
-
-static void from_json(const json& j, Surface& surf) {
-    surf.expolygon = j[JSON_EXPOLYGON];
-    surf.surface_type = j[JSON_SURF_TYPE];
-    surf.thickness = j[JSON_SURF_THICKNESS];
-    surf.thickness_layers = j[JSON_SURF_THICKNESS_LAYER];
-    surf.bridge_angle = j[JSON_SURF_BRIDGE_ANGLE];
-    surf.extra_perimeters = j[JSON_SURF_EXTRA_PERIMETERS];
-
-    return;
-}
-
-static void from_json(const json& j, ArcSegment& arc_seg) {
-    arc_seg.is_arc = j[JSON_IS_ARC];
-    arc_seg.length = j[JSON_ARC_LENGTH];
-    arc_seg.angle_radians = j[JSON_ARC_ANGLE_RADIUS];
-    arc_seg.polar_start_theta = j[JSON_ARC_POLAY_START_THETA];
-    arc_seg.polar_end_theta = j[JSON_ARC_POLAY_END_THETA];
-    arc_seg.start_point.x() = j[JSON_ARC_START_POINT][0];
-    arc_seg.start_point.y() = j[JSON_ARC_START_POINT][1];
-    arc_seg.end_point.x() = j[JSON_ARC_END_POINT][0];
-    arc_seg.end_point.y() = j[JSON_ARC_END_POINT][1];
-    arc_seg.direction = j[JSON_ARC_DIRECTION];
-    arc_seg.radius    = j[JSON_ARC_RADIUS];
-    arc_seg.center.x() = j[JSON_ARC_CENTER][0];
-    arc_seg.center.y() = j[JSON_ARC_CENTER][1];
-
-    return;
-}
-
-
-static void from_json(const json& j, Polyline& poly_line) {
-    poly_line.points = j[JSON_POINTS];
-
-    int arc_fitting_count = j[JSON_ARC_FITTING].size();
-    for (int arc_fitting_index = 0; arc_fitting_index < arc_fitting_count; arc_fitting_index++)
-    {
-        const json& fitting_json = j[JSON_ARC_FITTING][arc_fitting_index];
-        PathFittingData path_fitting;
-        path_fitting.start_point_index = fitting_json[JSON_ARC_START_INDEX];
-        path_fitting.end_point_index = fitting_json[JSON_ARC_END_INDEX];
-        path_fitting.path_type = fitting_json[JSON_ARC_PATH_TYPE];
-
-        if (fitting_json.contains(JSON_ARC_DATA)) {
-            path_fitting.arc_data = fitting_json[JSON_ARC_DATA];
-        }
-
-        poly_line.fitting_result.push_back(std::move(path_fitting));
-    }
-    return;
-}
+// static void to_json(json& j, const groupedVolumeSlices& first_layer_group) {
+//     json volumes_json = json::array(), slices_json = json::array();
+//     j[JSON_FIRSTLAYER_GROUP_ID] = first_layer_group.groupId;
+//
+//     for (const ObjectID& obj_id : first_layer_group.volume_ids)
+//     {
+//         volumes_json.push_back(obj_id.id);
+//     }
+//     j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS] = std::move(volumes_json);
+//
+//     for (const ExPolygon& slice_expolygon : first_layer_group.slices) {
+//         json slice_expolygon_json = slice_expolygon;
+//
+//         slices_json.push_back(std::move(slice_expolygon_json));
+//     }
+//     j[JSON_FIRSTLAYER_GROUP_SLICES] = std::move(slices_json);
+// }
+//
+// //load apis from json
+// static void from_json(const json& j, Points& p_s) {
+//     int array_size = j.size();
+//     for (int index = 0; index < array_size/2; index++)
+//     {
+//         coord_t x = j[2*index], y = j[2*index+1];
+//         Point p(x, y);
+//         p_s.push_back(std::move(p));
+//     }
+//     return;
+// }
+//
+// static void from_json(const json& j, BoundingBox& bbox) {
+//     bbox.min[0] = j[0];
+//     bbox.min[1] = j[1];
+//     bbox.max[0] = j[2];
+//     bbox.max[1] = j[3];
+//     bbox.defined = true;
+//
+//     return;
+// }
+//
+// static void from_json(const json& j, ExPolygon& polygon) {
+//     polygon.contour.points = j[JSON_POLYGON_CONTOUR];
+//
+//     int holes_count = j[JSON_POLYGON_HOLES].size();
+//     for (int holes_index = 0; holes_index < holes_count; holes_index++)
+//     {
+//         Polygon poly;
+//
+//         poly.points = j[JSON_POLYGON_HOLES][holes_index];
+//         polygon.holes.push_back(std::move(poly));
+//     }
+//     return;
+// }
+//
+// static void from_json(const json& j, Surface& surf) {
+//     surf.expolygon = j[JSON_EXPOLYGON];
+//     surf.surface_type = j[JSON_SURF_TYPE];
+//     surf.thickness = j[JSON_SURF_THICKNESS];
+//     surf.thickness_layers = j[JSON_SURF_THICKNESS_LAYER];
+//     surf.bridge_angle = j[JSON_SURF_BRIDGE_ANGLE];
+//     surf.extra_perimeters = j[JSON_SURF_EXTRA_PERIMETERS];
+//
+//     return;
+// }
+//
+// static void from_json(const json& j, ArcSegment& arc_seg) {
+//     arc_seg.is_arc = j[JSON_IS_ARC];
+//     arc_seg.length = j[JSON_ARC_LENGTH];
+//     arc_seg.angle_radians = j[JSON_ARC_ANGLE_RADIUS];
+//     arc_seg.polar_start_theta = j[JSON_ARC_POLAY_START_THETA];
+//     arc_seg.polar_end_theta = j[JSON_ARC_POLAY_END_THETA];
+//     arc_seg.start_point.x() = j[JSON_ARC_START_POINT][0];
+//     arc_seg.start_point.y() = j[JSON_ARC_START_POINT][1];
+//     arc_seg.end_point.x() = j[JSON_ARC_END_POINT][0];
+//     arc_seg.end_point.y() = j[JSON_ARC_END_POINT][1];
+//     arc_seg.direction = j[JSON_ARC_DIRECTION];
+//     arc_seg.radius    = j[JSON_ARC_RADIUS];
+//     arc_seg.center.x() = j[JSON_ARC_CENTER][0];
+//     arc_seg.center.y() = j[JSON_ARC_CENTER][1];
+//
+//     return;
+// }
+//
+//
+// static void from_json(const json& j, Polyline& poly_line) {
+//     poly_line.points = j[JSON_POINTS];
+//
+//     int arc_fitting_count = j[JSON_ARC_FITTING].size();
+//     for (int arc_fitting_index = 0; arc_fitting_index < arc_fitting_count; arc_fitting_index++)
+//     {
+//         const json& fitting_json = j[JSON_ARC_FITTING][arc_fitting_index];
+//         PathFittingData path_fitting;
+//         path_fitting.start_point_index = fitting_json[JSON_ARC_START_INDEX];
+//         path_fitting.end_point_index = fitting_json[JSON_ARC_END_INDEX];
+//         path_fitting.path_type = fitting_json[JSON_ARC_PATH_TYPE];
+//
+//         if (fitting_json.contains(JSON_ARC_DATA)) {
+//             path_fitting.arc_data = fitting_json[JSON_ARC_DATA];
+//         }
+//
+//         poly_line.fitting_result.push_back(std::move(path_fitting));
+//     }
+//     return;
+// }
 
 // static void from_json(const json& j, ExtrusionPath& extrusion_path) {
 //     extrusion_path.polyline               =    j[JSON_EXTRUSION_POLYLINE];
@@ -3824,28 +3813,28 @@ static void from_json(const json& j, Polyline& poly_line) {
 //     return;
 // }
 
-static void from_json(const json& j, groupedVolumeSlices& firstlayer_group)
-{
-    firstlayer_group.groupId               =   j[JSON_FIRSTLAYER_GROUP_ID];
-
-    int volume_count = j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS].size();
-    for (int volume_index = 0; volume_index < volume_count; volume_index++)
-    {
-        ObjectID obj_id;
-
-        obj_id.id = j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS][volume_index];
-        firstlayer_group.volume_ids.push_back(std::move(obj_id));
-    }
-
-    int slices_count = j[JSON_FIRSTLAYER_GROUP_SLICES].size();
-    for (int slice_index = 0; slice_index < slices_count; slice_index++)
-    {
-        ExPolygon polygon;
-
-        polygon = j[JSON_FIRSTLAYER_GROUP_SLICES][slice_index];
-        firstlayer_group.slices.push_back(std::move(polygon));
-    }
-}
+// static void from_json(const json& j, groupedVolumeSlices& firstlayer_group)
+// {
+//     firstlayer_group.groupId               =   j[JSON_FIRSTLAYER_GROUP_ID];
+//
+//     int volume_count = j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS].size();
+//     for (int volume_index = 0; volume_index < volume_count; volume_index++)
+//     {
+//         ObjectID obj_id;
+//
+//         obj_id.id = j[JSON_FIRSTLAYER_GROUP_VOLUME_IDS][volume_index];
+//         firstlayer_group.volume_ids.push_back(std::move(obj_id));
+//     }
+//
+//     int slices_count = j[JSON_FIRSTLAYER_GROUP_SLICES].size();
+//     for (int slice_index = 0; slice_index < slices_count; slice_index++)
+//     {
+//         ExPolygon polygon;
+//
+//         polygon = j[JSON_FIRSTLAYER_GROUP_SLICES][slice_index];
+//         firstlayer_group.slices.push_back(std::move(polygon));
+//     }
+// }
 
 // int Print::export_cached_data(const std::string& directory, bool with_space)
 // {

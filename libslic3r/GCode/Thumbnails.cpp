@@ -3,7 +3,6 @@
 #include "format.hpp"
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <qoi/qoi.h>
 #include <jpeglib.h>
 #include <jerror.h>
 #include <vector>

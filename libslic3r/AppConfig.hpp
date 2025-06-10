@@ -4,14 +4,11 @@
 #include <set>
 #include <map>
 #include <string>
-#include "nlohmann/json.hpp"
+
 #include <boost/algorithm/string/trim_all.hpp>
 
 #include "libslic3r/Config.hpp"
 #include "libslic3r/Semver.hpp"
-//#include "calib.hpp"
-
-using namespace nlohmann;
 
 #define ENV_DEV_HOST		"0"
 #define ENV_QAT_HOST		"1"
@@ -27,10 +24,8 @@ using namespace nlohmann;
 #define SUPPORT_DARK_MODE
 //#define _MSW_DARK_MODE
 
-
 namespace Slic3r {
-
-
+	
 // Connected LAN mode BambuLab printer
 struct BBLocalMachine
 {
@@ -197,28 +192,28 @@ public:
 	const VendorMap&    vendors() const { return m_vendors; }
 
 	// Orca printer settings
-    typedef std::map<std::string, nlohmann::json> MachineSettingMap;
+    //typedef std::map<std::string, nlohmann::json> MachineSettingMap;
     bool has_printer_settings(std::string printer) const {
-        return m_printer_settings.find(printer) != m_printer_settings.end();
+        return true;//m_printer_settings.find(printer) != m_printer_settings.end();
     }
     void clear_printer_settings(std::string printer) {
-        m_printer_settings.erase(printer);
+       // m_printer_settings.erase(printer);
         m_dirty = true;
     }
     bool has_printer_setting(std::string printer, std::string name) {
         if (!has_printer_settings(printer))
             return false;
-        if (!m_printer_settings[printer].contains(name))
-            return false;
+        // if (!m_printer_settings[printer].contains(name))
+        //     return false;
         return true;
     }
     std::string get_printer_setting(std::string printer, std::string name) {
         if (!has_printer_setting(printer, name))
             return "";
-        return m_printer_settings[printer][name];
+        return "---";//m_printer_settings[printer][name];
     }
     void set_printer_setting(std::string printer, std::string name, std::string value) {
-        m_printer_settings[printer][name] = value;
+        //m_printer_settings[printer][name] = value;
         m_dirty = true;
     }
 
@@ -367,7 +362,7 @@ private:
 	VendorMap                                                   m_vendors;
 
 	// Preset for each machine
-	MachineSettingMap											m_printer_settings;
+	//MachineSettingMap											m_printer_settings;
 	// Has any value been modified since the config.ini has been last saved or loaded?
 	bool														m_dirty;
 	// Original version found in the ini file before it was overwritten

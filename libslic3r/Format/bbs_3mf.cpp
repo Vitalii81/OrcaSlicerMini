@@ -47,10 +47,7 @@ namespace pt = boost::property_tree;
 #include <expat.h>
 #include <Eigen/Dense>
 #include "miniz_extension.hpp"
-#include "nlohmann/json.hpp"
-
 #include "TextConfiguration.hpp"
-//#include "EmbossShape.hpp"
 #include "ExPolygonSerialize.hpp" 
 
 #include "NSVGUtils.hpp"

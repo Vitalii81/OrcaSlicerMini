@@ -1,6 +1,6 @@
 #include "ClipperUtils.hpp"
 #include "Geometry.hpp"
-#include "Tesselate.hpp"
+//#include "Tesselate.hpp"
 #include "TriangleMesh.hpp"
 #include "TriangleMeshSlicer.hpp"
 #include "Utils.hpp"
@@ -2227,63 +2227,63 @@ static void triangulate_slice(
 
     if (triangulate) {
         size_t idx_vertex_new_first = its.vertices.size();
-        Pointf3s triangles = triangulate_expolygons_3d(make_expolygons_simple(lines), z, normals_down);
-        for (size_t i = 0; i < triangles.size(); ) {
-            stl_triangle_vertex_indices facet;
-            for (size_t j = 0; j < 3; ++ j) {
-                Vec3f v = triangles[i ++].cast<float>();
-                auto it = lower_bound_by_predicate(map_vertex_to_index.begin(), map_vertex_to_index.end(),
-                    [&v](const std::pair<Vec2f, int> &l) {
-                    return l.first.x() < v.x() || (is_equal_for_sort(l.first.x(), v.x()) && l.first.y() < v.y());
-                    });
-                auto  back_it = it;
-                int   idx = -1;
-                bool exist = false;
-                for (auto iter = section_vertices_map.begin(); iter != section_vertices_map.end(); iter++) {
-                    if (is_equal(v, *iter->second)) {
-                        idx   = iter->first;
-                        exist = true;
-                        break;
-                    }
-                }
-                // go on finding
-                if (!exist) {
-                    for (; it != map_vertex_to_index.end(); it++) {
-                        if (is_equal(it->first.x(), v.x()) && is_equal(it->first.y(), v.y())) {
-                            idx   = it->second;
-                            exist = true;
-                            break;
-                        }
-                    }
-                }
-                // go on finding
-                if (!exist) {
-                    it = back_it;
-                    for (; it != map_vertex_to_index.begin(); it--) {
-                        if (is_equal(it->first.x(), v.x()) && is_equal(it->first.y(), v.y())) {
-                            idx   = it->second;
-                            exist = true;
-                            break;
-                        }
-                    }
-                }
-                if (!exist){
-                    // Try to find the vertex in the list of newly added vertices. Those vertices are not matched on the cut and they shall be rare.
-                    for (size_t k = idx_vertex_new_first; k < its.vertices.size(); ++ k)
-                        if (its.vertices[k] == v) {
-                            idx = int(k);
-                            break;
-                        }
-                    if (idx == -1) {
-                        idx = int(its.vertices.size());
-                        its.vertices.emplace_back(v);
-                    }
-                }
-                facet(j) = idx;
-            }
-            if (facet(0) != facet(1) && facet(0) != facet(2) && facet(1) != facet(2))
-                its.indices.emplace_back(facet);
-        }
+        //Pointf3s triangles = triangulate_expolygons_3d(make_expolygons_simple(lines), z, normals_down);
+        // for (size_t i = 0; i < triangles.size(); ) {
+        //     stl_triangle_vertex_indices facet;
+        //     for (size_t j = 0; j < 3; ++ j) {
+        //         Vec3f v = triangles[i ++].cast<float>();
+        //         auto it = lower_bound_by_predicate(map_vertex_to_index.begin(), map_vertex_to_index.end(),
+        //             [&v](const std::pair<Vec2f, int> &l) {
+        //             return l.first.x() < v.x() || (is_equal_for_sort(l.first.x(), v.x()) && l.first.y() < v.y());
+        //             });
+        //         auto  back_it = it;
+        //         int   idx = -1;
+        //         bool exist = false;
+        //         for (auto iter = section_vertices_map.begin(); iter != section_vertices_map.end(); iter++) {
+        //             if (is_equal(v, *iter->second)) {
+        //                 idx   = iter->first;
+        //                 exist = true;
+        //                 break;
+        //             }
+        //         }
+        //         // go on finding
+        //         if (!exist) {
+        //             for (; it != map_vertex_to_index.end(); it++) {
+        //                 if (is_equal(it->first.x(), v.x()) && is_equal(it->first.y(), v.y())) {
+        //                     idx   = it->second;
+        //                     exist = true;
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //         // go on finding
+        //         if (!exist) {
+        //             it = back_it;
+        //             for (; it != map_vertex_to_index.begin(); it--) {
+        //                 if (is_equal(it->first.x(), v.x()) && is_equal(it->first.y(), v.y())) {
+        //                     idx   = it->second;
+        //                     exist = true;
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //         if (!exist){
+        //             // Try to find the vertex in the list of newly added vertices. Those vertices are not matched on the cut and they shall be rare.
+        //             for (size_t k = idx_vertex_new_first; k < its.vertices.size(); ++ k)
+        //                 if (its.vertices[k] == v) {
+        //                     idx = int(k);
+        //                     break;
+        //                 }
+        //             if (idx == -1) {
+        //                 idx = int(its.vertices.size());
+        //                 its.vertices.emplace_back(v);
+        //             }
+        //         }
+        //         facet(j) = idx;
+        //     }
+        //     if (facet(0) != facet(1) && facet(0) != facet(2) && facet(1) != facet(2))
+        //         its.indices.emplace_back(facet);
+        // }
     }
 
     // Remove vertices, which are not referenced by any face.
@@ -2536,7 +2536,7 @@ void cut_mesh(const indexed_triangle_set& mesh, float z, indexed_triangle_set* u
     }
 
     if (upper != nullptr) {
-        triangulate_slice(*upper, upper_lines, upper_slice_vertices, int(mesh.vertices.size()), z, triangulate_caps, NORMALS_DOWN, section_vertices_map);
+        triangulate_slice(*upper, upper_lines, upper_slice_vertices, int(mesh.vertices.size()), z, triangulate_caps, true/*NORMALS_DOWN*/, section_vertices_map);
 #ifndef NDEBUG
         if (triangulate_caps) {
             size_t num_open_edges_new = its_num_open_edges(*upper);
@@ -2546,7 +2546,7 @@ void cut_mesh(const indexed_triangle_set& mesh, float z, indexed_triangle_set* u
     }
 
     if (lower != nullptr) {
-        triangulate_slice(*lower, lower_lines, lower_slice_vertices, int(mesh.vertices.size()), z, triangulate_caps, NORMALS_UP, section_vertices_map);
+        triangulate_slice(*lower, lower_lines, lower_slice_vertices, int(mesh.vertices.size()), z, triangulate_caps, false/*NORMALS_UP*/, section_vertices_map);
 #ifndef NDEBUG
         if (triangulate_caps) {
             size_t num_open_edges_new = its_num_open_edges(*lower);
