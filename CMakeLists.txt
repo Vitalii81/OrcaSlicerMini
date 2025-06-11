@@ -11,21 +11,10 @@ set(SLIC3R_STATIC_INITIAL 1)
 
 option(SLIC3R_STATIC 			"Compile OrcaSlicer with static libraries (Boost, TBB, glew)" ${SLIC3R_STATIC_INITIAL})
 option(SLIC3R_FHS               "Assume OrcaSlicer is to be installed in a FHS directory structure" 0)
-option(SLIC3R_PCH               "Use precompiled headers" 1)
-option(SLIC3R_ASAN              "Enable ASan on Clang and GCC" 0)
 
 set(IS_CROSS_COMPILE FALSE)
 
 option(ORCA_TOOLS       "Build Orca tools" OFF)
-
-# Print out the SLIC3R_* cache options
-get_cmake_property(_cache_vars CACHE_VARIABLES)
-list (SORT _cache_vars)
-foreach (_cache_var ${_cache_vars})
-    if("${_cache_var}" MATCHES "^SLIC3R_")
-        message(STATUS "${_cache_var}: ${${_cache_var}}")
-    endif ()
-endforeach()
 
 # ARMs (Raspberry PI) use an unsigned char by default. Let's make it consistent for OrcaSlicer on all platforms.
 add_compile_options(-fsigned-char)
@@ -144,29 +133,6 @@ set(TBB_DEBUG 1)
 set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release "")
 find_package(TBB REQUIRED)
 
-#find_package(CURL REQUIRED)
-#
-#add_library(libcurl INTERFACE)
-#target_link_libraries(libcurl INTERFACE CURL::libcurl)
-#
-#find_package(ZLIB REQUIRED)
-#target_link_libraries(libcurl INTERFACE ZLIB::ZLIB)
-
-#if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_CURL)
-#        # libcurl is always linked dynamically to the system libcurl on OSX.
-#        # On other systems, libcurl is linked statically if SLIC3R_STATIC is set.
-#        target_compile_definitions(libcurl INTERFACE CURL_STATICLIB)
-#
-#    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-#        # As of now, our build system produces a statically linked libcurl,
-#        # which links the OpenSSL library dynamically.
-#        #find_package(OpenSSL REQUIRED)
-#        message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
-#        message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
-#
-#    endif()
-#endif()
-
 ## OPTIONAL packages
 
 # Find eigen3 or use bundled version
@@ -282,8 +248,6 @@ else ()
     install(DIRECTORY "${SLIC3R_RESOURCES_DIR}/" DESTINATION "${CMAKE_INSTALL_PREFIX}/resources")
 endif ()
 
-#install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.txt DESTINATION ".")
-
 set (CPACK_PACKAGE_NAME "OrcaSlicer")
 set (CPACK_PACKAGE_VENDOR "SoftFever")
 set (CPACK_PACKAGE_VERSION_MAJOR "${ORCA_VERSION_MAJOR}")
@@ -293,14 +257,7 @@ set (CPACK_PACKAGE_FILE_NAME "OrcaSlicer_Windows_Installer_V${SoftFever_VERSION}
 set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "Orca Slicer is an open source slicer for FDM printers")
 set (CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/SoftFever/OrcaSlicer")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
-#set (CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/resources/images\\\\OrcaSlicer.ico")
-#set (CPACK_NSIS_MUI_ICON "${CPACK_PACKAGE_ICON}")
-#set (CPACK_NSIS_MUI_UNIICON "${CPACK_PACKAGE_ICON}")
 set (CPACK_PACKAGE_CHECKSUM SHA256)
-#set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "OrcaSlicer")
-#set (CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-#set (CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 set(CPACK_PACKAGE_EXECUTABLES "orca-slicer;OrcaSlicer")
-#set(CPACK_CREATE_DESKTOP_LINKS "orca-slicer")
-#set(CPACK_GENERATOR NSIS)
+
 

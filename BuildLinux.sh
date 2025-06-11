@@ -91,22 +91,6 @@ fi
 DISTRIBUTION="debian"
 source ./linux.d/${DISTRIBUTION}
 
-echo "FOUND_GTK3=${FOUND_GTK3}"
-if [[ -z "${FOUND_GTK3_DEV}" ]]
-then
-    echo "Error, you must install the dependencies before."
-    echo "Use option -u with sudo"
-    exit 1
-fi
-
-echo "Changing date in version..."
-{
-    # change date in version
-    sed -i "s/+UNKNOWN/_$(date '+%F')/" version.inc
-}
-echo "done"
-
-
 if ! [[ -n "${SKIP_RAM_CHECK}" ]]
 then
     check_available_memory_and_disk
