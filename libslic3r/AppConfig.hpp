@@ -25,7 +25,7 @@
 //#define _MSW_DARK_MODE
 
 namespace Slic3r {
-	
+
 // Connected LAN mode BambuLab printer
 struct BBLocalMachine
 {
