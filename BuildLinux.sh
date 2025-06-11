@@ -2,6 +2,10 @@
 
 export ROOT=$(dirname $(readlink -f ${0}))
 
+sudo apt install m4 -y
+sudo apt install texinfo -y
+sudo apt install autoconf automake libtool -y
+
 set -e # exit on first error
 
 function check_available_memory_and_disk() {
@@ -84,20 +88,7 @@ then
     exit 0
 fi
 
-DISTRIBUTION=$(awk -F= '/^ID=/ {print $2}' /etc/os-release | tr -d '"')
-DISTRIBUTION_LIKE=$(awk -F= '/^ID_LIKE=/ {print $2}' /etc/os-release | tr -d '"')
-# Check for direct distribution match to Ubuntu/Debian
-if [ "${DISTRIBUTION}" == "ubuntu" ] || [ "${DISTRIBUTION}" == "linuxmint" ]; then
-    DISTRIBUTION="debian"
-# Check if distribution is Debian/Ubuntu-like based on ID_LIKE
-elif [[ "${DISTRIBUTION_LIKE}" == *"debian"* ]] || [[ "${DISTRIBUTION_LIKE}" == *"ubuntu"* ]]; then
-    DISTRIBUTION="debian"
-fi
-if [ ! -f ./linux.d/${DISTRIBUTION} ]
-then
-    echo "Your distribution does not appear to be currently supported by these build scripts"
-    exit 1
-fi
+DISTRIBUTION="debian"
 source ./linux.d/${DISTRIBUTION}
 
 echo "FOUND_GTK3=${FOUND_GTK3}"
@@ -124,7 +115,7 @@ fi
 if [[ -n "${BUILD_DEPS}" ]]
 then
     echo "Configuring dependencies..."
-    BUILD_ARGS="-DDEP_WX_GTK3=ON"
+    BUILD_ARGS="-DDEP_WX_GTK3=OFF"
     if [[ -n "${CLEAN_BUILD}" ]]
     then
         rm -fr deps/build
@@ -146,8 +137,8 @@ then
     fi
 
     echo "cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS}"
-    cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS}
-    cmake --build deps/build
+    cmake -S deps -B deps/build -G Ninja ${BUILD_ARGS} 2>&1 | tee deps_config.log
+    cmake --build deps/build --verbose 2>&1 | tee deps_build.log
 fi
 
 
@@ -159,20 +150,17 @@ then
         rm -fr build
     fi
     BUILD_ARGS=""
-    if [[ -n "${FOUND_GTK3_DEV}" ]]
-    then
-        BUILD_ARGS="-DSLIC3R_GTK=3"
-    fi
+
     if [[ -n "${BUILD_DEBUG}" ]]
     then
         BUILD_ARGS="${BUILD_ARGS} -DCMAKE_BUILD_TYPE=Debug -DBBL_INTERNAL_TESTING=1"
     else
         BUILD_ARGS="${BUILD_ARGS} -DBBL_RELEASE_TO_PUBLIC=1 -DBBL_INTERNAL_TESTING=0"
     fi
-    echo -e "cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" -DSLIC3R_STATIC=0 -DORCA_TOOLS=OFF ${BUILD_ARGS}"
+    echo -e "cmake -S . -B build -G Ninja -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" -DSLIC3R_STATIC=1 -DORCA_TOOLS=OFF ${BUILD_ARGS}"
     cmake -S . -B build -G Ninja \
         -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" \
-        -DSLIC3R_STATIC=0 \
+        -DSLIC3R_STATIC=1 \
         -DORCA_TOOLS=OFF \
         ${BUILD_ARGS}
     echo "done"
@@ -182,20 +170,4 @@ then
     cmake --build build --target OrcaSlicer_profile_validator
     ./run_gettext.sh
     echo "done"
-fi
-
-if [[ -e ${ROOT}/build/src/BuildLinuxImage.sh ]]; then
-# Give proper permissions to script
-chmod 755 ${ROOT}/build/src/BuildLinuxImage.sh
-
-echo "[9/9] Generating Linux app..."
-    pushd build
-        if [[ -n "${BUILD_IMAGE}" ]]
-        then
-            ${ROOT}/build/src/BuildLinuxImage.sh -i
-        else
-            ${ROOT}/build/src/BuildLinuxImage.sh
-        fi
-    popd
-echo "done"
 fi
