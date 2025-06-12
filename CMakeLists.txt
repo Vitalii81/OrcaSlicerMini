@@ -27,8 +27,6 @@ option(SLIC3R_FHS               "Assume OrcaSlicer is to be installed in a FHS d
 
 set(IS_CROSS_COMPILE FALSE)
 
-option(ORCA_TOOLS       "Build Orca tools" OFF)
-
 # ARMs (Raspberry PI) use an unsigned char by default. Let's make it consistent for OrcaSlicer on all platforms.
 add_compile_options(-fsigned-char)
 
@@ -177,10 +175,10 @@ endif ()
 #set(GLEW_ROOT "${CMAKE_PREFIX_PATH}")
 message("GLEW_ROOT: ${GLEW_ROOT}")
 # Find glew or use bundled version
-#if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_GLEW)
-#    set(GLEW_USE_STATIC_LIBS ON)
-#    set(GLEW_VERBOSE ON)
-#endif()
+if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_GLEW)
+    set(GLEW_USE_STATIC_LIBS ON)
+    set(GLEW_VERBOSE ON)
+endif()
 
 add_library(GLEW::glew_s STATIC IMPORTED)
 set_target_properties(GLEW::glew_s PROPERTIES
@@ -189,7 +187,6 @@ set_target_properties(GLEW::glew_s PROPERTIES
 )
 
 list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_DEPS_DIR}/local")
-find_package(glfw3 REQUIRED)
 
 # Find the Cereal serialization library
 find_package(cereal REQUIRED)
@@ -199,29 +196,6 @@ if (NOT TARGET cereal::cereal)
 else ()
     set_target_properties(cereal::cereal PROPERTIES IMPORTED_GLOBAL TRUE)
 endif ()
-
-# l10n
-set(L10N_DIR "${SLIC3R_RESOURCES_DIR}/i18n")
-set(BBL_L18N_DIR "${CMAKE_CURRENT_SOURCE_DIR}/localization/i18n")
-
-file(GLOB BBL_L10N_PO_FILES "${BBL_L18N_DIR}/*/OrcaSlicer*.po")
-foreach(po_file ${BBL_L10N_PO_FILES})
-    GET_FILENAME_COMPONENT(po_dir "${po_file}" DIRECTORY)
-    SET(po_new_file "${po_dir}/OrcaSlicer_.po")
-    add_custom_command(
-            #         TARGET gettext_merge_po_with_pot PRE_BUILD
-            COMMAND msgmerge -N -o ${po_file} ${po_file} "${BBL_L18N_DIR}/OrcaSlicer.pot"
-            DEPENDS ${po_file}
-    )
-endforeach()
-
-file(GLOB L10N_PO_FILES "${BBL_L18N_DIR}/*/OrcaSlicer*.po")
-foreach(po_file ${BBL_L10N_PO_FILES})
-    GET_FILENAME_COMPONENT(SECOND_FOLDER_ABSOLUTE ${po_file} DIRECTORY)
-    string(REGEX REPLACE ".*/(.*)" "\\1" po_dir "${SECOND_FOLDER_ABSOLUTE}" )
-    SET(mo_file "${L10N_DIR}/${po_dir}/OrcaSlicer.mo")
-
-endforeach()
 
 find_package(NLopt 1.4 REQUIRED)
 

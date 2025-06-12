@@ -111,7 +111,6 @@ then
     cmake -S . -B build -G Ninja \
         -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" \
         -DSLIC3R_STATIC=1 \
-        -DORCA_TOOLS=OFF \
         ${BUILD_ARGS}
     echo "done"
     echo "Building OrcaSlicer ..."
