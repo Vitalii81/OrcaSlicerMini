@@ -8,27 +8,6 @@ sudo apt install autoconf automake libtool -y
 
 set -e # exit on first error
 
-function check_available_memory_and_disk() {
-    FREE_MEM_GB=$(free -g -t | grep 'Mem' | rev | cut -d" " -f1 | rev)
-    MIN_MEM_GB=10
-
-    FREE_DISK_KB=$(df -k . | tail -1 | awk '{print $4}')
-    MIN_DISK_KB=$((10 * 1024 * 1024))
-
-    if [ ${FREE_MEM_GB} -le ${MIN_MEM_GB} ]; then
-        echo -e "\nERROR: Orca Slicer Builder requires at least ${MIN_MEM_GB}G of 'available' mem (system has only ${FREE_MEM_GB}G available)"
-        echo && free -h && echo
-        echo "Invoke with -r to skip ram and disk checks."
-        exit 2
-    fi
-
-    if [[ ${FREE_DISK_KB} -le ${MIN_DISK_KB} ]]; then
-        echo -e "\nERROR: Orca Slicer Builder requires at least $(echo ${MIN_DISK_KB} |awk '{ printf "%.1fG\n", $1/1024/1024; }') (system has only $(echo ${FREE_DISK_KB} | awk '{ printf "%.1fG\n", $1/1024/1024; }') disk free)"
-        echo && df -h . && echo
-        echo "Invoke with -r to skip ram and disk checks."
-        exit 1
-    fi
-}
 
 function usage() {
     echo "Usage: ./BuildLinux.sh [-1][-b][-c][-d][-i][-r][-s][-u] [-j N]"
@@ -38,8 +17,6 @@ function usage() {
     echo "   -c: force a clean build"
     echo "   -d: build deps (optional)"
     echo "   -h: this help output"
-    echo "   -i: Generate appimage (optional)"
-    echo "   -r: skip ram and disk checks (low ram compiling)"
     echo "   -s: build orca-slicer (optional)"
     echo "   -u: update and build dependencies (optional and need sudo)"
     echo "For a first use, you want to 'sudo ./BuildLinux.sh -u'"
@@ -67,12 +44,6 @@ while getopts ":1j:bcdghirsu" opt; do
     h ) usage
         exit 0
         ;;
-    i )
-        BUILD_IMAGE="1"
-        ;;
-    r )
-        SKIP_RAM_CHECK="1"
-        ;;
     s )
         BUILD_ORCA="1"
         ;;
@@ -90,11 +61,6 @@ fi
 
 DISTRIBUTION="debian"
 source ./linux.d/${DISTRIBUTION}
-
-if ! [[ -n "${SKIP_RAM_CHECK}" ]]
-then
-    check_available_memory_and_disk
-fi
 
 if [[ -n "${BUILD_DEPS}" ]]
 then
@@ -150,8 +116,5 @@ then
     echo "done"
     echo "Building OrcaSlicer ..."
     cmake --build build --target OrcaSlicer
-    echo "Building OrcaSlicer_profile_validator .."
-    cmake --build build --target OrcaSlicer_profile_validator
-    ./run_gettext.sh
     echo "done"
 fi

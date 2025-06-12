@@ -5,6 +5,19 @@ project(OrcaSlicer)
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
+set(LOCAL_DEPS_DIR "${CMAKE_SOURCE_DIR}/deps/build/destdir/usr" CACHE PATH "Directory for local dependencies")
+list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_DEPS_DIR}")
+
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/deps/build/destdir/usr/local/lib/cmake/CGAL")
+list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/deps/build/destdir/usr/local")
+
+set(GLEW_ROOT "${CMAKE_SOURCE_DIR}/deps/build/destdir/usr/local")
+set(GLEW_INCLUDE_DIR "${GLEW_ROOT}/include")
+set(GLEW_LIBRARY "${GLEW_ROOT}/lib/libGLEW.a")
+set(GLEW_LIBRARIES "${GLEW_LIBRARY}")
+list(PREPEND CMAKE_PREFIX_PATH "${GLEW_ROOT}/lib/cmake")
+list(PREPEND CMAKE_LIBRARY_PATH "${GLEW_ROOT}/lib")
+
 message(STATUS "Build type selected: ${CMAKE_BUILD_TYPE}")
 
 set(SLIC3R_STATIC_INITIAL 1)
@@ -152,25 +165,30 @@ find_package(EXPAT)
 
 if (NOT EXPAT_FOUND)
     add_library(expat STATIC
-        ${LIBDIR}/expat/xmlparse.c
-        ${LIBDIR}/expat/xmlrole.c
-        ${LIBDIR}/expat/xmltok.c
+            ${LIBDIR}/expat/xmlparse.c
+            ${LIBDIR}/expat/xmlrole.c
+            ${LIBDIR}/expat/xmltok.c
     )
     set(EXPAT_FOUND 1)
     set(EXPAT_INCLUDE_DIRS ${LIBDIR}/expat/)
     set(EXPAT_LIBRARIES expat)
 endif ()
 
-set(GLEW_ROOT "${CMAKE_PREFIX_PATH}")
+#set(GLEW_ROOT "${CMAKE_PREFIX_PATH}")
 message("GLEW_ROOT: ${GLEW_ROOT}")
 # Find glew or use bundled version
-if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_GLEW)
-    set(GLEW_USE_STATIC_LIBS ON)
-    set(GLEW_VERBOSE ON)
-endif()
+#if (SLIC3R_STATIC AND NOT SLIC3R_STATIC_EXCLUDE_GLEW)
+#    set(GLEW_USE_STATIC_LIBS ON)
+#    set(GLEW_VERBOSE ON)
+#endif()
 
-find_package(GLEW REQUIRED)
+add_library(GLEW::glew_s STATIC IMPORTED)
+set_target_properties(GLEW::glew_s PROPERTIES
+        IMPORTED_LOCATION "${GLEW_ROOT}/lib/libGLEW.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${GLEW_ROOT}/include"
+)
 
+list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_DEPS_DIR}/local")
 find_package(glfw3 REQUIRED)
 
 # Find the Cereal serialization library
@@ -191,9 +209,9 @@ foreach(po_file ${BBL_L10N_PO_FILES})
     GET_FILENAME_COMPONENT(po_dir "${po_file}" DIRECTORY)
     SET(po_new_file "${po_dir}/OrcaSlicer_.po")
     add_custom_command(
-#         TARGET gettext_merge_po_with_pot PRE_BUILD
-        COMMAND msgmerge -N -o ${po_file} ${po_file} "${BBL_L18N_DIR}/OrcaSlicer.pot"
-        DEPENDS ${po_file}
+            #         TARGET gettext_merge_po_with_pot PRE_BUILD
+            COMMAND msgmerge -N -o ${po_file} ${po_file} "${BBL_L18N_DIR}/OrcaSlicer.pot"
+            DEPENDS ${po_file}
     )
 endforeach()
 
@@ -235,12 +253,12 @@ if (SLIC3R_FHS)
     # CMAKE_INSTALL_FULL_DATAROOTDIR: read-only architecture-independent data root (share)
     set(SLIC3R_FHS_RESOURCES "${CMAKE_INSTALL_FULL_DATAROOTDIR}/OrcaSlicer")
     install(DIRECTORY ${SLIC3R_RESOURCES_DIR}/ DESTINATION ${SLIC3R_FHS_RESOURCES}
-        PATTERN "*/udev" EXCLUDE
+            PATTERN "*/udev" EXCLUDE
     )
     install(FILES src/platform/unix/OrcaSlicer.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
     foreach(SIZE 32 128 192)
         install(FILES ${SLIC3R_RESOURCES_DIR}/images/OrcaSlicer_${SIZE}px.png
-            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/${SIZE}x${SIZE}/apps RENAME OrcaSlicer.png
+                DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/${SIZE}x${SIZE}/apps RENAME OrcaSlicer.png
         )
     endforeach()
 else ()
@@ -259,5 +277,4 @@ set (CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/SoftFever/OrcaSlicer")
 set (CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
 set (CPACK_PACKAGE_CHECKSUM SHA256)
 set(CPACK_PACKAGE_EXECUTABLES "orca-slicer;OrcaSlicer")
-
 
