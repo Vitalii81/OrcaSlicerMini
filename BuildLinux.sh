@@ -60,11 +60,13 @@ source ./linux.d/${DISTRIBUTION}
 
 if [[ -n "${BUILD_DEPS}" ]]
 then
-
+    set +e
     sudo apt install m4 -y
     sudo apt install texinfo -y
     sudo apt install autoconf automake libtool -y
-    sudo apt-get install libnoise-dev - y
+    sudo apt-get install libnoise-dev -y
+    set -e
+
 # The following commands run without sudo (as regular user)
     echo "Configuring dependencies..."
     BUILD_ARGS="-DDEP_WX_GTK3=OFF"
