@@ -1,11 +1,29 @@
-# Ігнорування папок
-/CMakeFiles/
-/.cache/
-/build/
-/3dModel/
-/src/deps/
+# CMake cache and generated files
+**/CMakeFiles*/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
+# IDE or internal caches
+.cache/
+
+# Build directories
+**/build*/
+cmake-build-*/
+
+# Temporary models
+3dModel/cube/
+
+# Local dependency builds
+deps/build/
+deps/DL_CACHE/
+
+# Compiler output files
 *.d
 *.out
-/cmake-build-debug/
-/cmake-build-release/
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
