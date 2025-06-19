@@ -4,4 +4,5 @@
 cd "$(dirname "$0")"
 
 # Запуск виконуваного файлу з абсолютним шляхом
-./cmake-build-release/src/orca-slicer "$@"
+./build/src/orca-slicer "$@"
+#./cmake-build-release/src/orca-slicer "$@"
