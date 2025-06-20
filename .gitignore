@@ -30,3 +30,5 @@ deps/DL_CACHE/
 *.exe
 .idea/
 
+!src/build-utils/
+!src/build-utils/*
