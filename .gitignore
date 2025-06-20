@@ -21,7 +21,6 @@ deps/build/
 deps/DL_CACHE/
 
 # Compiler output files
-*.d
 *.out
 *.o
 *.obj
@@ -30,3 +29,4 @@ deps/DL_CACHE/
 *.dll
 *.exe
 .idea/
+
