@@ -24,6 +24,9 @@ Ensure all required dependencies are built first:
 ./BuildLinux.sh -dc    # Build deps in Release mode
 ```
 
+On a fresh Linux installation, you may also need to install minimal system packages:
+./install_min_sys_deps.sh
+
 Then build the application:
 
 ```bash

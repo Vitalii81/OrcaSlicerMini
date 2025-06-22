@@ -30,6 +30,8 @@ deps/DL_CACHE/
 *.exe
 .idea/
 
+*.log
+
 !src/build-utils/
 !src/build-utils/*
 
