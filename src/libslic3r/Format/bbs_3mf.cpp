@@ -1499,11 +1499,11 @@ namespace Slic3r {
             plate->pattern_bbox_file = it->second->pattern_bbox_file.empty();
             plate->config = it->second->config;
 
-            if (!plate->thumbnail_file.empty())
-                _extract_from_archive(archive, plate->thumbnail_file, [&pixels = plate_data_list[it->first - 1]->plate_thumbnail.pixels](auto &archive, auto const &stat) -> bool {
-                    pixels.resize(stat.m_uncomp_size);
-                    return mz_zip_reader_extract_to_mem(&archive, stat.m_file_index, pixels.data(), pixels.size(), 0);
-                });
+            // if (!plate->thumbnail_file.empty())
+            //     _extract_from_archive(archive, plate->thumbnail_file, [&pixels = plate_data_list[it->first - 1]->plate_thumbnail.pixels](auto &archive, auto const &stat) -> bool {
+            //         pixels.resize(stat.m_uncomp_size);
+            //         return mz_zip_reader_extract_to_mem(&archive, stat.m_file_index, pixels.data(), pixels.size(), 0);
+            //     });
 
             BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ":" << __LINE__ << boost::format(", plate %1%, thumbnail_file=%2%, no_light_thumbnail_file=%3%")%it->first %plate->thumbnail_file %plate->no_light_thumbnail_file;
             BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << ":" << __LINE__ << boost::format(", top_thumbnail_file=%1%, pick_thumbnail_file=%2%")%plate->top_file %plate->pick_file;
@@ -5493,21 +5493,6 @@ namespace Slic3r {
             }
         };
 
-        //BBS: change volume to seperate objects
-        /*struct Offsets
-        {
-            unsigned int first_vertex_id;
-            unsigned int first_triangle_id;
-            unsigned int last_triangle_id;
-
-            Offsets(unsigned int first_vertex_id)
-                : first_vertex_id(first_vertex_id)
-                , first_triangle_id(-1)
-                , last_triangle_id(-1)
-            {
-            }
-        };*/
-
         //typedef std::map<const ModelVolume*, Offsets> VolumeToOffsetsMap;
         typedef std::map<const ModelVolume*, int> VolumeToObjectIDMap;
 
@@ -5551,20 +5536,6 @@ namespace Slic3r {
         static void add_transformation(std::stringstream &stream, const Transform3d &tr);
 
     private:
-        //BBS: add plate data related logic
-        bool _save_model_to_file(const std::string& filename,
-            Model& model, PlateDataPtrs& plate_data_list,
-            std::vector<Preset*>& project_presets,
-            const DynamicPrintConfig* config,
-            const std::vector<ThumbnailData*>& thumbnail_data,
-            const std::vector<ThumbnailData *>& no_light_thumbnail_data,
-            const std::vector<ThumbnailData*>& top_thumbnail_data,
-            const std::vector<ThumbnailData*>& pick_thumbnail_data,
-            Export3mfProgressFn proFn,
-            const std::vector<ThumbnailData*>& calibration_data,
-            const std::vector<PlateBBoxData*>& id_bboxes,
-            BBLProject* project = nullptr,
-            int export_plate_idx = -1);
 
         bool _add_file_to_archive(mz_zip_archive& archive, const std::string & path_in_zip, const std::string & file_path);
 
@@ -5572,7 +5543,7 @@ namespace Slic3r {
 
         bool _add_thumbnail_file_to_archive(mz_zip_archive& archive, const ThumbnailData& thumbnail_data, const char* local_path, int index, bool generate_small_thumbnail = false);
         bool _add_calibration_file_to_archive(mz_zip_archive& archive, const ThumbnailData& thumbnail_data, int index);
-        bool _add_bbox_file_to_archive(mz_zip_archive& archive, const PlateBBoxData& id_bboxes, int index);
+       // bool _add_bbox_file_to_archive(mz_zip_archive& archive, const PlateBBoxData& id_bboxes, int index);
         bool _add_relationships_file_to_archive(mz_zip_archive &                archive,
                                                 std::string const &             from    = {},
                                                 std::vector<std::string> const &targets = {},

@@ -2,7 +2,7 @@
 #define BBS_3MF_hpp_
 #include <boost/thread.hpp>
 
-#include "../GCode/ThumbnailData.hpp"
+//#include "../GCode/ThumbnailData.hpp"
 //#include "libslic3r/ProjectTask.hpp"
 //#include "libslic3r/GCode/GCodeProcessor.hpp"
 #include <functional>
@@ -78,7 +78,7 @@ struct PlateData
     std::string     gcode_file_md5;
     std::string     thumbnail_file;
     std::string     no_light_thumbnail_file;
-    ThumbnailData   plate_thumbnail;
+   // ThumbnailData   plate_thumbnail;
     std::string     top_file;
     std::string     pick_file;
     //ThumbnailData   pattern_thumbnail;
@@ -226,7 +226,7 @@ struct StoreParams
     std::vector<ThumbnailData*> calibration_thumbnail_data;
     SaveStrategy strategy = SaveStrategy::Zip64;
     Export3mfProgressFn proFn = nullptr;
-    std::vector<PlateBBoxData*> id_bboxes;
+   // std::vector<PlateBBoxData*> id_bboxes;
     //BBLProject* project = nullptr;
     //BBLProfile* profile = nullptr;
 

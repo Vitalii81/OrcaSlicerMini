@@ -5,7 +5,7 @@
 #include "../LocalesUtils.hpp"
 //#include "../GCode.hpp"
 #include "../Geometry.hpp"
-#include "../GCode/ThumbnailData.hpp"
+//#include "../GCode/ThumbnailData.hpp"
 #include "../Semver.hpp"
 #include "../Time.hpp"
 
@@ -2322,126 +2322,7 @@ ModelVolumeType type_from_string(const std::string &s)
         clear_errors();
         m_fullpath_sources = fullpath_sources;
         m_zip64 = zip64;
-        return _save_model_to_file(filename, model, config, thumbnail_data);
-    }
-
-    bool _3MF_Exporter::_save_model_to_file(const std::string& filename, Model& model, const DynamicPrintConfig* config, const ThumbnailData* thumbnail_data)
-    {
-        mz_zip_archive archive;
-        mz_zip_zero_struct(&archive);
-
-        if (!open_zip_writer(&archive, filename)) {
-            add_error("Unable to open the file");
-            return false;
-        }
-
-        // Adds content types file ("[Content_Types].xml";).
-        // The content of this file is the same for each PrusaSlicer 3mf.
-        if (!_add_content_types_file_to_archive(archive)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        if (thumbnail_data != nullptr && thumbnail_data->is_valid()) {
-            // Adds the file Metadata/thumbnail.png.
-            if (!_add_thumbnail_file_to_archive(archive, *thumbnail_data)) {
-                close_zip_writer(&archive);
-                boost::filesystem::remove(filename);
-                return false;
-            }
-        }
-
-        // Adds relationships file ("_rels/.rels").
-        // The content of this file is the same for each PrusaSlicer 3mf.
-        // The relationshis file contains a reference to the geometry file "3D/3dmodel.model", the name was chosen to be compatible with CURA.
-        if (!_add_relationships_file_to_archive(archive)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        // Adds model file ("3D/3dmodel.model").
-        // This is the one and only file that contains all the geometry (vertices and triangles) of all ModelVolumes.
-        IdToObjectDataMap objects_data;
-        if (!_add_model_file_to_archive(filename, archive, model, objects_data)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        // Adds layer height profile file ("Metadata/Slic3r_PE_layer_heights_profile.txt").
-        // All layer height profiles of all ModelObjects are stored here, indexed by 1 based index of the ModelObject in Model.
-        // The index differes from the index of an object ID of an object instance of a 3MF file!
-        if (!_add_layer_height_profile_file_to_archive(archive, model)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        // Adds layer config ranges file ("Metadata/Slic3r_PE_layer_config_ranges.txt").
-        // All layer height profiles of all ModelObjects are stored here, indexed by 1 based index of the ModelObject in Model.
-        // The index differes from the index of an object ID of an object instance of a 3MF file!
-        if (!_add_layer_config_ranges_file_to_archive(archive, model)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        // Adds sla support points file ("Metadata/Slic3r_PE_sla_support_points.txt").
-        // All  sla support points of all ModelObjects are stored here, indexed by 1 based index of the ModelObject in Model.
-        // The index differes from the index of an object ID of an object instance of a 3MF file!
-        if (!_add_sla_support_points_file_to_archive(archive, model)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        if (!_add_sla_drain_holes_file_to_archive(archive, model)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-
-        // Adds custom gcode per height file ("Metadata/Prusa_Slicer_custom_gcode_per_print_z.xml").
-        // All custom gcode per height of whole Model are stored here
-        if (!_add_custom_gcode_per_print_z_file_to_archive(archive, model, config)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        // Adds slic3r print config file ("Metadata/Slic3r_PE.config").
-        // This file contains the content of FullPrintConfig / SLAFullPrintConfig.
-        if (config != nullptr) {
-            if (!_add_print_config_file_to_archive(archive, *config)) {
-                close_zip_writer(&archive);
-                boost::filesystem::remove(filename);
-                return false;
-            }
-        }
-
-        // Adds slic3r model config file ("Metadata/Slic3r_PE_model.config").
-        // This file contains all the attributes of all ModelObjects and their ModelVolumes (names, parameter overrides).
-        // As there is just a single Indexed Triangle Set data stored per ModelObject, offsets of volumes into their respective Indexed Triangle Set data
-        // is stored here as well.
-        if (!_add_model_config_file_to_archive(archive, model, objects_data)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            return false;
-        }
-
-        if (!mz_zip_writer_finalize_archive(&archive)) {
-            close_zip_writer(&archive);
-            boost::filesystem::remove(filename);
-            add_error("Unable to finalize the archive");
-            return false;
-        }
-
-        close_zip_writer(&archive);
-
-        return true;
+        return false;//_save_model_to_file(filename, model, config, thumbnail_data);
     }
 
     bool _3MF_Exporter::_add_content_types_file_to_archive(mz_zip_archive& archive)
@@ -2469,11 +2350,11 @@ ModelVolumeType type_from_string(const std::string &s)
         bool res = false;
 
         size_t png_size = 0;
-        void* png_data = tdefl_write_image_to_png_file_in_memory_ex((const void*)thumbnail_data.pixels.data(), thumbnail_data.width, thumbnail_data.height, 4, &png_size, MZ_DEFAULT_LEVEL, 1);
-        if (png_data != nullptr) {
-            res = mz_zip_writer_add_mem(&archive, THUMBNAIL_FILE.c_str(), (const void*)png_data, png_size, MZ_DEFAULT_COMPRESSION);
-            mz_free(png_data);
-        }
+        // void* png_data = tdefl_write_image_to_png_file_in_memory_ex((const void*)thumbnail_data.pixels.data(), thumbnail_data.width, thumbnail_data.height, 4, &png_size, MZ_DEFAULT_LEVEL, 1);
+        // if (png_data != nullptr) {
+        //     res = mz_zip_writer_add_mem(&archive, THUMBNAIL_FILE.c_str(), (const void*)png_data, png_size, MZ_DEFAULT_COMPRESSION);
+        //     mz_free(png_data);
+        // }
 
         if (!res)
             add_error("Unable to add thumbnail file to archive");

@@ -68,8 +68,6 @@ set(lisbslic3r_sources
         Format/ZipperArchiveImport.hpp # ZIP archive import
         Format/ZipperArchiveImport.cpp
 
-        GCode/ThumbnailData.cpp # Preview thumbnail generation
-        GCode/ThumbnailData.hpp
         Geometry.cpp            # Geometric operations
         Geometry.hpp
         Geometry/Bicubic.hpp    # Bicubic interpolation
@@ -183,7 +181,7 @@ set(lisbslic3r_sources
         Execution/Execution.hpp         # Execution interface
         Execution/ExecutionSeq.hpp      # Sequential execution
         Execution/ExecutionTBB.hpp      # Parallel execution
-        GCode/Thumbnails.cpp            # Thumbnails in GCode
+
 )
 
 add_library(libslic3r STATIC ${lisbslic3r_sources}
@@ -199,7 +197,7 @@ set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
 cmake_policy(PUSH)
 cmake_policy(SET CMP0011 NEW)
 find_package(CGAL REQUIRED)
-find_package(JPEG REQUIRED)
+#find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 cmake_policy(POP)
 
@@ -287,7 +285,7 @@ target_link_libraries(libslic3r
         ${OCCT_LIBS}
         Clipper2
         mcut
-        JPEG::JPEG
+        #JPEG::JPEG
         noise
         freetype
         fontconfig

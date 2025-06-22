@@ -60,16 +60,21 @@ source ./linux.d/${DISTRIBUTION}
 
 if [[ -n "${BUILD_DEPS}" ]]
 then
-    set +e
-    sudo apt install m4 -y
-    sudo apt install texinfo -y
-    sudo apt install autoconf automake libtool -y
-    sudo apt-get install libnoise-dev -y
-    set -e
 
 # The following commands run without sudo (as regular user)
     echo "Configuring dependencies..."
-    BUILD_ARGS="-DDEP_WX_GTK3=OFF"
+    BUILD_ARGS="-DDEP_WX_GTK3=OFF \
+    -DOCCT_BUILD_MODULE_Draw=OFF \
+    -DOCCT_BUILD_MODULE_Visualization=OFF \
+    -DOCCT_BUILD_MODULE_TKOpenGl=OFF \
+    -DOCCT_BUILD_MODULE_TKXw=OFF \
+    -DOCCT_BUILD_MODULE_TKService=OFF \
+    -DOCCT_BUILD_MODULE_TKIVtk=OFF \
+    -DOCCT_BUILD_MODULE_TKIVtkDraw=OFF \
+    -DOCCT_BUILD_MODULE_ViewerTest=OFF \
+    -DOCCT_BUILD_MODULE_TKV3d=OFF \
+    -DUSE_X11=OFF"
+
     if [[ -n "${CLEAN_BUILD}" ]]
     then
         rm -fr deps/build
@@ -115,9 +120,9 @@ then
     cmake -S . -B build -G Ninja \
         -DCMAKE_PREFIX_PATH="${PWD}/deps/build/destdir/usr/local" \
         -DSLIC3R_STATIC=1 \
-        ${BUILD_ARGS}
+        ${BUILD_ARGS} 2>&1 | tee build_config.log
     echo "done"
     echo "Building OrcaSlicer ..."
-    cmake --build build --target OrcaSlicer
+    cmake --build build --target OrcaSlicer --verbose 2>&1 | tee build.log
     echo "done"
 fi

@@ -4,7 +4,7 @@
 #include "I18N.hpp"
 #include "format.hpp"
 
-#include "GCode/Thumbnails.hpp"
+//#include "GCode/Thumbnails.hpp"
 #include <set>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -6569,15 +6569,15 @@ void PrintConfigDef::handle_legacy_composite(DynamicPrintConfig &config)
         }
 
         std::string thumbnails_str = config.opt_string("thumbnails");
-        auto [thumbnails_list, errors] = GCodeThumbnails::make_and_check_thumbnail_list(thumbnails_str, extention);
+        /*auto [thumbnails_list, errors] = GCodeThumbnails::make_and_check_thumbnail_list(thumbnails_str, extention);
 
         if (errors != enum_bitmask<ThumbnailError>()) {
             std::string error_str = "\n" + Slic3r::format("Invalid value provided for parameter %1%: %2%", "thumbnails", thumbnails_str);
             error_str += GCodeThumbnails::get_error_string(errors);
             throw BadOptionValueException(error_str);
-        }
+        }*/
 
-        if (!thumbnails_list.empty()) {
+        /*if (!thumbnails_list.empty()) {
             const auto& extentions = ConfigOptionEnum<GCodeThumbnailsFormat>::get_enum_names();
             thumbnails_str.clear();
             for (const auto& [ext, size] : thumbnails_list)
@@ -6585,7 +6585,7 @@ void PrintConfigDef::handle_legacy_composite(DynamicPrintConfig &config)
             thumbnails_str.resize(thumbnails_str.length() - 2);
 
             config.set_key_value("thumbnails", new ConfigOptionString(thumbnails_str));
-        }
+        }*/
     }
 
     if (config.has("wiping_volumes_matrix") && !config.has("wiping_volumes_use_custom_matrix")) {
