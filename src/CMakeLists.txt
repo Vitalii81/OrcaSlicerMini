@@ -31,7 +31,7 @@ add_executable(OrcaSlicer OrcaSlicer_cli.cpp OrcaSlicer_cli.hpp)
 target_link_libraries(OrcaSlicer libslic3r cereal::cereal)
 
 # Boost on Raspberry-Pi does not link to pthreads explicitely.
-target_link_libraries(OrcaSlicer ${CMAKE_DL_LIBS} -lstdc++ Threads::Threads pangoft2-1.0)
+target_link_libraries(OrcaSlicer ${CMAKE_DL_LIBS} -lstdc++ Threads::Threads)
 
 # Slic3r binary install target. Default build type is release in case no CMAKE_BUILD_TYPE is provided.
 if( ("${CMAKE_BUILD_TYPE}" STREQUAL "Release") OR ("${CMAKE_BUILD_TYPE}" STREQUAL "") )
