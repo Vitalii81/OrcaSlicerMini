@@ -789,7 +789,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    cout << "--- Started Orca Slicer App ---" << endl;
+    cout << "--- APP Ver: " << USER_VERSION << " Started Orca Slicer App ---" << endl;
 
     if (argc >= 2)
     {

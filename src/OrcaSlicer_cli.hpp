@@ -2,8 +2,9 @@
 #ifndef ORCA_SLICER_CLI_H
 #define ORCA_SLICER_CLI_H
 
+#define USER_VERSION "1.3.0"
+
 #include "libslic3r/Print.hpp"
-#include "libslic3r/TriangleMesh.hpp"
 
 enum TypeFile { TypeSTL, TypeSTEP, Type3MF, TypeOBJ, TypeUnknown };
 

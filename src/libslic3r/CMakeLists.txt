@@ -153,8 +153,6 @@ set(lisbslic3r_sources
         SurfaceCollection.hpp
         SurfaceMesh.hpp         # Surface mesh
         Technologies.hpp        # Print technologies
-        #Tesselate.cpp           # Geometry tessellation
-        #Tesselate.hpp
         TextConfiguration.hpp   # Text configuration
         TriangleMesh.cpp        # Mesh
         TriangleMesh.hpp
@@ -197,8 +195,6 @@ set(CGAL_DO_NOT_WARN_ABOUT_CMAKE_BUILD_TYPE ON CACHE BOOL "" FORCE)
 cmake_policy(PUSH)
 cmake_policy(SET CMP0011 NEW)
 find_package(CGAL REQUIRED)
-#find_package(JPEG REQUIRED)
-find_package(PNG REQUIRED)
 cmake_policy(POP)
 
 add_library(libslic3r_cgal STATIC
@@ -225,7 +221,7 @@ endif()
 
 target_link_libraries(libslic3r_cgal PRIVATE ${_cgal_tgt} libigl mcut boost_libs)
 
-encoding_check(libslic3r)
+#encoding_check(libslic3r)
 
 target_compile_definitions(libslic3r PUBLIC -DUSE_TBB -DTBB_USE_CAPTURED_EXCEPTION=0)
 target_include_directories(libslic3r PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
@@ -265,7 +261,6 @@ set(OCCT_LIBS
 )
 
 target_link_libraries(libslic3r
-
         admesh
         cereal::cereal
         libigl
@@ -273,19 +268,16 @@ target_link_libraries(libslic3r
         boost_libs
         clipper
         ${EXPAT_LIBRARIES}
-        #glu-libtess
         qhull
         semver
         TBB::tbb
         TBB::tbbmalloc
         libslic3r_cgal
         ${CMAKE_DL_LIBS}
-        PNG::PNG
         ZLIB::ZLIB
         ${OCCT_LIBS}
         Clipper2
         mcut
-        #JPEG::JPEG
         noise
         freetype
         fontconfig

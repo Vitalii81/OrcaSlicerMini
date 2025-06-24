@@ -5,6 +5,14 @@ project(OrcaSlicer)
 include(GNUInstallDirs)
 include(CMakeDependentOption)
 
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
+else()
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (default debug)" FORCE)
+endif()
+
+message("-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
 set(LOCAL_DEPS_DIR "${CMAKE_SOURCE_DIR}/deps/build/destdir/usr" CACHE PATH "Directory for local dependencies")
 list(PREPEND CMAKE_PREFIX_PATH "${LOCAL_DEPS_DIR}")
 
@@ -17,8 +25,6 @@ set(GLEW_LIBRARY "${GLEW_ROOT}/lib/libGLEW.a")
 set(GLEW_LIBRARIES "${GLEW_LIBRARY}")
 list(PREPEND CMAKE_PREFIX_PATH "${GLEW_ROOT}/lib/cmake")
 list(PREPEND CMAKE_LIBRARY_PATH "${GLEW_ROOT}/lib")
-
-message(STATUS "Build type selected: ${CMAKE_BUILD_TYPE}")
 
 set(SLIC3R_STATIC_INITIAL 1)
 
@@ -121,7 +127,7 @@ if(SLIC3R_STATIC)
     # Use static boost libraries.
     set(Boost_USE_STATIC_LIBS ON)
     # Use boost libraries linked statically to the C++ runtime.
-    # set(Boost_USE_STATIC_RUNTIME ON)
+    set(Boost_USE_STATIC_RUNTIME ON)
 else()
     add_definitions(-DBOOST_LOG_DYN_LINK)
 endif()
@@ -143,7 +149,7 @@ endif()
 set(TBB_DEBUG 1)
 set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release "")
 find_package(TBB REQUIRED)
-
+find_package(ZLIB REQUIRED)
 ## OPTIONAL packages
 
 # Find eigen3 or use bundled version

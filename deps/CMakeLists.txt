@@ -191,13 +191,7 @@ if(FLATPAK)
     # flatpak bundles some deps with the layer, so attempt to find them first
     # also, yes, this reduces CI by not needing to vendor certain deps
     find_package(ZLIB)
-    find_package(PNG)
     find_package(EXPAT)
-    #find_package(CURL)
-    find_package(JPEG)
-    #find_package(Freetype)
-   # find_package(OpenSSL 1.1...<3.2)
-    #find_package(CURL)
 endif()
 
 set(ZLIB_PKG "")
@@ -205,11 +199,7 @@ if (NOT ZLIB_FOUND)
     include(ZLIB/ZLIB.cmake)
     set(ZLIB_PKG dep_ZLIB)
 endif ()
-set(PNG_PKG "")
-if (NOT PNG_FOUND) 
-    include(PNG/PNG.cmake)
-    set(PNG_PKG dep_PNG)
-endif ()
+
 set(EXPAT_PKG "")
 find_package(EXPAT)
 if (NOT EXPAT_FOUND) 
@@ -252,28 +242,6 @@ if(NOT OPENSSL_FOUND)
     set(OPENSSL_PKG dep_OpenSSL)
 endif()
 
-# we don't want to load a "wrong" openssl whenOpenCV loading curl
-# so, just don't even bother 
-# ...i think this is how it works? change if wrong
-# set(CURL_PKG "")
-# if (NOT OPENSSL_FOUND OR NOT CURL_FOUND)
-#     include(CURL/CURL.cmake)
-#     set(CURL_PKG dep_CURL)
-# endif ()
-
-set(JPEG_PKG "")
-if (NOT JPEG_FOUND)
-    include(JPEG/JPEG.cmake)
-    set(JPEG_PKG dep_JPEG)
-endif()
-
-# flatpak builds wxwidgets separately 
-# set(WXWIDGETS_PKG "")
-# if (NOT FLATPAK)
-#     include(wxWidgets/wxWidgets.cmake)
-#     set(WXWIDGETS_PKG "dep_wxWidgets")
-# endif()
-
 set(FREETYPE_PKG "")
 if(NOT FREETYPE_FOUND)
     include(FREETYPE/FREETYPE.cmake)
@@ -301,21 +269,12 @@ set(_dep_list
     dep_Boost
     dep_TBB
     ${OPENSSL_PKG}
-    #${CURL_PKG}
-    #${WXWIDGETS_PKG}
     dep_Cereal
     dep_NLopt
-    #dep_OpenVDB
-    #dep_OpenCSG
-    #dep_OpenCV
     dep_CGAL
-    #dep_GLFW
     dep_OCCT
-    #${FREETYPE_PKG}
-    ${PNG_PKG}
     ${ZLIB_PKG}
     ${EXPAT_PKG}
-    #dep_libnoise
     )
 
 
