@@ -70,6 +70,12 @@ Show help:
 
 ## Notes
 
+
+* Build type (Debug/Release) **must match** between the IDE and the prebuilt dependencies:
+  * If deps are built in Debug (`./BuildLinux.sh -dbc`), the IDE build must also use Debug
+  * If deps are built in Release (`./BuildLinux.sh -dc`), the IDE build must also use Release
+  * Mismatched build types will result in linker errors (e.g., missing debug symbols or duplicated symbols)
+
 * Uses `stb_image_write` for PNG export (currently commented out)
 * All output directories are created or cleaned automatically
 * Model is recentred vertically to rest on the build plate
