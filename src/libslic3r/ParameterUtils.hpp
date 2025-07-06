@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <cstddef>
 
 namespace Slic3r {
 using LayerPrintSequence = std::pair<std::pair<int, int>, std::vector<int>>;
